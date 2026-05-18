@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.facilitymanager.KiemThuUngDungQuanLy
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 25.13 s -- in com.facilitymanager.KiemThuUngDungQuanLy

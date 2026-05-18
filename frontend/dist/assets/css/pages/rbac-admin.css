@@ -1,0 +1,182 @@
+.rb-admin-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.rb-admin-msg {
+  min-height: 1.25rem;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+.rb-admin-msg.is-error {
+  color: var(--error);
+}
+.rb-admin-msg.is-ok {
+  color: var(--success);
+}
+
+.rb-tree {
+  margin: 0;
+  padding-left: 1.2rem;
+  list-style: disc;
+}
+.rb-tree li {
+  margin: 0.35rem 0;
+}
+.rb-tree label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.rb-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 14, 30, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.rb-overlay.is-open {
+  display: flex;
+}
+
+.rb-modal-card {
+  width: min(640px, 100%);
+  max-height: min(92vh, 720px);
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid rgba(136, 128, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.rb-modal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(148, 140, 255, 0.15);
+}
+
+.rb-modal-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.rb-modal-scroll {
+  padding: 1rem 1.25rem;
+  overflow: auto;
+  flex: 1;
+}
+
+.uuid-pill {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.72rem;
+  word-break: break-all;
+}
+
+/* Cây quyền / menu trong panel — cùng visual language với sidebar */
+.sidebar-tree {
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--sidebar-bg) 0%, var(--sidebar-bg-deep) 100%);
+  color: var(--sidebar-text-strong);
+  padding: 10px 8px;
+  /* Cuộn chỉ ở ô cha (.menu-page-tree hoặc .iv-modal-body) — tránh hai thanh cuộn dọc */
+  overflow: visible;
+}
+
+.sidebar-tree-nav .nav-group {
+  margin-bottom: 4px;
+}
+
+.sidebar-tree-nav .nav-submenu {
+  margin-left: 6px;
+  padding-left: 6px;
+}
+
+.sidebar-tree-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border-radius: 8px;
+}
+
+.sidebar-tree-head.is-selected {
+  background: var(--sidebar-hover);
+}
+
+.sidebar-tree-cb {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary, #2563eb);
+  cursor: pointer;
+}
+
+.sidebar-tree-caret {
+  flex: 0 0 28px;
+  width: 28px;
+  border: none;
+  background: transparent;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.sidebar-tree-caret:hover {
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text-strong);
+}
+
+.sidebar-tree-title-btn {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--sidebar-text);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.sidebar-tree-title-btn:hover {
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text-strong);
+}
+
+.sidebar-tree .nav-subitem--perm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--sidebar-muted);
+}
+
+.sidebar-tree .nav-subitem--perm.is-selected {
+  background: var(--sidebar-active-bg, var(--sidebar-active));
+  color: var(--sidebar-text-strong);
+}
+
+.sidebar-tree .nav-subitem--perm:hover {
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text-strong);
+}

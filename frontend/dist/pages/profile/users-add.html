@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thêm user</title>
+    <link rel="stylesheet" href="../../assets/css/base.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/pages.css" />
+  </head>
+  <body data-required-roles="ADMIN">
+    <div class="app app--with-sidebar">
+      <div id="appSidebar"></div>
+
+      <main class="content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <strong id="topbarRoleText">Administrator</strong>
+          </div>
+          <div class="topbar-right"></div>
+        </header>
+
+        <h1 id="userFormPageTitle" class="page-title" data-i18n="userForm.pageTitle">Quản lý user</h1>
+        <section class="panel modern-panel">
+          <div class="tabs">
+            <a class="tab" href="../profile/users.html" data-i18n="users.tabList">Danh sách</a>
+            <a id="userFormTabLabel" class="tab tab-active" href="../profile/users-add.html" data-i18n="users.tabAdd">Thêm user</a>
+            <button type="button" class="tab" id="userFormExportJsonBtn" data-i18n="toolbar.exportJson">Xuất JSON</button>
+          </div>
+
+          <form id="userForm" class="form-grid modern-form" method="post" action="#" enctype="multipart/form-data">
+            <div class="field">
+              <label data-i18n="userForm.account">Tài khoản</label>
+              <input id="userUsernameInput" name="username" data-i18n-placeholder="userForm.phUsername" placeholder="Tên đăng nhập" />
+            </div>
+            <div class="field">
+              <label data-i18n="userForm.password">Mật khẩu</label>
+              <input id="userPasswordInput" name="password" type="password" data-i18n-placeholder="userForm.phPassword" placeholder="Mật khẩu" />
+            </div>
+            <div class="field form-span-2">
+              <label data-i18n="userForm.fullName">Họ tên</label>
+              <input id="userFullnameInput" name="fullName" data-i18n-placeholder="userForm.phFullName" placeholder="Nguyễn Văn A" />
+            </div>
+            <div class="field form-span-2">
+              <label data-i18n="userForm.address">Địa chỉ</label>
+              <input id="userAddressInput" name="address" data-i18n-placeholder="userForm.phAddress" placeholder="Nhập địa chỉ hiện tại" />
+            </div>
+            <div class="field form-span-2">
+              <label data-i18n="userForm.phone">Số điện thoại</label>
+              <input id="userPhoneInput" name="phoneNumber" data-i18n-placeholder="userForm.phPhone" placeholder="0901234567" />
+            </div>
+            <div class="field form-span-2">
+              <label data-i18n="userForm.role">Chức vụ</label>
+              <select id="userRoleInput" name="role">
+                <option value="" selected disabled data-i18n="userForm.rolePlaceholder">Chọn chức vụ</option>
+                <option>Cán bộ quản lý tài sản</option>
+                <option>Hiệu trưởng</option>
+                <option>Kế toán</option>
+                <option>Giảng viên</option>
+              </select>
+            </div>
+            <div class="field form-span-2">
+              <label data-i18n="userForm.avatar">Ảnh đại diện</label>
+              <div class="avatar-upload">
+                <label class="avatar-preview" id="avatarPreview" for="avatarInput">
+                  <img id="avatarImage" alt="avatar preview" />
+                  <span id="avatarPlaceholder" data-i18n="userForm.pickAvatar">Chọn ảnh đại diện</span>
+                </label>
+                <input id="avatarInput" name="avatar" type="file" accept="image/*" />
+              </div>
+            </div>
+          </form>
+          <div class="actions actions-centered">
+            <button id="userFormSubmitBtn" class="btn btn-primary" type="button" data-i18n="userForm.btnAdd">Thêm</button>
+            <button class="btn btn-success" type="reset" form="userForm" data-i18n="userForm.btnReset">Nhập lại</button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../assets/js/auth/auth.js"></script>
+    <script src="../../assets/js/shared/menu-store.js"></script>
+    <script src="../../assets/js/auth/guard.js"></script>
+    <script src="../../assets/js/shared/sidebar.js"></script>
+    <script src="../../assets/js/shared/i18n-manager.js"></script>
+    <script src="../../assets/js/shared/lang-switcher.js"></script>
+    <script src="../../assets/js/components/navigation.js"></script>
+    <script src="../../assets/js/shared/menu-links.js"></script>
+    <script src="../../assets/js/shared/table-controls.js"></script>
+    <script src="../../assets/js/shared/room-helpers.js"></script>
+    <script src="../../assets/js/shared/user-avatar.js"></script>
+    <script src="../../assets/js/api/giaoDienApi.js"></script>
+    <script src="../../assets/js/shared/export-json.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script>
+      const avatarInput = document.getElementById("avatarInput");
+      const avatarImage = document.getElementById("avatarImage");
+      const avatarPlaceholder = document.getElementById("avatarPlaceholder");
+
+      avatarInput.addEventListener("change", (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        const imageUrl = URL.createObjectURL(file);
+        avatarImage.src = imageUrl;
+        avatarImage.style.display = "block";
+        avatarPlaceholder.style.display = "none";
+      });
+    </script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

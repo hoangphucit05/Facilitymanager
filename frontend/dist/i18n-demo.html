@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>i18n demo — Spring Boot static</title>
+    <link rel="stylesheet" href="./assets/css/base.css" />
+    <link rel="stylesheet" href="./assets/css/layout.css" />
+  </head>
+  <body>
+    <p style="padding: 12px 16px; background: #eef4ff; border-bottom: 1px solid #bfd5ff; margin: 0">
+      Demo served from <code>src/main/resources/static</code> (or Live Server at frontend root). JSON:
+      <code>./i18n/{vi,en,ja}.json</code>
+    </p>
+
+    <header class="topbar" style="margin: 16px">
+      <div class="topbar-left">
+        <strong id="topbarRoleText" data-i18n="nav.roleAdministrator">Administrator</strong>
+      </div>
+      <div class="topbar-right"></div>
+    </header>
+
+    <main style="max-width: 960px; margin: 0 auto; padding: 0 16px 48px">
+      <section class="panel" style="margin-bottom: 16px">
+        <h1 data-i18n="dashboard.modulesTitle">Module thường dùng</h1>
+        <p data-i18n="forms.requiredHint">Các trường có dấu * là bắt buộc</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px">
+          <button type="button" class="fm-lang-btn" data-lang="vi" style="padding: 8px 14px">VN</button>
+          <button type="button" class="fm-lang-btn" data-lang="en" style="padding: 8px 14px">EN</button>
+          <button type="button" class="fm-lang-btn" data-lang="ja" style="padding: 8px 14px">JP</button>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-bottom: 16px">
+        <h2>Form</h2>
+        <form style="display: grid; gap: 10px; max-width: 420px" onsubmit="return false">
+          <label>
+            <span data-i18n="forms.username">Username</span>
+            <input name="u" data-i18n-placeholder="forms.username" placeholder="" />
+          </label>
+          <label>
+            <span data-i18n="forms.email">Email</span>
+            <input name="e" type="email" data-i18n-placeholder="forms.email" placeholder="" />
+          </label>
+          <button type="submit" data-i18n="buttons.save">Lưu</button>
+        </form>
+      </section>
+
+      <section class="panel" style="margin-bottom: 16px">
+        <h2>Table</h2>
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="table.users.id">ID</th>
+              <th data-i18n="table.users.username">Username</th>
+              <th data-i18n="table.users.fullname">Fullname</th>
+              <th data-i18n="table.users.actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>demo</td>
+              <td>Demo User</td>
+              <td><button type="button" data-i18n="buttons.edit">Sửa</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>Validation (JS)</h2>
+        <p id="validationDemo" style="color: #b3261e"></p>
+        <button type="button" id="runValidationDemo" data-i18n="buttons.search">Tìm kiếm</button>
+      </section>
+    </main>
+
+    <script>
+      window.MenuStore = window.MenuStore || { depthFromFrontendRoot: function () { return 0; } };
+    </script>
+    <script src="./assets/js/shared/i18n-manager.js"></script>
+    <script>
+      void window.FmI18n.init().catch(function (err) {
+        console.error("FmI18n.init", err);
+      });
+      document.querySelectorAll(".fm-lang-btn[data-lang]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var lang = btn.getAttribute("data-lang");
+          localStorage.setItem("fm_ui_lang", lang);
+          window.dispatchEvent(new CustomEvent("fm-lang-change", { detail: { lang: lang, furiganaOn: true } }));
+        });
+      });
+      document.getElementById("runValidationDemo").addEventListener("click", function () {
+        var msg = window.FmI18n.validation("minLength", { min: 8 });
+        document.getElementById("validationDemo").textContent = msg;
+      });
+    </script>
+  </body>
+</html>

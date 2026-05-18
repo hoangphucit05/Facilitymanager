@@ -1,0 +1,420 @@
+{
+  "meta": { "locale": "en", "label": "English" },
+  "sidebar": {
+    "brand": "FM",
+    "welcome": "Hello,",
+    "home": "Home",
+    "logout": "Log out",
+    "loading": "Loading menu…",
+    "emptyMenu": "No menu items.",
+    "menuError": "Could not load menu.",
+    "retry": "Retry"
+  },
+  "menu": {
+    "users": "Users",
+    "buildings": "Buildings",
+    "building": "Buildings",
+    "categories": "Categories",
+    "assets": "Assets",
+    "statistics": "Statistics",
+    "liquidation": "Disposal / transfer",
+    "contact": "Contacts",
+    "rbac": "Access control",
+    "students": "Students",
+    "manageUsers": "User management",
+    "manageCategoriesPage": "Category management",
+    "manageAssetsPage": "Asset management",
+    "manageRoles": "Role management",
+    "studentCreateRequest": "Create request",
+    "studentSent": "Submitted requests",
+    "studentDrafts": "Saved requests",
+    "buildingNamed": "Building {{name}}",
+    "buildingRoomList": "Building / room list",
+    "venueLectureHall": "Multi-purpose lecture hall",
+    "venueCanteen": "Canteen"
+  },
+  "departments": {
+    "pageTitle": "Building management",
+    "buildingNavAria": "Select building",
+    "allRooms": "All rooms",
+    "addRoom": "Add room",
+    "searchPlaceholder": "Search",
+    "searchAllBuildings": "Search all buildings",
+    "colBuilding": "Building",
+    "colRoomCode": "Room ID",
+    "colFloor": "Floor",
+    "colClassUsing": "Class in use",
+    "colCapacity": "Capacity",
+    "colStatus": "Status",
+    "colActions": "Actions",
+    "viewRoom": "View room details",
+    "updateRoom": "Update room",
+    "deleteRoom": "Delete room",
+    "confirmDeleteRoom": "Delete room {{code}} from the list?",
+    "deleteRoomFailed": "Failed to delete room on the server."
+  },
+  "nav": {
+    "language": "Choose language",
+    "furiganaShow": "Show furigana",
+    "furiganaHide": "Hide furigana",
+    "roleAdministrator": "Administrator",
+    "roleStudent": "Student"
+  },
+  "pager": {
+    "previous": "Previous",
+    "next": "Next",
+    "showPageOf": "Showing {{current}} of {{total}} pages"
+  },
+  "toolbar": {
+    "showRows": "Show",
+    "exportJson": "Export JSON"
+  },
+  "rbacRoles": {
+    "pageTitle": "Role management",
+    "searchNamePlaceholder": "Role name",
+    "searchDescPlaceholder": "Role description",
+    "search": "Search",
+    "add": "Add role",
+    "colOrdinal": "#",
+    "colName": "Role name",
+    "colNote": "Notes",
+    "colCreatedAt": "Created at",
+    "colCreatedBy": "Created by",
+    "colUpdatedAt": "Updated at",
+    "colUpdatedBy": "Last updated by",
+    "colActions": "Actions",
+    "loading": "Loading data…",
+    "empty": "No data",
+    "loadError": "Could not load roles.",
+    "pagerTotalPrefix": "Total",
+    "perPageSuffix": "/page",
+    "actionMenuPerm": "Menu permissions",
+    "actionEdit": "Edit",
+    "actionDelete": "Delete",
+    "modalAddTitle": "Add role",
+    "modalEditTitle": "Edit role",
+    "modalCancel": "Cancel",
+    "modalSaveRole": "Save role",
+    "permTitleSuffix": "— Assign menu permissions",
+    "permLoading": "Loading permission tree…",
+    "permSave": "Save menu permissions",
+    "labelName": "Role name",
+    "labelNote": "Notes",
+    "namePlaceholder": "Display name or ROLE_... code (A–Z, 0–9, _)"
+  },
+  "users": {
+    "pageTitle": "User management",
+    "tabList": "List",
+    "tabAdd": "Add user"
+  },
+  "userForm": {
+    "pageTitle": "User management",
+    "account": "Account",
+    "password": "Password",
+    "fullName": "Full name",
+    "address": "Address",
+    "phone": "Phone",
+    "role": "Role",
+    "avatar": "Avatar",
+    "pickAvatar": "Choose avatar",
+    "rolePlaceholder": "Select a role",
+    "phUsername": "Login name",
+    "phPassword": "Password",
+    "phFullName": "John Doe",
+    "phAddress": "Current address",
+    "phPhone": "0901234567",
+    "btnAdd": "Add",
+    "btnReset": "Reset",
+    "roleAssetStaff": "Asset officer",
+    "rolePrincipal": "Principal",
+    "roleAccountant": "Accountant",
+    "roleLecturer": "Lecturer"
+  },
+  "contact": {
+    "backToList": "Back to list"
+  },
+  "assets": {
+    "back": "Back",
+    "pageTitle": "Asset management",
+    "pageRating": "Rate assets",
+    "pageReRating": "Re-rate assets",
+    "tabList": "All assets",
+    "tabDetail": "Add asset",
+    "tabTransfer": "Transfer",
+    "detailHeading": "Add asset",
+    "detailLead": "Enter new asset information."
+  },
+  "common": {
+    "loadingData": "Loading data…",
+    "shortcutEmpty": "Not added"
+  },
+  "home": {
+    "shortcuts": {
+      "assets": "Assets",
+      "categories": "Categories",
+      "statistics": "Statistics",
+      "building": "Buildings",
+      "liquidation": "Disposal / transfer",
+      "users": "Users"
+    }
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "submit": "Submit",
+    "retry": "Retry",
+    "close": "Close"
+  },
+  "forms": {
+    "username": "Username",
+    "password": "Password",
+    "email": "Email",
+    "fullName": "Full name",
+    "phone": "Phone number",
+    "rememberMe": "Remember me",
+    "requiredHint": "Fields marked * are required"
+  },
+  "dashboard": {
+    "modulesTitle": "Frequently used modules",
+    "homeGreeting": "Hello",
+    "taskPending": "Pending tasks",
+    "taskOpen": "Open tasks",
+    "taskMine": "My tasks",
+    "cardAssetsTitle": "Assets",
+    "cardAssetsSubtitle": "List & create",
+    "statsOverview": "Statistics overview"
+  },
+  "table": {
+    "users": {
+      "id": "ID",
+      "username": "Username",
+      "fullname": "Full name",
+      "status": "Status",
+      "role": "Role",
+      "avatar": "Avatar",
+      "actions": "Actions"
+    },
+    "assets": {
+      "code": "Tag number",
+      "name": "Name",
+      "unitPrice": "Unit price",
+      "category": "Category",
+      "quantity": "Quantity",
+      "unit": "Unit / class",
+      "buyer": "Buyer",
+      "status": "Status",
+      "rating": "Rating",
+      "actions": "Actions"
+    }
+  },
+  "categories": {
+    "searchPlaceholder": "Search",
+    "budgetSelectPlaceholder": "-- Select funding type --",
+    "validationRequired": "Please enter a category name.",
+    "validationExtraMoney": "Please enter a valid amount.",
+    "confirmDelete": "Delete category \"{{name}}\"?",
+    "deleteServerFail": "Could not delete category on the server.",
+    "successUpdateAlert": "Category updated successfully.",
+    "actions": {
+      "updateTitle": "Update",
+      "deleteTitle": "Delete"
+    },
+    "edit": {
+      "titlePrefix": "Update category",
+      "scopeLabel": "Scope:",
+      "save": "Update",
+      "cancel": "Cancel",
+      "fieldFallback": "Field {{n}}"
+    },
+    "views": {
+      "default": {
+        "title": "Asset category management",
+        "listTab": "All categories",
+        "addTab": "Add category",
+        "extraTab": "Extra",
+        "nameLabel": "Category name",
+        "codeLabel": "Category code",
+        "namePlaceholder": "Enter category name",
+        "codePlaceholder": "e.g. MM-TB",
+        "extraNameLabel": "Add budget",
+        "extraCodeLabel": "Funding type",
+        "extraNamePlaceholder": "Enter amount to add",
+        "submitBtn": "Add",
+        "resetBtn": "Reset",
+        "columns": {
+          "0": "ID",
+          "1": "Category code",
+          "2": "Category name",
+          "3": "Actions"
+        }
+      },
+      "may_moc_thiet_bi": {
+        "title": "Machinery & equipment categories",
+        "listTab": "Machinery & equipment",
+        "addTab": "Add machinery & equipment",
+        "extraTab": "Extra",
+        "nameLabel": "Name",
+        "codeLabel": "Code",
+        "namePlaceholder": "Enter name",
+        "codePlaceholder": "e.g. MM-01",
+        "extraNameLabel": "Add budget",
+        "extraCodeLabel": "Funding type",
+        "extraNamePlaceholder": "Enter amount to add",
+        "submitBtn": "Add",
+        "resetBtn": "Reset",
+        "columns": {
+          "0": "ID",
+          "1": "Code",
+          "2": "Name",
+          "3": "Actions"
+        }
+      },
+      "cong_cu_dung_cu": {
+        "title": "Tools & instruments categories",
+        "listTab": "Tools & instruments",
+        "addTab": "Add tools & instruments",
+        "extraTab": "Extra",
+        "nameLabel": "Name",
+        "codeLabel": "Code",
+        "namePlaceholder": "Enter name",
+        "codePlaceholder": "e.g. CC-01",
+        "extraNameLabel": "Add budget",
+        "extraCodeLabel": "Funding type",
+        "extraNamePlaceholder": "Enter amount to add",
+        "submitBtn": "Add",
+        "resetBtn": "Reset",
+        "columns": {
+          "0": "ID",
+          "1": "Code",
+          "2": "Name",
+          "3": "Actions"
+        }
+      },
+      "nguon_kinh_phi": {
+        "title": "Funding source management",
+        "listTab": "Funding sources",
+        "addTab": "Add funding source",
+        "extraTab": "Supplement funding source",
+        "nameLabel": "Funding source name",
+        "codeLabel": "Funding source code",
+        "namePlaceholder": "Enter funding source name",
+        "codePlaceholder": "Enter funding source code",
+        "extraNameLabel": "Add budget",
+        "extraCodeLabel": "Funding type",
+        "extraNamePlaceholder": "Enter amount to add",
+        "submitBtn": "Add",
+        "resetBtn": "Reset",
+        "columns": {
+          "0": "ID",
+          "1": "FS code",
+          "2": "Funding source name",
+          "3": "Total budget",
+          "4": "Total spent",
+          "5": "Total disposed",
+          "6": "Remaining",
+          "7": "Actions"
+        }
+      },
+      "nha_cung_cap": {
+        "title": "Supplier management",
+        "listTab": "All suppliers",
+        "addTab": "Add supplier",
+        "extraTab": "Extra",
+        "nameLabel": "Supplier name",
+        "codeLabel": "Supplier code",
+        "namePlaceholder": "Enter supplier name",
+        "codePlaceholder": "Enter supplier code",
+        "extraNameLabel": "Add budget",
+        "extraCodeLabel": "Funding type",
+        "extraNamePlaceholder": "Enter amount to add",
+        "submitBtn": "Add",
+        "resetBtn": "Reset",
+        "columns": {
+          "0": "ID",
+          "1": "Supplier code",
+          "2": "Supplier name",
+          "3": "Address",
+          "4": "Email",
+          "5": "Phone",
+          "6": "Actions"
+        }
+      },
+      "nuoc": {
+        "title": "Country management",
+        "listTab": "Countries",
+        "addTab": "Add country",
+        "extraTab": "Extra",
+        "nameLabel": "Country name",
+        "codeLabel": "Country code",
+        "namePlaceholder": "Enter country name",
+        "codePlaceholder": "Enter country code",
+        "extraNameLabel": "Add budget",
+        "extraCodeLabel": "Funding type",
+        "extraNamePlaceholder": "Enter amount to add",
+        "submitBtn": "Add",
+        "resetBtn": "Reset",
+        "columns": {
+          "0": "ID",
+          "1": "Country code",
+          "2": "Country name",
+          "3": "Actions"
+        }
+      }
+    }
+  },
+  "studentRequests": {
+    "create": {
+      "pageTitle": "CREATE REQUEST",
+      "documentTitle": "Create request",
+      "uploadHint": "Tap to take a photo or record a video",
+      "uploadAlt": "Attachment preview",
+      "optManagerGroupEmpty": "Management group",
+      "optStatusEmpty": "Status",
+      "optEquipment": "Equipment",
+      "statusUrgent": "Urgent",
+      "statusNormal": "Normal",
+      "statusWatch": "Watch",
+      "phManagerName": "Manager name",
+      "phTitle": "Title: Enter title…",
+      "noteLabel": "Note",
+      "noteCounter": "{{n}}/250",
+      "phNote": "Enter note",
+      "saveDraft": "Save draft",
+      "sendNow": "Send now",
+      "filePicked": "Selected: {{name}}",
+      "backAria": "Back"
+    },
+    "sent": {
+      "pageTitle": "SENT REQUESTS",
+      "documentTitle": "Sent requests",
+      "empty": "No requests yet"
+    },
+    "drafts": {
+      "pageTitle": "SAVED REQUESTS",
+      "documentTitle": "Saved requests",
+      "empty": "No draft requests saved"
+    },
+    "list": {
+      "managerGroup": "Management group",
+      "status": "Status",
+      "time": "Time",
+      "noTitle": "(No title)"
+    },
+    "alerts": {
+      "draftNeedContent": "Enter a title or note before saving a draft.",
+      "sendNeedTitleNote": "Please enter both title and note before sending."
+    }
+  },
+  "validation": {
+    "required": "This field is required.",
+    "email": "Invalid email address.",
+    "minLength": "At least {{min}} characters.",
+    "maxLength": "At most {{max}} characters.",
+    "number": "Please enter a valid number.",
+    "server": "The server rejected the request. Try again later."
+  }
+}

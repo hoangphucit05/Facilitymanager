@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý cơ sở vật chất — Trang chủ</title>
+    <link rel="stylesheet" href="./assets/css/base.css" />
+    <link rel="stylesheet" href="./assets/css/layout.css" />
+    <link rel="stylesheet" href="./assets/css/components.css" />
+    <link rel="stylesheet" href="./assets/css/pages.css" />
+  </head>
+  <body data-required-roles="ADMIN,MANAGER,STAFF,STUDENT">
+    <div class="app app--with-sidebar">
+      <div id="appSidebar"></div>
+
+      <main class="content page-home">
+        <header class="topbar">
+          <div class="topbar-left">
+            <strong id="topbarRoleText">Administrator</strong>
+          </div>
+          <div class="topbar-right"></div>
+        </header>
+
+        <section class="panel home-hero">
+          <img class="home-logo" src="./assets/images/a.png" alt="Logo CATEPIE" width="96" height="96" />
+          <div class="home-hero-row">
+            <div class="home-hero-left">
+              <p class="home-greeting"><span data-i18n="dashboard.homeGreeting">Xin chào</span> <span id="homeUserName">—</span></p>
+              <p class="fm-furigana-sample" lang="ja" aria-hidden="true">
+                <ruby>施設<rt>しせつ</rt></ruby>の<ruby>管理<rt>かんり</rt></ruby>
+              </p>
+            </div>
+            <div class="home-hero-time">
+              <span id="homeDate" class="home-date">—</span>
+              <span id="homeClock" class="home-clock">—</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel home-shortcuts-panel">
+          <h2 class="home-section-title" data-i18n="dashboard.modulesTitle">Module thường dùng</h2>
+          <div class="home-modules-layout">
+            <div id="homeShortcutGrid" class="home-shortcut-grid" aria-label="Lối tắt module"></div>
+            <div class="home-modules-divider" aria-hidden="true"></div>
+            <div class="home-task-buttons">
+              <button type="button" class="home-task-btn" data-task="pending">
+                <span class="home-task-icon" aria-hidden="true">&#128203;</span>
+                <span data-i18n="dashboard.taskPending">Việc chờ xử lý</span>
+              </button>
+              <button type="button" class="home-task-btn" data-task="open">
+                <span class="home-task-icon" aria-hidden="true">&#9203;</span>
+                <span data-i18n="dashboard.taskOpen">Việc chưa xong</span>
+              </button>
+              <button type="button" class="home-task-btn" data-task="mine">
+                <span class="home-task-icon" aria-hidden="true">&#128100;</span>
+                <span data-i18n="dashboard.taskMine">Việc tôi phụ trách</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" charset="utf-8"></script>
+    <script src="./assets/js/auth/auth.js" charset="utf-8"></script>
+    <script src="./assets/js/auth/guard.js" charset="utf-8"></script>
+    <script src="./assets/js/shared/menu-store.js" charset="utf-8"></script>
+    <script src="./assets/js/shared/i18n-manager.js" charset="utf-8"></script>
+    <script src="./assets/js/shared/permission.js" charset="utf-8"></script>
+    <script src="./assets/js/shared/sidebar.js" charset="utf-8"></script>
+    <script src="./assets/js/shared/lang-switcher.js" charset="utf-8"></script>
+    <script src="./assets/js/components/navigation.js" charset="utf-8"></script>
+    <script src="./assets/js/shared/menu-links.js" charset="utf-8"></script>
+    <script src="./assets/js/api/giaoDienApi.js" charset="utf-8"></script>
+    <script src="./assets/js/pages/home-page.js" charset="utf-8"></script>
+  </body>
+</html>

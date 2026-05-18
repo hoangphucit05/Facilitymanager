@@ -1,0 +1,234 @@
+/* Captcha lưới ảnh (đăng ký — luôn thất bại) */
+.bug-captcha-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.82);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.bug-captcha-overlay.is-open {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.bug-captcha-box {
+  width: min(420px, 100%);
+  background: #111827;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+}
+
+.bug-captcha-header {
+  background: #2563eb;
+  padding: 16px 18px;
+  color: #fff;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bug-captcha-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.bug-captcha-header-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  opacity: 0.95;
+}
+
+.bug-captcha-header-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.bug-captcha-header h1 {
+  font-size: clamp(2rem, 8vw, 2.75rem);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.bug-captcha-header p {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+
+.bug-captcha-header-text p:first-child {
+  margin-top: 0;
+}
+
+.bug-captcha-skip {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #fff;
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+
+.bug-captcha-skip:hover {
+  opacity: 1;
+}
+
+.bug-captcha-grid {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.bug-captcha-item {
+  position: relative;
+  aspect-ratio: 1.2 / 1;
+  min-height: 86px;
+  overflow: hidden;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #0d1117;
+}
+
+.bug-captcha-tile-bg {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-size: 300% 300%;
+  pointer-events: none;
+}
+
+.bug-captcha-item.is-selected {
+  border-color: #3b82f6;
+}
+
+.bug-captcha-check {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #2563eb;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  color: #fff;
+}
+
+.bug-captcha-item.is-selected .bug-captcha-check {
+  display: flex;
+}
+
+.bug-captcha-actions {
+  padding: 0;
+}
+
+.bug-captcha-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #0d1117;
+  border-top: 1px solid #1f2937;
+}
+
+.bug-captcha-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bug-captcha-icon-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #8b949e;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bug-captcha-icon-btn:hover {
+  color: #e6edf3;
+  background: #21262d;
+}
+
+.bug-captcha-verify-inline {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bug-captcha-verify-inline:hover {
+  background: #1d4ed8;
+}
+
+.bug-captcha-result {
+  text-align: center;
+  padding: 36px 24px;
+  display: none;
+}
+
+.bug-captcha-result.is-visible {
+  display: block;
+}
+
+.bug-captcha-result h2 {
+  margin: 16px 0 0;
+  color: #f87171;
+  font-size: 1.35rem;
+}
+
+.bug-captcha-result .bug-captcha-retry {
+  margin-top: 22px;
+  width: 100%;
+  max-width: 280px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.bug-captcha-result .bug-captcha-retry:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #fff;
+}
+
+.bug-captcha-panel {
+  display: block;
+}
+
+.bug-captcha-panel.is-hidden {
+  display: none;
+}

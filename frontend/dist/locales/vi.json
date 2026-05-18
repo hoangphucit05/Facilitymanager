@@ -1,0 +1,420 @@
+{
+  "meta": { "locale": "vi", "label": "Tiếng Việt" },
+  "sidebar": {
+    "brand": "CSVC",
+    "welcome": "Xin chào,",
+    "home": "Trang chủ",
+    "logout": "Đăng xuất",
+    "loading": "Đang tải menu…",
+    "emptyMenu": "Không có menu.",
+    "menuError": "Không tải được menu.",
+    "retry": "Thử lại"
+  },
+  "menu": {
+    "users": "Người dùng",
+    "buildings": "Tòa nhà",
+    "building": "Tòa nhà",
+    "categories": "Danh mục",
+    "assets": "Tài sản",
+    "statistics": "Thống kê",
+    "liquidation": "Thanh lý / điều chuyển",
+    "contact": "Liên hệ",
+    "rbac": "Phân quyền",
+    "students": "Sinh viên",
+    "manageUsers": "Quản lý user",
+    "manageCategoriesPage": "Quản lý danh mục",
+    "manageAssetsPage": "Quản lý tài sản",
+    "manageRoles": "Quản lý vai trò",
+    "studentCreateRequest": "Tạo yêu cầu xử lý",
+    "studentSent": "Yêu cầu đã gửi",
+    "studentDrafts": "Yêu cầu đã lưu",
+    "buildingNamed": "Tòa nhà {{name}}",
+    "buildingRoomList": "Danh sách tòa / phòng",
+    "venueLectureHall": "Giảng đường Đa Năng",
+    "venueCanteen": "Căn Tin"
+  },
+  "departments": {
+    "pageTitle": "Quản lý tòa nhà",
+    "buildingNavAria": "Chọn tòa nhà",
+    "allRooms": "Tất cả các phòng",
+    "addRoom": "Thêm phòng",
+    "searchPlaceholder": "Tìm kiếm",
+    "searchAllBuildings": "Tìm trên tất cả tòa nhà",
+    "colBuilding": "Tòa nhà",
+    "colRoomCode": "Mã phòng",
+    "colFloor": "Tầng",
+    "colClassUsing": "Lớp đang sử dụng",
+    "colCapacity": "Sức chứa",
+    "colStatus": "Trạng thái",
+    "colActions": "Chức năng",
+    "viewRoom": "Xem chi tiết phòng",
+    "updateRoom": "Cập nhật phòng",
+    "deleteRoom": "Xóa phòng",
+    "confirmDeleteRoom": "Bạn có chắc muốn xóa phòng {{code}} khỏi danh sách?",
+    "deleteRoomFailed": "Xóa phòng trên máy chủ thất bại."
+  },
+  "nav": {
+    "language": "Chọn ngôn ngữ",
+    "furiganaShow": "hiện furigana",
+    "furiganaHide": "ẩn furigana",
+    "roleAdministrator": "Administrator",
+    "roleStudent": "Sinh viên"
+  },
+  "pager": {
+    "previous": "Trước",
+    "next": "Sau",
+    "showPageOf": "Hiển thị {{current}} của {{total}} trang"
+  },
+  "toolbar": {
+    "showRows": "Hiển thị",
+    "exportJson": "Xuất JSON"
+  },
+  "rbacRoles": {
+    "pageTitle": "Quản lý vai trò",
+    "searchNamePlaceholder": "Tên vai trò",
+    "searchDescPlaceholder": "Mô tả vai trò",
+    "search": "Tìm kiếm",
+    "add": "Thêm vai trò",
+    "colOrdinal": "#",
+    "colName": "Tên vai trò",
+    "colNote": "Ghi chú",
+    "colCreatedAt": "Thời gian tạo",
+    "colCreatedBy": "Người tạo",
+    "colUpdatedAt": "Thời gian cập nhật",
+    "colUpdatedBy": "Người cập nhật cuối",
+    "colActions": "Thao tác",
+    "loading": "Đang tải dữ liệu…",
+    "empty": "Không có dữ liệu",
+    "loadError": "Không tải được danh sách vai trò.",
+    "pagerTotalPrefix": "Tổng",
+    "perPageSuffix": "/trang",
+    "actionMenuPerm": "Quyền menu",
+    "actionEdit": "Sửa",
+    "actionDelete": "Xóa",
+    "modalAddTitle": "Thêm vai trò",
+    "modalEditTitle": "Sửa vai trò",
+    "modalCancel": "Hủy",
+    "modalSaveRole": "Lưu vai trò",
+    "permTitleSuffix": "— Gán quyền menu",
+    "permLoading": "Đang tải cây quyền…",
+    "permSave": "Lưu quyền menu",
+    "labelName": "Tên vai trò",
+    "labelNote": "Ghi chú",
+    "namePlaceholder": "Tên hiển thị hoặc mã ROLE_... (chữ in hoa, số, _)"
+  },
+  "users": {
+    "pageTitle": "Quản lý user",
+    "tabList": "Danh sách",
+    "tabAdd": "Thêm user"
+  },
+  "userForm": {
+    "pageTitle": "Quản lý user",
+    "account": "Tài khoản",
+    "password": "Mật khẩu",
+    "fullName": "Họ tên",
+    "address": "Địa chỉ",
+    "phone": "Số điện thoại",
+    "role": "Chức vụ",
+    "avatar": "Ảnh đại diện",
+    "pickAvatar": "Chọn ảnh đại diện",
+    "rolePlaceholder": "Chọn chức vụ",
+    "phUsername": "Tên đăng nhập",
+    "phPassword": "Mật khẩu",
+    "phFullName": "Nguyễn Văn A",
+    "phAddress": "Nhập địa chỉ hiện tại",
+    "phPhone": "0901234567",
+    "btnAdd": "Thêm",
+    "btnReset": "Nhập lại",
+    "roleAssetStaff": "Cán bộ quản lý tài sản",
+    "rolePrincipal": "Hiệu trưởng",
+    "roleAccountant": "Kế toán",
+    "roleLecturer": "Giảng viên"
+  },
+  "contact": {
+    "backToList": "Quay lại danh sách"
+  },
+  "assets": {
+    "back": "Quay lại",
+    "pageTitle": "Quản lý tài sản",
+    "pageRating": "Đánh giá tài sản",
+    "pageReRating": "Đánh giá lại tài sản",
+    "tabList": "Tất cả tài sản",
+    "tabDetail": "Thêm tài sản",
+    "tabTransfer": "Điều chuyển",
+    "detailHeading": "Thêm tài sản",
+    "detailLead": "Nhập thông tin tài sản mới vào hệ thống."
+  },
+  "common": {
+    "loadingData": "Đang tải dữ liệu…",
+    "shortcutEmpty": "Chưa thêm"
+  },
+  "home": {
+    "shortcuts": {
+      "assets": "Tài sản",
+      "categories": "Danh mục",
+      "statistics": "Thống kê",
+      "building": "Tòa nhà",
+      "liquidation": "Thanh lý / điều chuyển",
+      "users": "Người dùng"
+    }
+  },
+  "buttons": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "add": "Thêm",
+    "search": "Tìm kiếm",
+    "submit": "Gửi",
+    "retry": "Thử lại",
+    "close": "Đóng"
+  },
+  "forms": {
+    "username": "Tên đăng nhập",
+    "password": "Mật khẩu",
+    "email": "Email",
+    "fullName": "Họ và tên",
+    "phone": "Số điện thoại",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "requiredHint": "Các trường có dấu * là bắt buộc"
+  },
+  "dashboard": {
+    "modulesTitle": "Module thường dùng",
+    "homeGreeting": "Xin chào",
+    "taskPending": "Việc chờ xử lý",
+    "taskOpen": "Việc chưa xong",
+    "taskMine": "Việc tôi phụ trách",
+    "cardAssetsTitle": "Tài sản",
+    "cardAssetsSubtitle": "Danh sách & thêm mới",
+    "statsOverview": "Tổng quan thống kê"
+  },
+  "table": {
+    "users": {
+      "id": "ID",
+      "username": "Tên đăng nhập",
+      "fullname": "Họ tên",
+      "status": "Trạng thái",
+      "role": "Chức vụ",
+      "avatar": "Ảnh đại diện",
+      "actions": "Chức năng"
+    },
+    "assets": {
+      "code": "Số thẻ",
+      "name": "Tên",
+      "unitPrice": "Đơn giá",
+      "category": "Danh mục",
+      "quantity": "Số lượng",
+      "unit": "Đơn vị",
+      "buyer": "Người mua",
+      "status": "Tình trạng",
+      "rating": "Đánh giá",
+      "actions": "Chức năng"
+    }
+  },
+  "categories": {
+    "searchPlaceholder": "Tìm kiếm",
+    "budgetSelectPlaceholder": "-- Chọn loại kinh phí --",
+    "validationRequired": "Hãy nhập danh mục của bạn !",
+    "validationExtraMoney": "Vui lòng nhập số tiền hợp lệ",
+    "confirmDelete": "Bạn có chắc muốn xóa danh mục \"{{name}}\"?",
+    "deleteServerFail": "Xóa danh mục trên máy chủ thất bại.",
+    "successUpdateAlert": "Cập nhật danh mục thành công!",
+    "actions": {
+      "updateTitle": "Cập nhật",
+      "deleteTitle": "Xóa"
+    },
+    "edit": {
+      "titlePrefix": "Cập nhật danh mục",
+      "scopeLabel": "Phạm vi:",
+      "save": "Cập nhật",
+      "cancel": "Hủy",
+      "fieldFallback": "Trường {{n}}"
+    },
+    "views": {
+      "default": {
+        "title": "Quản lý danh mục tài sản",
+        "listTab": "Tất cả danh mục",
+        "addTab": "Thêm danh mục",
+        "extraTab": "Bổ sung",
+        "nameLabel": "Tên danh mục",
+        "codeLabel": "Mã danh mục",
+        "namePlaceholder": "Nhập tên danh mục",
+        "codePlaceholder": "Ví dụ: MM-TB",
+        "extraNameLabel": "Thêm kinh phí",
+        "extraCodeLabel": "Loại kinh phí",
+        "extraNamePlaceholder": "Vui lòng nhập số tiền cần bổ sung",
+        "submitBtn": "Thêm",
+        "resetBtn": "Nhập lại",
+        "columns": {
+          "0": "ID",
+          "1": "Mã danh mục",
+          "2": "Tên danh mục",
+          "3": "Chức năng"
+        }
+      },
+      "may_moc_thiet_bi": {
+        "title": "Quản lý danh mục máy móc, thiết bị",
+        "listTab": "Máy móc, thiết bị",
+        "addTab": "Thêm Máy móc, thiết bị",
+        "extraTab": "Bổ sung",
+        "nameLabel": "Tên",
+        "codeLabel": "Mã",
+        "namePlaceholder": "Nhập tên",
+        "codePlaceholder": "Ví dụ: MM-01",
+        "extraNameLabel": "Thêm kinh phí",
+        "extraCodeLabel": "Loại kinh phí",
+        "extraNamePlaceholder": "Vui lòng nhập số tiền cần bổ sung",
+        "submitBtn": "Thêm",
+        "resetBtn": "Nhập lại",
+        "columns": {
+          "0": "ID",
+          "1": "Mã",
+          "2": "Tên",
+          "3": "Chức năng"
+        }
+      },
+      "cong_cu_dung_cu": {
+        "title": "Quản lý danh mục công cụ, dụng cụ",
+        "listTab": "Công cụ, dụng cụ",
+        "addTab": "Thêm Công cụ, dụng cụ",
+        "extraTab": "Bổ sung",
+        "nameLabel": "Tên",
+        "codeLabel": "Mã",
+        "namePlaceholder": "Nhập tên",
+        "codePlaceholder": "Ví dụ: CC-01",
+        "extraNameLabel": "Thêm kinh phí",
+        "extraCodeLabel": "Loại kinh phí",
+        "extraNamePlaceholder": "Vui lòng nhập số tiền cần bổ sung",
+        "submitBtn": "Thêm",
+        "resetBtn": "Nhập lại",
+        "columns": {
+          "0": "ID",
+          "1": "Mã",
+          "2": "Tên",
+          "3": "Chức năng"
+        }
+      },
+      "nguon_kinh_phi": {
+        "title": "Quản lý nguồn kinh phí",
+        "listTab": "Nguồn kinh phí",
+        "addTab": "Thêm nguồn kinh phí",
+        "extraTab": "Bổ sung nguồn kinh phí",
+        "nameLabel": "Tên nguồn kinh phí",
+        "codeLabel": "Mã nguồn kinh phí",
+        "namePlaceholder": "Vui lòng nhập tên nguồn kinh phí",
+        "codePlaceholder": "Vui lòng nhập mã nguồn kinh phí",
+        "extraNameLabel": "Thêm kinh phí",
+        "extraCodeLabel": "Loại kinh phí",
+        "extraNamePlaceholder": "Vui lòng nhập số tiền cần bổ sung",
+        "submitBtn": "Thêm",
+        "resetBtn": "Nhập lại",
+        "columns": {
+          "0": "ID",
+          "1": "Mã NKP",
+          "2": "Tên nguồn kinh phí",
+          "3": "Tổng ngân sách",
+          "4": "Tổng chi",
+          "5": "Tổng thanh lý",
+          "6": "Còn lại",
+          "7": "Chức năng"
+        }
+      },
+      "nha_cung_cap": {
+        "title": "Quản lý nhà cung cấp",
+        "listTab": "Tất cả nhà cung cấp",
+        "addTab": "Thêm nhà cung cấp mới",
+        "extraTab": "Bổ sung",
+        "nameLabel": "Tên nhà cung cấp",
+        "codeLabel": "Mã nhà cung cấp",
+        "namePlaceholder": "Vui lòng nhập tên nhà cung cấp",
+        "codePlaceholder": "Vui lòng nhập mã nhà cung cấp",
+        "extraNameLabel": "Thêm kinh phí",
+        "extraCodeLabel": "Loại kinh phí",
+        "extraNamePlaceholder": "Vui lòng nhập số tiền cần bổ sung",
+        "submitBtn": "Thêm",
+        "resetBtn": "Nhập lại",
+        "columns": {
+          "0": "ID",
+          "1": "Mã nhà cung cấp",
+          "2": "Tên nhà cung cấp",
+          "3": "Địa chỉ",
+          "4": "Email",
+          "5": "SDT",
+          "6": "Chức năng"
+        }
+      },
+      "nuoc": {
+        "title": "Quản lý nước",
+        "listTab": "Nước",
+        "addTab": "Thêm nước",
+        "extraTab": "Bổ sung",
+        "nameLabel": "Tên nước",
+        "codeLabel": "Mã nước",
+        "namePlaceholder": "Vui lòng nhập tên nước",
+        "codePlaceholder": "Vui lòng nhập mã nước",
+        "extraNameLabel": "Thêm kinh phí",
+        "extraCodeLabel": "Loại kinh phí",
+        "extraNamePlaceholder": "Vui lòng nhập số tiền cần bổ sung",
+        "submitBtn": "Thêm",
+        "resetBtn": "Nhập lại",
+        "columns": {
+          "0": "ID",
+          "1": "Mã nước",
+          "2": "Tên nước",
+          "3": "Chức năng"
+        }
+      }
+    }
+  },
+  "studentRequests": {
+    "create": {
+      "pageTitle": "TẠO YÊU CẦU XỬ LÝ",
+      "documentTitle": "Tạo yêu cầu xử lý",
+      "uploadHint": "Nhấn để chụp hình hoặc quay phim",
+      "uploadAlt": "Ảnh đính kèm",
+      "optManagerGroupEmpty": "Nhóm quản lý",
+      "optStatusEmpty": "Trạng thái",
+      "optEquipment": "Thiết bị",
+      "statusUrgent": "Khẩn cấp",
+      "statusNormal": "Bình thường",
+      "statusWatch": "Theo dõi",
+      "phManagerName": "Tên người quản lý",
+      "phTitle": "Tiêu đề: Nhập tiêu đề...",
+      "noteLabel": "Ghi chú",
+      "noteCounter": "{{n}}/250",
+      "phNote": "Nhập ghi chú",
+      "saveDraft": "Lưu tạm",
+      "sendNow": "Gửi ngay",
+      "filePicked": "Đã chọn: {{name}}",
+      "backAria": "Quay lại"
+    },
+    "sent": {
+      "pageTitle": "YÊU CẦU ĐÃ GỬI",
+      "documentTitle": "Yêu cầu đã gửi",
+      "empty": "Danh sách yêu cầu rỗng"
+    },
+    "drafts": {
+      "pageTitle": "YÊU CẦU ĐÃ LƯU",
+      "documentTitle": "Yêu cầu đã lưu",
+      "empty": "Không có yêu cầu nào được lưu tạm"
+    },
+    "list": {
+      "managerGroup": "Nhóm quản lý",
+      "status": "Trạng thái",
+      "time": "Thời gian",
+      "noTitle": "(Không tiêu đề)"
+    },
+    "alerts": {
+      "draftNeedContent": "Nhập tiêu đề hoặc ghi chú trước khi lưu tạm.",
+      "sendNeedTitleNote": "Vui lòng nhập tiêu đề và ghi chú trước khi gửi."
+    }
+  },
+  "validation": {
+    "required": "Trường này là bắt buộc.",
+    "email": "Email không hợp lệ.",
+    "minLength": "Tối thiểu {{min}} ký tự.",
+    "maxLength": "Tối đa {{max}} ký tự.",
+    "number": "Vui lòng nhập số hợp lệ.",
+    "server": "Máy chủ từ chối yêu cầu. Thử lại sau."
+  }
+}
