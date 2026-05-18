@@ -1,0 +1,420 @@
+{
+  "meta": { "locale": "ja", "label": "日本語" },
+  "sidebar": {
+    "brand": "施設",
+    "welcome": "こんにちは、",
+    "home": "ホーム",
+    "logout": "ログアウト",
+    "loading": "メニューを読み込み中…",
+    "emptyMenu": "メニューがありません。",
+    "menuError": "メニューを読み込めませんでした。",
+    "retry": "再試行"
+  },
+  "menu": {
+    "users": "ユーザー",
+    "buildings": "<ruby>建物<rt>たてもの</rt></ruby>",
+    "building": "<ruby>建物<rt>たてもの</rt></ruby>",
+    "categories": "<ruby>分類<rt>ぶんるい</rt></ruby>",
+    "assets": "<ruby>資産<rt>しさん</rt></ruby>",
+    "statistics": "<ruby>統計<rt>とうけい</rt></ruby>",
+    "liquidation": "<ruby>廃棄<rt>はいき</rt></ruby>・<ruby>移管<rt>いかん</rt></ruby>",
+    "contact": "<ruby>連絡先<rt>れんらくさき</rt></ruby>",
+    "rbac": "<ruby>権限<rt>けんげん</rt></ruby><ruby>管理<rt>かんり</rt></ruby>",
+    "students": "<ruby>学生<rt>がくせい</rt></ruby>",
+    "manageUsers": "<ruby>ユーザー<rt>ゆーざー</rt></ruby><ruby>管理<rt>かんり</rt></ruby>",
+    "manageCategoriesPage": "<ruby>カテゴリ<rt>かてごり</rt></ruby><ruby>管理<rt>かんり</rt></ruby>",
+    "manageAssetsPage": "<ruby>資産<rt>しさん</rt></ruby><ruby>管理<rt>かんり</rt></ruby>",
+    "manageRoles": "<ruby>ロール<rt>ろーる</rt></ruby><ruby>管理<rt>かんり</rt></ruby>",
+    "studentCreateRequest": "<ruby>処理<rt>しょり</rt></ruby><ruby>依頼<rt>いらい</rt></ruby>を<ruby>作成<rt>さくせい</rt></ruby>",
+    "studentSent": "<ruby>送信済み<rt>そうしんずみ</rt></ruby>の<ruby>依頼<rt>いらい</rt></ruby>",
+    "studentDrafts": "<ruby>下書<rt>したが</rt></ruby>きの<ruby>依頼<rt>いらい</rt></ruby>",
+    "buildingNamed": "<ruby>建物<rt>たてもの</rt></ruby> {{name}}",
+    "buildingRoomList": "<ruby>建物<rt>たてもの</rt></ruby>・<ruby>部屋<rt>へや</rt></ruby>リスト",
+    "venueLectureHall": "<ruby>多目的<rt>たもくてき</rt></ruby><ruby>講義室<rt>こうぎしつ</rt></ruby>",
+    "venueCanteen": "<ruby>食堂<rt>しょくどう</rt></ruby>"
+  },
+  "departments": {
+    "pageTitle": "<ruby>建物<rt>たてもの</rt></ruby><ruby>管理<rt>かんり</rt></ruby>",
+    "buildingNavAria": "<ruby>建物<rt>たてもの</rt></ruby>を<ruby>選択<rt>せんたく</rt></ruby>",
+    "allRooms": "<ruby>全部屋<rt>ぜんへや</rt></ruby>",
+    "addRoom": "<ruby>部屋<rt>へや</rt></ruby>を<ruby>追加<rt>ついか</rt></ruby>",
+    "searchPlaceholder": "<ruby>検索<rt>けんさく</rt></ruby>",
+    "searchAllBuildings": "<ruby>全<rt>ぜん</rt></ruby><ruby>建物<rt>たてもの</rt></ruby>を<ruby>検索<rt>けんさく</rt></ruby>",
+    "colBuilding": "<ruby>建物<rt>たてもの</rt></ruby>",
+    "colRoomCode": "<ruby>部屋<rt>へや</rt></ruby>コード",
+    "colFloor": "<ruby>階<rt>かい</rt></ruby>",
+    "colClassUsing": "<ruby>使用<rt>しよう</rt></ruby><ruby>クラス<rt>くらす</rt></ruby>",
+    "colCapacity": "<ruby>収容<rt>しゅうよう</rt></ruby><ruby>人数<rt>にんずう</rt></ruby>",
+    "colStatus": "<ruby>状態<rt>じょうたい</rt></ruby>",
+    "colActions": "<ruby>操作<rt>そうさ</rt></ruby>",
+    "viewRoom": "<ruby>部屋<rt>へや</rt></ruby>の<ruby>詳細<rt>しょうさい</rt></ruby>",
+    "updateRoom": "<ruby>部屋<rt>へや</rt></ruby>を<ruby>更新<rt>こうしん</rt></ruby>",
+    "deleteRoom": "<ruby>部屋<rt>へや</rt></ruby>を<ruby>削除<rt>さくじょ</rt></ruby>",
+    "confirmDeleteRoom": "<ruby>部屋<rt>へや</rt></ruby> {{code}} を<ruby>削除<rt>さくじょ</rt></ruby>しますか？",
+    "deleteRoomFailed": "サーバーでの<ruby>削除<rt>さくじょ</rt></ruby>に<ruby>失敗<rt>しっぱい</rt></ruby>しました。"
+  },
+  "nav": {
+    "language": "言語を選択",
+    "furiganaShow": "ふりがなを表示",
+    "furiganaHide": "ふりがなを隠す",
+    "roleAdministrator": "管理者",
+    "roleStudent": "学生"
+  },
+  "pager": {
+    "previous": "前へ",
+    "next": "次へ",
+    "showPageOf": "{{total}} ページ中 {{current}} ページ目"
+  },
+  "toolbar": {
+    "showRows": "表示",
+    "exportJson": "JSONを出力"
+  },
+  "rbacRoles": {
+    "pageTitle": "<ruby>役割<rt>やくわり</rt></ruby><ruby>管理<rt>かんり</rt></ruby>",
+    "searchNamePlaceholder": "<ruby>役割名<rt>やくわりめい</rt></ruby>",
+    "searchDescPlaceholder": "<ruby>説明<rt>せつめい</rt></ruby>",
+    "search": "検索",
+    "add": "<ruby>役割<rt>やくわり</rt></ruby>を<ruby>追加<rt>ついか</rt></ruby>",
+    "colOrdinal": "#",
+    "colName": "<ruby>役割名<rt>やくわりめい</rt></ruby>",
+    "colNote": "<ruby>備考<rt>びこう</rt></ruby>",
+    "colCreatedAt": "<ruby>作成日時<rt>さくせいにちじ</rt></ruby>",
+    "colCreatedBy": "<ruby>作成者<rt>さくせいしゃ</rt></ruby>",
+    "colUpdatedAt": "<ruby>更新日時<rt>こうしんにちじ</rt></ruby>",
+    "colUpdatedBy": "<ruby>最終更新者<rt>さいしゅうこうしんしゃ</rt></ruby>",
+    "colActions": "<ruby>操作<rt>そうさ</rt></ruby>",
+    "loading": "読み込み中…",
+    "empty": "データがありません",
+    "loadError": "役割一覧を読み込めませんでした。",
+    "pagerTotalPrefix": "合計",
+    "perPageSuffix": "件/ページ",
+    "actionMenuPerm": "メニュー権限",
+    "actionEdit": "編集",
+    "actionDelete": "削除",
+    "modalAddTitle": "<ruby>役割<rt>やくわり</rt></ruby>を<ruby>追加<rt>ついか</rt></ruby>",
+    "modalEditTitle": "<ruby>役割<rt>やくわり</rt></ruby>を<ruby>編集<rt>へんしゅう</rt></ruby>",
+    "modalCancel": "キャンセル",
+    "modalSaveRole": "<ruby>役割<rt>やくわり</rt></ruby>を<ruby>保存<rt>ほぞん</rt></ruby>",
+    "permTitleSuffix": "— メニュー権限の割当",
+    "permLoading": "権限ツリーを読み込み中…",
+    "permSave": "メニュー権限を保存",
+    "labelName": "<ruby>役割名<rt>やくわりめい</rt></ruby>",
+    "labelNote": "<ruby>備考<rt>びこう</rt></ruby>",
+    "namePlaceholder": "表示名または ROLE_...（英大文字・数字・_）"
+  },
+  "users": {
+    "pageTitle": "ユーザー管理",
+    "tabList": "一覧",
+    "tabAdd": "ユーザーを追加"
+  },
+  "userForm": {
+    "pageTitle": "ユーザー管理",
+    "account": "アカウント",
+    "password": "パスワード",
+    "fullName": "氏名",
+    "address": "住所",
+    "phone": "電話番号",
+    "role": "役割",
+    "avatar": "アバター",
+    "pickAvatar": "画像を選択",
+    "rolePlaceholder": "役割を選択",
+    "phUsername": "ログイン名",
+    "phPassword": "パスワード",
+    "phFullName": "山田 太郎",
+    "phAddress": "現住所を入力",
+    "phPhone": "0901234567",
+    "btnAdd": "追加",
+    "btnReset": "リセット",
+    "roleAssetStaff": "資産管理担当",
+    "rolePrincipal": "校長",
+    "roleAccountant": "会計担当",
+    "roleLecturer": "講師"
+  },
+  "contact": {
+    "backToList": "一覧に戻る"
+  },
+  "assets": {
+    "back": "戻る",
+    "pageTitle": "<ruby>資産<rt>しさん</rt></ruby><ruby>管理<rt>かんり</rt></ruby>",
+    "pageRating": "<ruby>資産<rt>しさん</rt></ruby>の<ruby>評価<rt>ひょうか</rt></ruby>",
+    "pageReRating": "<ruby>資産<rt>しさん</rt></ruby>の<ruby>再評価<rt>さいひょうか</rt></ruby>",
+    "tabList": "<ruby>全<rt>ぜん</rt></ruby><ruby>資産<rt>しさん</rt></ruby>",
+    "tabDetail": "<ruby>資産<rt>しさん</rt></ruby>を<ruby>追加<rt>ついか</rt></ruby>",
+    "tabTransfer": "<ruby>移管<rt>いかん</rt></ruby>",
+    "detailHeading": "<ruby>資産<rt>しさん</rt></ruby>を<ruby>追加<rt>ついか</rt></ruby>",
+    "detailLead": "<ruby>新規<rt>しんき</rt></ruby><ruby>資産<rt>しさん</rt></ruby>の<ruby>情報<rt>じょうほう</rt></ruby>を<ruby>入力<rt>にゅうりょく</rt></ruby>してください。"
+  },
+  "common": {
+    "loadingData": "読み込み中…",
+    "shortcutEmpty": "<ruby>未設定<rt>みせってい</rt></ruby>"
+  },
+  "home": {
+    "shortcuts": {
+      "assets": "<ruby>資産<rt>しさん</rt></ruby>",
+      "categories": "<ruby>分類<rt>ぶんるい</rt></ruby>",
+      "statistics": "<ruby>統計<rt>とうけい</rt></ruby>",
+      "building": "<ruby>建物<rt>たてもの</rt></ruby>",
+      "liquidation": "<ruby>廃棄<rt>はいき</rt></ruby>・<ruby>移管<rt>いかん</rt></ruby>",
+      "users": "ユーザー"
+    }
+  },
+  "buttons": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "add": "追加",
+    "search": "検索",
+    "submit": "送信",
+    "retry": "再試行",
+    "close": "閉じる"
+  },
+  "forms": {
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "email": "メール",
+    "fullName": "氏名",
+    "phone": "電話番号",
+    "rememberMe": "ログイン状態を保持",
+    "requiredHint": "* の付いた項目は必須です"
+  },
+  "dashboard": {
+    "modulesTitle": "よく<ruby>使<rt>つか</rt></ruby>うモジュール",
+    "homeGreeting": "こんにちは",
+    "taskPending": "<ruby>未処理<rt>みしょり</rt></ruby>の<ruby>作業<rt>さぎょう</rt></ruby>",
+    "taskOpen": "<ruby>未完了<rt>みかんりょう</rt></ruby>の<ruby>作業<rt>さぎょう</rt></ruby>",
+    "taskMine": "<ruby>担当<rt>たんとう</rt></ruby>の<ruby>作業<rt>さぎょう</rt></ruby>",
+    "cardAssetsTitle": "<ruby>資産<rt>しさん</rt></ruby>",
+    "cardAssetsSubtitle": "<ruby>一覧<rt>いちらん</rt></ruby>と<ruby>新規<rt>しんき</rt></ruby>",
+    "statsOverview": "<ruby>統計<rt>とうけい</rt></ruby>の<ruby>概要<rt>がいよう</rt></ruby>"
+  },
+  "table": {
+    "users": {
+      "id": "ID",
+      "username": "ユーザー名",
+      "fullname": "氏名",
+      "status": "状態",
+      "role": "役割",
+      "avatar": "アバター",
+      "actions": "操作"
+    },
+    "assets": {
+      "code": "管理番号",
+      "name": "名称",
+      "unitPrice": "単価",
+      "category": "分類",
+      "quantity": "数量",
+      "unit": "部署・クラス",
+      "buyer": "購入者",
+      "status": "状態",
+      "rating": "評価",
+      "actions": "操作"
+    }
+  },
+  "categories": {
+    "searchPlaceholder": "検索",
+    "budgetSelectPlaceholder": "-- 資金種別を選択 --",
+    "validationRequired": "カテゴリ名を入力してください。",
+    "validationExtraMoney": "有効な金額を入力してください。",
+    "confirmDelete": "カテゴリ「{{name}}」を削除しますか？",
+    "deleteServerFail": "サーバー上のカテゴリを削除できませんでした。",
+    "successUpdateAlert": "カテゴリを更新しました。",
+    "actions": {
+      "updateTitle": "更新",
+      "deleteTitle": "削除"
+    },
+    "edit": {
+      "titlePrefix": "カテゴリを更新",
+      "scopeLabel": "範囲:",
+      "save": "更新",
+      "cancel": "キャンセル",
+      "fieldFallback": "項目 {{n}}"
+    },
+    "views": {
+      "default": {
+        "title": "資産カテゴリの管理",
+        "listTab": "すべてのカテゴリ",
+        "addTab": "カテゴリを追加",
+        "extraTab": "追加",
+        "nameLabel": "カテゴリ名",
+        "codeLabel": "カテゴリコード",
+        "namePlaceholder": "カテゴリ名を入力",
+        "codePlaceholder": "例: MM-TB",
+        "extraNameLabel": "予算を追加",
+        "extraCodeLabel": "資金種別",
+        "extraNamePlaceholder": "追加する金額を入力",
+        "submitBtn": "追加",
+        "resetBtn": "リセット",
+        "columns": {
+          "0": "ID",
+          "1": "カテゴリコード",
+          "2": "カテゴリ名",
+          "3": "操作"
+        }
+      },
+      "may_moc_thiet_bi": {
+        "title": "機械・設備カテゴリの管理",
+        "listTab": "機械・設備",
+        "addTab": "機械・設備を追加",
+        "extraTab": "追加",
+        "nameLabel": "名称",
+        "codeLabel": "コード",
+        "namePlaceholder": "名称を入力",
+        "codePlaceholder": "例: MM-01",
+        "extraNameLabel": "予算を追加",
+        "extraCodeLabel": "資金種別",
+        "extraNamePlaceholder": "追加する金額を入力",
+        "submitBtn": "追加",
+        "resetBtn": "リセット",
+        "columns": {
+          "0": "ID",
+          "1": "コード",
+          "2": "名称",
+          "3": "操作"
+        }
+      },
+      "cong_cu_dung_cu": {
+        "title": "工具・器具カテゴリの管理",
+        "listTab": "工具・器具",
+        "addTab": "工具・器具を追加",
+        "extraTab": "追加",
+        "nameLabel": "名称",
+        "codeLabel": "コード",
+        "namePlaceholder": "名称を入力",
+        "codePlaceholder": "例: CC-01",
+        "extraNameLabel": "予算を追加",
+        "extraCodeLabel": "資金種別",
+        "extraNamePlaceholder": "追加する金額を入力",
+        "submitBtn": "追加",
+        "resetBtn": "リセット",
+        "columns": {
+          "0": "ID",
+          "1": "コード",
+          "2": "名称",
+          "3": "操作"
+        }
+      },
+      "nguon_kinh_phi": {
+        "title": "資金源の管理",
+        "listTab": "資金源",
+        "addTab": "資金源を追加",
+        "extraTab": "資金源を補足",
+        "nameLabel": "資金源名",
+        "codeLabel": "資金源コード",
+        "namePlaceholder": "資金源名を入力",
+        "codePlaceholder": "資金源コードを入力",
+        "extraNameLabel": "予算を追加",
+        "extraCodeLabel": "資金種別",
+        "extraNamePlaceholder": "追加する金額を入力",
+        "submitBtn": "追加",
+        "resetBtn": "リセット",
+        "columns": {
+          "0": "ID",
+          "1": "資金コード",
+          "2": "資金源名",
+          "3": "予算合計",
+          "4": "支出合計",
+          "5": "廃棄合計",
+          "6": "残高",
+          "7": "操作"
+        }
+      },
+      "nha_cung_cap": {
+        "title": "仕入先の管理",
+        "listTab": "すべての仕入先",
+        "addTab": "仕入先を追加",
+        "extraTab": "追加",
+        "nameLabel": "仕入先名",
+        "codeLabel": "仕入先コード",
+        "namePlaceholder": "仕入先名を入力",
+        "codePlaceholder": "仕入先コードを入力",
+        "extraNameLabel": "予算を追加",
+        "extraCodeLabel": "資金種別",
+        "extraNamePlaceholder": "追加する金額を入力",
+        "submitBtn": "追加",
+        "resetBtn": "リセット",
+        "columns": {
+          "0": "ID",
+          "1": "仕入先コード",
+          "2": "仕入先名",
+          "3": "住所",
+          "4": "メール",
+          "5": "電話",
+          "6": "操作"
+        }
+      },
+      "nuoc": {
+        "title": "国・地域の管理",
+        "listTab": "国・地域",
+        "addTab": "国・地域を追加",
+        "extraTab": "追加",
+        "nameLabel": "国名",
+        "codeLabel": "国コード",
+        "namePlaceholder": "国名を入力",
+        "codePlaceholder": "国コードを入力",
+        "extraNameLabel": "予算を追加",
+        "extraCodeLabel": "資金種別",
+        "extraNamePlaceholder": "追加する金額を入力",
+        "submitBtn": "追加",
+        "resetBtn": "リセット",
+        "columns": {
+          "0": "ID",
+          "1": "国コード",
+          "2": "国名",
+          "3": "操作"
+        }
+      }
+    }
+  },
+  "studentRequests": {
+    "create": {
+      "pageTitle": "<ruby>処理<rt>しょり</rt></ruby><ruby>依頼<rt>いらい</rt></ruby>を<ruby>作成<rt>さくせい</rt></ruby>",
+      "documentTitle": "処理依頼を作成",
+      "uploadHint": "<ruby>写真<rt>しゃしん</rt></ruby>を<ruby>撮<rt>と</rt></ruby>るか<ruby>動画<rt>どうが</rt></ruby>を<ruby>録画<rt>ろくが</rt></ruby>するにはタップ",
+      "uploadAlt": "添付プレビュー",
+      "optManagerGroupEmpty": "管理グループ",
+      "optStatusEmpty": "状態",
+      "optEquipment": "設備",
+      "statusUrgent": "緊急",
+      "statusNormal": "通常",
+      "statusWatch": "監視",
+      "phManagerName": "管理者名",
+      "phTitle": "件名：入力…",
+      "noteLabel": "<ruby>備考<rt>びこう</rt></ruby>",
+      "noteCounter": "{{n}}/250",
+      "phNote": "備考を入力",
+      "saveDraft": "<ruby>下書<rt>したが</rt></ruby>き保存",
+      "sendNow": "すぐ送信",
+      "filePicked": "選択：{{name}}",
+      "backAria": "戻る"
+    },
+    "sent": {
+      "pageTitle": "<ruby>送信済み<rt>そうしんずみ</rt></ruby>の<ruby>依頼<rt>いらい</rt></ruby>",
+      "documentTitle": "送信済みの依頼",
+      "empty": "<ruby>送信<rt>そうしん</rt></ruby>した<ruby>依頼<rt>いらい</rt></ruby>はありません"
+    },
+    "drafts": {
+      "pageTitle": "<ruby>下書<rt>したが</rt></ruby>き<ruby>保存<rt>ほぞん</rt></ruby>の<ruby>依頼<rt>いらい</rt></ruby>",
+      "documentTitle": "下書きの依頼",
+      "empty": "<ruby>下書<rt>したが</rt></ruby>きはありません"
+    },
+    "list": {
+      "managerGroup": "<ruby>管理<rt>かんり</rt></ruby>グループ",
+      "status": "<ruby>状態<rt>じょうたい</rt></ruby>",
+      "time": "<ruby>日時<rt>にちじ</rt></ruby>",
+      "noTitle": "（<ruby>件名<rt>けんめい</rt></ruby>なし）"
+    },
+    "alerts": {
+      "draftNeedContent": "<ruby>件名<rt>けんめい</rt></ruby>か<ruby>備考<rt>びこう</rt></ruby>を入力してから<ruby>下書<rt>したが</rt></ruby>き<ruby>保存<rt>ほぞん</rt></ruby>してください。",
+      "sendNeedTitleNote": "<ruby>送信<rt>そうしん</rt></ruby>するには<ruby>件名<rt>けんめい</rt></ruby>と<ruby>備考<rt>びこう</rt></ruby>の両方を入力してください。"
+    }
+  },
+  "validation": {
+    "required": "この項目は必須です。",
+    "email": "メール形式が正しくありません。",
+    "minLength": "最低 {{min}} 文字です。",
+    "maxLength": "最大 {{max}} 文字です。",
+    "number": "有効な数値を入力してください。",
+    "server": "サーバーが要求を拒否しました。後でもう一度お試しください。"
+  }
+}

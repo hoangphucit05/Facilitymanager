@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="studentRequests.create.documentTitle">Tạo yêu cầu xử lý</title>
+    <link rel="stylesheet" href="../../assets/css/base.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/pages.css" />
+    <link rel="stylesheet" href="../../assets/css/student.css" />
+  </head>
+  <body data-required-roles="ADMIN,MANAGER,STAFF,STUDENT" data-student-page="create-request">
+    <div class="app app--with-sidebar">
+      <div id="appSidebar"></div>
+      <main class="content content--student">
+        <header class="topbar">
+          <div class="topbar-left">
+            <strong id="topbarRoleText">Administrator</strong>
+          </div>
+          <div class="topbar-right"></div>
+        </header>
+
+        <div class="student-shell">
+          <header class="student-topbar">
+            <button
+              id="studentBackBtn"
+              class="student-back"
+              type="button"
+              data-i18n-title="studentRequests.create.backAria"
+              data-i18n-aria-label="studentRequests.create.backAria"
+              title="Quay lại"
+              aria-label="Quay lại"
+            >
+              &#8592;
+            </button>
+            <span class="student-topbar-title" data-i18n-html="studentRequests.create.pageTitle">TẠO YÊU CẦU XỬ LÝ</span>
+          </header>
+
+          <div class="student-main">
+            <form id="studentRequestForm" method="post" action="#" enctype="multipart/form-data">
+              <label class="student-upload" for="studentAttachmentInput">
+                <input id="studentAttachmentInput" name="attachment" type="file" accept="image/*,video/*" hidden />
+                <div id="studentUploadPlaceholder">
+                  <div class="student-upload-icon">&#128247;</div>
+                  <div data-i18n-html="studentRequests.create.uploadHint">Nhấn để chụp hình hoặc quay phim</div>
+                </div>
+                <img
+                  id="studentUploadPreviewImage"
+                  class="student-upload-preview"
+                  data-i18n-alt="studentRequests.create.uploadAlt"
+                  alt="Ảnh đính kèm"
+                  hidden
+                />
+                <div id="studentUploadFileName" class="student-upload-file-name" hidden></div>
+              </label>
+
+              <section class="student-card" style="margin-top: 12px">
+                <div class="student-row">
+                  <select id="studentManagerGroup" name="managerGroup" class="student-field">
+                    <option value="" data-i18n="studentRequests.create.optManagerGroupEmpty">Nhóm quản lý</option>
+                    <option value="CSVC">CSVC</option>
+                    <option value="CNTT">CNTT</option>
+                    <option value="Thiết bị" data-i18n="studentRequests.create.optEquipment">Thiết bị</option>
+                  </select>
+                  <select id="studentStatus" name="requestPriority" class="student-field">
+                    <option value="" data-i18n="studentRequests.create.optStatusEmpty">Trạng thái</option>
+                    <option value="Khẩn cấp" data-i18n="studentRequests.create.statusUrgent">Khẩn cấp</option>
+                    <option value="Bình thường" data-i18n="studentRequests.create.statusNormal">Bình thường</option>
+                    <option value="Theo dõi" data-i18n="studentRequests.create.statusWatch">Theo dõi</option>
+                  </select>
+                </div>
+
+                <input
+                  id="studentManagerName"
+                  name="managerName"
+                  class="student-field"
+                  style="margin-top: 10px"
+                  data-i18n-placeholder="studentRequests.create.phManagerName"
+                  placeholder="Tên người quản lý"
+                />
+
+                <div class="student-title-row">
+                  <input
+                    id="studentRequestTitle"
+                    name="title"
+                    class="student-field"
+                    data-i18n-placeholder="studentRequests.create.phTitle"
+                    placeholder="Tiêu đề: Nhập tiêu đề..."
+                  />
+                </div>
+
+                <div style="margin-top: 8px">
+                  <div class="student-note-header">
+                    <span data-i18n-html="studentRequests.create.noteLabel">Ghi chú</span>
+                    <span id="studentNoteCount">0/250</span>
+                  </div>
+                  <textarea
+                    id="studentRequestNote"
+                    name="note"
+                    class="student-textarea"
+                    maxlength="250"
+                    data-i18n-placeholder="studentRequests.create.phNote"
+                    placeholder="Nhập ghi chú"
+                  ></textarea>
+                </div>
+              </section>
+
+              <div class="student-actions">
+                <button id="studentSaveDraftBtn" class="student-btn" type="button" data-i18n="studentRequests.create.saveDraft">
+                  Lưu tạm
+                </button>
+                <button id="studentSendNowBtn" class="student-btn" type="button" data-i18n="studentRequests.create.sendNow">Gửi ngay</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../assets/js/auth/auth.js"></script>
+    <script src="../../assets/js/shared/menu-store.js"></script>
+    <script src="../../assets/js/auth/guard.js"></script>
+    <script src="../../assets/js/shared/permission.js"></script>
+    <script src="../../assets/js/shared/sidebar.js"></script>
+    <script src="../../assets/js/shared/i18n-manager.js"></script>
+    <script src="../../assets/js/shared/lang-switcher.js"></script>
+    <script src="../../assets/js/components/navigation.js"></script>
+    <script src="../../assets/js/shared/menu-links.js"></script>
+    <script src="../../assets/js/student/requests.js"></script>
+  </body>
+</html>

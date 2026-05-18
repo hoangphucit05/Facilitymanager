@@ -1,0 +1,25 @@
+# Node
+node_modules/
+frontend/node_modules/
+sql-sync-server/node_modules/
+
+# Build output
+frontend/dist/
+
+# Java build
+backend/target/
+
+# IDE / OS
+.idea/
+.vscode/
+.settings/
+*.iml
+Thumbs.db
+Desktop.ini
+
+# Env / secrets
+.env
+*.local
+
+# Temp
+tmp-room.json

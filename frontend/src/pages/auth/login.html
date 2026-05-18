@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Đăng nhập</title>
+        <link rel="stylesheet" href="../../assets/css/auth.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    </head>
+    <body>
+        <div id="loginBox" class="box">
+            <div class="login">
+                <div class="loginBx">
+                    <h2>
+                        <img class="title-icon" src="../../assets/images/logo-left.png" alt="logo icon">
+                        <span class="title-text">Welcome to Catepie</span>
+                        <img class="title-icon" src="../../assets/images/logo-right.png" alt="logo icon" style="transform:  scaleX(-1);">
+                    </h2>
+                </div>
+            </div>
+            <div class="modern-login-embed">
+                <div class="container">
+                    <div class="login-card">
+                        <div class="icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+
+                        <h2>Đăng nhập</h2>
+                        <p>Chào mừng quay lại! Vui lòng đăng nhập</p>
+                        <form id="loginForm" method="post" action="#">
+                            <div class="field-group">
+                                <div class="input-group">
+                                    <i class="fa-regular fa-user"></i>
+                                    <input id="username" name="username" type="text" placeholder="Tên đăng nhập" autocomplete="username">
+                                </div>
+                                <p id="usernameErr" class="field-error" role="alert"></p>
+                            </div>
+
+                            <div class="field-group">
+                                <div class="input-group">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <input id="password" name="password" type="password" placeholder="Mật khẩu" autocomplete="current-password">
+                                    <i class="fa-regular fa-eye eye"></i>
+                                </div>
+                                <p id="passwordErr" class="field-error" role="alert"></p>
+                            </div>
+
+                            <div class="field-group field-group-captcha">
+                                <div class="captcha-row">
+                                    <div class="input-group captcha-input-wrap">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                        <input id="imgCode" name="code" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Nhập mã xác thực" maxlength="6">
+                                    </div>
+                                    <img id="captchaImg" class="captcha-image-img" src="" alt="Mã xác thực" title="Nhấn để làm mới">
+                                </div>
+                                <p id="captchaErr" class="field-error" role="alert"></p>
+                            </div>
+
+                            <label class="login-options">
+                                <input id="saveLogin" name="saveLogin" type="checkbox" value="true">
+                                <span>Tự động đăng nhập</span>
+                            </label>
+
+                            <button type="submit">ĐĂNG NHẬP</button>
+                            <p id="loginFormError" class="auth-error auth-error-form"></p>
+                            <p class="auth-alt-link">
+                                <a href="register.html">Chưa có tài khoản? Đăng ký</a>
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="../../assets/js/auth/auth.js"></script>
+        <script src="../../assets/js/auth/login.js"></script>
+        <script>
+          (function initLoginBoxClickMode() {
+            const box = document.getElementById("loginBox");
+            if (!box) return;
+
+            box.addEventListener("click", () => {
+              box.classList.add("is-open");
+            });
+
+            document.addEventListener("click", (event) => {
+              if (box.contains(event.target)) return;
+              box.classList.remove("is-open");
+            });
+          })();
+        </script>
+    </body>
+</html>

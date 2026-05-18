@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: facility-manager-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/asset_management?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci
+    username: root
+    # Mật khẩu MySQL máy bạn; có thể ghi đè bằng biến môi trường MYSQL_PASSWORD
+    password: ${MYSQL_PASSWORD:1234567891}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-init-sql: SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3s
+
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+logging:
+  level:
+    com.facilitymanager: DEBUG
+
+facility:
+  token:
+    ttl-minutes: ${FACILITY_TOKEN_TTL_MINUTES:120}
+    save-login-ttl-days: ${FACILITY_SAVE_LOGIN_DAYS:30}
+  captcha:
+    ttl-minutes: ${FACILITY_CAPTCHA_TTL_MINUTES:2}
+
+# ── CORS toàn cục ──────────────────────────────────────────────────────────
+# Cho phép frontend (file://, localhost:*, 127.0.0.1:*) và SQL Sync Server
+# gọi vào backend. @CrossOrigin trên mỗi controller cũng đã khai báo "*"
+# nhưng config này đảm bảo preflight OPTIONS luôn được xử lý đúng.
+cors:
+  allowed-origins: "*"
+  allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+  allowed-headers: "*"
+  max-age: 3600

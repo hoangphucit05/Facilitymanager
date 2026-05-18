@@ -1,0 +1,129 @@
+.nav-item {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  color: var(--sidebar-text);
+}
+
+button.nav-item.nav-action-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text-strong);
+}
+
+.nav-item.active {
+  background: var(--sidebar-active-bg, var(--sidebar-active));
+  box-shadow: 0 4px 12px var(--sidebar-active-shadow, rgba(37, 99, 235, 0.38));
+}
+
+.nav-group {
+  margin-bottom: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.nav-group-toggle {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--sidebar-text);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+  min-height: 40px;
+}
+
+.nav-group-toggle span:first-child {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.nav-group-toggle span:last-child {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-group.open > .nav-group-toggle span:last-child {
+  transform: rotate(-180deg);
+}
+
+.nav-group-toggle:hover,
+.nav-group.open > .nav-group-toggle {
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text-strong);
+}
+
+.nav-submenu {
+  display: block;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin-left: 10px;
+  border-left: 1px solid var(--sidebar-border);
+  padding-left: 8px;
+  padding-top: 0;
+  padding-bottom: 0;
+  transition:
+    max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.26s ease,
+    padding-top 0.26s ease,
+    padding-bottom 0.26s ease;
+  will-change: max-height;
+}
+
+/* Chỉ submenu trực tiếp (>) — tránh submenu nhóm con bị mở nhầm */
+.nav-group.open > .nav-submenu {
+  max-height: min(4000px, 85vh);
+  opacity: 1;
+  padding-top: 4px;
+  padding-bottom: 6px;
+}
+
+.nav-subitem {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin: 4px 0;
+  color: var(--sidebar-muted);
+}
+
+.nav-subitem:hover,
+.nav-subitem.active {
+  color: var(--sidebar-text-strong);
+}
+
+.nav-subitem:hover {
+  background: var(--sidebar-hover);
+}
+
+.nav-subitem.active {
+  background: var(--sidebar-active-bg, var(--sidebar-active));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-submenu,
+  .nav-group-toggle span:last-child {
+    transition: none;
+  }
+}

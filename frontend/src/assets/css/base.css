@@ -1,0 +1,165 @@
+:root {
+  /* =======================
+     1) PRIMARY BLUE
+     Main actions / links / active states
+     ======================= */
+  --blue-50: #eef4ff;
+  --blue-200: #bfd5ff;
+  --blue-600: #2f6fed;
+  --blue-800: #234fb4;
+
+  /* =======================
+     2) NEUTRAL SLATE
+     Sidebar / background / borders / text hierarchy
+     ======================= */
+  --slate-50: #fcfaf6;
+  --slate-200: #ddd5c8;
+  --slate-600: #6b6257;
+  --slate-800: #3b342d;
+  --slate-900: #26221d;
+
+  /* =======================
+     3) SUCCESS TEAL
+     Success states / active status
+     ======================= */
+  --teal-50: #eefbf7;
+  --teal-200: #a9ead8;
+  --teal-600: #1d8f78;
+  --teal-800: #146354;
+
+  /* =======================
+     4) WARNING AMBER
+     ======================= */
+  --amber-50: #fff8e8;
+  --amber-200: #f6dd9a;
+  --amber-600: #c9831f;
+  --amber-800: #8a5511;
+
+  /* =======================
+     5) DANGER RED
+     ======================= */
+  --red-50: #fff1f1;
+  --red-200: #f6c2c2;
+  --red-600: #cb3a3a;
+  --red-800: #8f2222;
+
+  /* =======================
+     6) ACCENT PURPLE
+     ======================= */
+  --violet-50: #f6f2ff;
+  --violet-200: #ded2ff;
+  --violet-600: #7a43d6;
+  --violet-800: #56309c;
+
+  /* App aliases */
+  --bg: var(--slate-50);
+  --card: #ffffff;
+  --text: var(--slate-800);
+  --muted: var(--slate-600);
+  --line: var(--slate-200);
+
+  --primary: var(--blue-600);
+  --primary-600: var(--blue-600);
+  --primary-700: var(--blue-800);
+  --primary-soft: var(--blue-50);
+  --primary-soft-strong: rgba(47, 111, 237, 0.2);
+
+  --success: var(--teal-600);
+  --success-soft: var(--teal-50);
+  --warning: var(--amber-600);
+  --warning-soft: var(--amber-50);
+  --error: var(--red-600);
+  --error-soft: var(--red-50);
+  --info: var(--violet-600);
+  --info-soft: var(--violet-50);
+
+  --accent: var(--violet-600);
+
+  --sidebar-bg: #1e3a5f;
+  --sidebar-bg-deep: #152a45;
+  --sidebar-hover: #2a4d7a;
+  --sidebar-active: var(--blue-600);
+  --sidebar-active-bg: var(--sidebar-active);
+  --sidebar-active-shadow: rgba(47, 111, 237, 0.34);
+  --sidebar-text: #dce6f2;
+  --sidebar-text-strong: #f8fafc;
+  --sidebar-muted: #94a3b8;
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid var(--line);
+  padding: 10px;
+  font-size: 14px;
+  text-align: left;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+/* i18n: smooth refresh when locale bundle applies */
+html.fm-i18n-transitioning .app,
+html.fm-i18n-transitioning body {
+  transition: opacity 0.18s ease;
+  opacity: 0.94;
+}
+
+/* Furigana (日本語): ẩn đọc <rt> cho đến khi tick; chỉ áp dụng khi lang = ja */
+html[data-fm-lang]:not([data-fm-lang="ja"]) ruby rt {
+  display: none !important;
+}
+html[data-fm-lang="ja"][data-fm-furigana="0"] ruby rt {
+  display: none !important;
+}
+html[data-fm-lang="ja"][data-fm-furigana="1"] ruby {
+  ruby-position: over;
+}
+html[data-fm-lang="ja"][data-fm-furigana="1"] ruby rt {
+  font-size: 0.52em;
+  line-height: 1.1;
+  font-weight: 500;
+  user-select: none;
+}

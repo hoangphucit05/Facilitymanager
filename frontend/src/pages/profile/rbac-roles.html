@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="rbacRoles.pageTitle">Quản lý vai trò</title>
+    <link rel="stylesheet" href="../../assets/css/base.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/pages.css" />
+  </head>
+  <body data-required-roles="ADMIN">
+    <div class="app app--with-sidebar">
+      <div id="appSidebar"></div>
+
+      <main class="content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <strong id="topbarRoleText">Administrator</strong>
+          </div>
+          <div class="topbar-right"></div>
+        </header>
+
+        <h1 class="page-title" data-i18n="rbacRoles.pageTitle">Quản lý vai trò</h1>
+        <section class="panel role-page">
+          <form id="rolesSearchForm" class="iv-form-inline" autocomplete="off">
+            <div class="iv-form-item">
+              <input
+                class="iv-input iv-input-w-200"
+                type="text"
+                name="name"
+                data-i18n-placeholder="rbacRoles.searchNamePlaceholder"
+                placeholder="Tên vai trò"
+              />
+            </div>
+            <div class="iv-form-item">
+              <input
+                class="iv-input iv-input-w-200"
+                type="text"
+                name="description"
+                data-i18n-placeholder="rbacRoles.searchDescPlaceholder"
+                placeholder="Mô tả vai trò"
+              />
+            </div>
+            <div class="iv-form-item">
+              <button type="submit" class="iv-btn iv-btn-success iv-btn-circle iv-btn-sm">
+                <i class="iv-btn-icon">⟳</i><span data-i18n="rbacRoles.search">Tìm kiếm</span>
+              </button>
+              <span class="iv-divider-vertical"></span>
+              <button
+                type="button"
+                class="iv-btn iv-btn-primary iv-btn-circle iv-btn-sm"
+                data-action="add-role"
+              >
+                <i class="iv-btn-icon">＋</i><span data-i18n="rbacRoles.add">Thêm vai trò</span>
+              </button>
+              <span class="iv-divider-vertical"></span>
+              <button type="button" class="iv-btn iv-btn-default iv-btn-circle iv-btn-sm" id="rolesExportJsonBtn" data-i18n="toolbar.exportJson">
+                Xuất JSON
+              </button>
+            </div>
+          </form>
+
+          <hr class="iv-divider" />
+
+          <div class="iv-table-wrap">
+            <table class="iv-table" id="rolesTable">
+              <thead>
+                <tr>
+                  <th class="iv-th-center" style="width: 60px" data-i18n="rbacRoles.colOrdinal">#</th>
+                  <th><span data-i18n="rbacRoles.colName">Tên vai trò</span> ↕</th>
+                  <th><span data-i18n="rbacRoles.colNote">Ghi chú</span> ↕</th>
+                  <th><span data-i18n="rbacRoles.colCreatedAt">Thời gian tạo</span> ↕</th>
+                  <th><span data-i18n="rbacRoles.colCreatedBy">Người tạo</span> ↕</th>
+                  <th><span data-i18n="rbacRoles.colUpdatedAt">Thời gian cập nhật</span> ↕</th>
+                  <th><span data-i18n="rbacRoles.colUpdatedBy">Người cập nhật cuối</span> ↕</th>
+                  <th class="iv-th-center iv-th-action"><span data-i18n="rbacRoles.colActions">Thao tác</span></th>
+                </tr>
+              </thead>
+              <tbody data-role-rows>
+                <tr>
+                  <td colspan="8" class="iv-td-center" style="color: var(--muted)">
+                    Đang tải dữ liệu…
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="iv-page-row">
+            <div class="iv-page" id="rolesPager">
+              <span class="iv-page-total"><span data-i18n="rbacRoles.pagerTotalPrefix">Tổng</span> <span data-page-total>0</span></span>
+              <button type="button" class="iv-page-prev" data-page-prev>‹</button>
+              <span class="iv-page-pages" data-page-pages></span>
+              <button type="button" class="iv-page-next" data-page-next>›</button>
+              <select class="iv-page-size" data-page-size>
+                <option value="10">10/trang</option>
+                <option value="20">20/trang</option>
+                <option value="50">50/trang</option>
+              </select>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="iv-modal-mask" id="roleEditMask" aria-hidden="true">
+      <div class="iv-modal" role="dialog" aria-labelledby="roleEditTitle">
+        <div class="iv-modal-header">
+          <span id="roleEditTitle">Thêm vai trò</span>
+          <button type="button" class="iv-modal-close" data-action="close-edit">×</button>
+        </div>
+        <form id="roleEditForm" class="iv-modal-body iv-form-vertical" autocomplete="off">
+          <input type="hidden" name="id" />
+          <div class="iv-form-row">
+            <div class="iv-form-item iv-form-item-full">
+              <label class="iv-form-item-label iv-form-item-required" data-i18n="rbacRoles.labelName">Tên vai trò</label>
+              <input
+                class="iv-input"
+                type="text"
+                name="name"
+                data-i18n-placeholder="rbacRoles.namePlaceholder"
+                placeholder="Tên hiển thị hoặc mã ROLE_... (chữ in hoa, số, _)"
+                required
+              />
+            </div>
+            <div class="iv-form-item iv-form-item-full">
+              <label class="iv-form-item-label" data-i18n="rbacRoles.labelNote">Ghi chú</label>
+              <input class="iv-input" type="text" name="description" />
+            </div>
+            <div class="iv-form-item iv-form-item-full">
+              <label class="iv-form-item-label" for="parentRoleSelect">Kế thừa quyền (RBAC1)</label>
+              <select class="iv-input" id="parentRoleSelect" name="parentRoleId">
+                <option value="">— Không kế thừa —</option>
+              </select>
+              <p class="iv-form-hint" style="font-size: 12px; color: var(--muted, #888); margin-top: 6px">
+                Menu hiệu lực = menu gán cho vai trò này ∪ menu của các vai trò cha.
+              </p>
+            </div>
+          </div>
+        </form>
+        <div class="iv-modal-footer">
+          <button type="button" class="iv-btn iv-btn-text" data-action="close-edit" data-i18n="rbacRoles.modalCancel">Hủy</button>
+          <button
+            type="button"
+            class="iv-btn iv-btn-md iv-btn-solid-primary"
+            data-action="submit-edit"
+            data-i18n="rbacRoles.modalSaveRole"
+          >
+            Lưu vai trò
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="iv-modal-mask" id="rolePermMask" aria-hidden="true">
+      <div class="iv-modal iv-modal-lg" role="dialog" aria-labelledby="rolePermTitle">
+        <div class="iv-modal-header">
+          <span id="rolePermTitle">Gán quyền menu</span>
+          <button type="button" class="iv-modal-close" data-action="close-perm">×</button>
+        </div>
+        <div class="iv-modal-body iv-spin-fix" style="max-height: 500px">
+          <div id="rolePermTree" class="iv-tree"></div>
+          <div class="iv-spin-overlay" id="rolePermSpin" hidden data-i18n="rbacRoles.permLoading">Đang tải cây quyền…</div>
+        </div>
+        <div class="iv-modal-footer">
+          <button type="button" class="iv-btn iv-btn-text" data-action="close-perm" data-i18n="rbacRoles.modalCancel">Hủy</button>
+          <button
+            type="button"
+            class="iv-btn iv-btn-md iv-btn-solid-primary"
+            data-action="submit-perm"
+            data-i18n="rbacRoles.permSave"
+          >
+            Lưu quyền menu
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../assets/js/auth/auth.js"></script>
+    <script src="../../assets/js/auth/guard.js"></script>
+    <script src="../../assets/js/shared/menu-store.js"></script>
+    <script src="../../assets/js/shared/permission.js"></script>
+    <script src="../../assets/js/shared/sidebar.js"></script>
+    <script src="../../assets/js/shared/i18n-manager.js"></script>
+    <script src="../../assets/js/shared/lang-switcher.js"></script>
+    <script src="../../assets/js/components/navigation.js"></script>
+    <script src="../../assets/js/shared/menu-links.js"></script>
+    <script src="../../assets/js/shared/rbac-api.js"></script>
+    <script src="../../assets/js/shared/export-json.js"></script>
+    <script src="../../assets/js/pages/rbac-roles-page.js"></script>
+  </body>
+</html>

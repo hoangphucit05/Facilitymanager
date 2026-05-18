@@ -1,0 +1,673 @@
+/* =========================================================
+   iView-clone styles (vanilla HTML/CSS)
+   Dùng cho 2 trang:
+   - pages/profile/rbac-roles.html
+   - pages/profile/rbac-menus.html
+   ========================================================= */
+
+/* --- Card / Panel --- */
+.iv-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+/* --- Divider --- */
+.iv-divider {
+  height: 1px;
+  margin: 14px 0;
+  border: 0;
+  border-top: 1px dashed var(--line);
+}
+.iv-divider-solid {
+  border-top-style: solid;
+}
+.iv-divider-vertical {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: var(--line);
+  margin: 0 8px;
+  vertical-align: middle;
+}
+.iv-divider-text {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.iv-divider-text::before,
+.iv-divider-text::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--line);
+}
+
+/* --- Inline form --- */
+.iv-form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+}
+.iv-form-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.iv-form-item-label {
+  min-width: 90px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--text);
+}
+.iv-form-item-required::before {
+  content: "*";
+  color: var(--error);
+  margin-right: 4px;
+}
+.iv-form-vertical .iv-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 16px;
+}
+.iv-form-vertical .iv-form-row .iv-form-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.iv-form-vertical .iv-form-row .iv-form-item-full {
+  grid-column: 1 / -1;
+}
+
+/* --- Input --- */
+.iv-input {
+  height: 28px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+.iv-input:focus,
+.iv-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-soft-strong);
+}
+.iv-input-w-200 {
+  width: 200px;
+}
+.iv-input-search {
+  position: relative;
+}
+.iv-input-search input {
+  padding-right: 28px;
+}
+.iv-input-search::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  background: url("../../icons/search.svg") no-repeat center / contain;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* --- Select (native) --- */
+.iv-select {
+  height: 28px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+  width: 100%;
+}
+
+/* --- Number input --- */
+.iv-number {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  height: 28px;
+  background: #fff;
+  width: 100%;
+}
+.iv-number input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  padding: 0 8px;
+  font-size: 13px;
+  width: 100%;
+  background: transparent;
+}
+.iv-number button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  width: 22px;
+  height: 100%;
+  color: var(--muted);
+  border-left: 1px solid var(--line);
+}
+.iv-number button:hover {
+  color: var(--primary);
+}
+
+/* --- Switch (i-switch) --- */
+.iv-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 6px;
+  background: var(--slate-200);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  min-width: 56px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  user-select: none;
+}
+.iv-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: left 0.2s ease;
+}
+.iv-switch .iv-switch-on,
+.iv-switch .iv-switch-off {
+  flex: 1;
+  text-align: center;
+  pointer-events: none;
+}
+.iv-switch .iv-switch-on {
+  display: none;
+  padding-right: 18px;
+}
+.iv-switch .iv-switch-off {
+  padding-left: 18px;
+}
+.iv-switch.is-on {
+  background: var(--primary);
+}
+.iv-switch.is-on::after {
+  left: calc(100% - 22px);
+}
+.iv-switch.is-on .iv-switch-on {
+  display: block;
+}
+.iv-switch.is-on .iv-switch-off {
+  display: none;
+}
+
+/* --- Buttons (ghost / circle, theo iView) --- */
+.iv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 12px;
+  font-size: 12px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+  line-height: 1;
+  white-space: nowrap;
+}
+.iv-btn:hover {
+  opacity: 0.85;
+}
+.iv-btn-sm {
+  height: 24px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+.iv-btn-md {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+.iv-btn-circle {
+  border-radius: 999px;
+  padding: 0 12px;
+}
+
+/* Ghost (outline) variants */
+.iv-btn-primary {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+.iv-btn-primary:hover {
+  background: var(--primary-soft);
+}
+.iv-btn-success {
+  border-color: var(--success);
+  color: var(--success);
+  background: transparent;
+}
+.iv-btn-success:hover {
+  background: var(--success-soft);
+}
+.iv-btn-warning {
+  border-color: var(--warning);
+  color: var(--warning);
+  background: transparent;
+}
+.iv-btn-warning:hover {
+  background: var(--warning-soft);
+}
+.iv-btn-error {
+  border-color: var(--error);
+  color: var(--error);
+  background: transparent;
+}
+.iv-btn-error:hover {
+  background: var(--error-soft);
+}
+.iv-btn-info {
+  border-color: var(--slate-200);
+  color: var(--muted);
+  background: transparent;
+}
+.iv-btn-info:hover {
+  background: var(--slate-50);
+}
+
+/* Solid (footer of modal) */
+.iv-btn-solid-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.iv-btn-solid-primary:hover {
+  background: var(--blue-800);
+}
+.iv-btn-text {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+}
+.iv-btn-text:hover {
+  color: var(--primary);
+}
+
+.iv-btn-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+}
+
+/* --- Table --- */
+.iv-table-wrap {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: auto;
+}
+.iv-table {
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+  font-size: 12px;
+}
+.iv-table th,
+.iv-table td {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  vertical-align: middle;
+  text-align: left;
+}
+.iv-table thead th {
+  background: var(--slate-50);
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.iv-table tbody tr:nth-child(odd) td {
+  background: #fafbfc;
+}
+.iv-table tbody tr:hover td {
+  background: var(--primary-soft);
+}
+.iv-table .iv-th-center,
+.iv-table .iv-td-center {
+  text-align: center;
+}
+.iv-table .iv-th-action {
+  width: 380px;
+  text-align: center;
+}
+
+/* --- Pagination --- */
+.iv-page {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  margin-left: auto;
+  font-size: 12px;
+}
+.iv-page-row {
+  display: flex;
+  justify-content: flex-end;
+}
+.iv-page-item,
+.iv-page-prev,
+.iv-page-next {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.iv-page-item:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.iv-page-item.is-active {
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+}
+.iv-page-total {
+  color: var(--muted);
+  margin-right: 6px;
+}
+.iv-page select {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  height: 24px;
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+/* --- Modal --- */
+.iv-modal-mask {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  padding-top: 80px;
+  background: rgba(55, 55, 55, 0.32);
+}
+.iv-modal-mask.is-open {
+  display: flex;
+}
+.iv-modal {
+  background: #fff;
+  border-radius: 6px;
+  width: min(520px, 92vw);
+  max-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+}
+.iv-modal-lg {
+  width: min(720px, 95vw);
+}
+.iv-modal-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 14px;
+}
+.iv-modal-close {
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.iv-modal-body {
+  padding: 16px 18px;
+  overflow: auto;
+  flex: 1;
+}
+.iv-modal-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* --- Alert --- */
+.iv-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.iv-alert-success {
+  background: var(--success-soft);
+  color: var(--teal-800);
+  border: 1px solid var(--teal-200);
+}
+.iv-alert .iv-alert-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+.iv-alert a {
+  color: var(--primary);
+  cursor: pointer;
+}
+
+/** Nút dạng liên kết trong alert (tránh <a> không href làm nhảy trang) */
+button.iv-text-btn {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  color: var(--primary);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+}
+button.iv-text-btn:hover {
+  filter: brightness(1.08);
+}
+.iv-alert .iv-select-title {
+  font-weight: 700;
+  margin: 0 4px;
+}
+
+/* --- Tree --- */
+.iv-tree {
+  font-size: 13px;
+  color: var(--text);
+}
+.iv-tree-list {
+  list-style: none;
+  margin: 0;
+  padding-left: 18px;
+}
+.iv-tree > .iv-tree-list {
+  padding-left: 0;
+}
+.iv-tree-node {
+  margin: 2px 0;
+}
+.iv-tree-node-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  user-select: none;
+}
+.iv-tree-node-row:hover {
+  background: var(--primary-soft);
+}
+.iv-tree-node-row.is-selected {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.iv-tree-toggle {
+  width: 14px;
+  display: inline-block;
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+}
+.iv-tree-toggle.is-leaf {
+  visibility: hidden;
+}
+.iv-tree-checkbox {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--primary);
+}
+.iv-tree-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  border-radius: 3px;
+  background: var(--slate-200);
+}
+.iv-tree-icon.lvl-0 {
+  background: var(--blue-200);
+}
+.iv-tree-icon.lvl-1 {
+  background: var(--teal-200);
+}
+.iv-tree-icon.lvl-2 {
+  background: var(--amber-200);
+}
+.iv-tree-icon.lvl-3 {
+  background: var(--violet-200);
+}
+.iv-tree-children {
+  margin-left: 18px;
+  border-left: 1px dashed var(--line);
+  padding-left: 4px;
+}
+.iv-tree-children.is-collapsed {
+  display: none;
+}
+.iv-tree-empty {
+  color: var(--muted);
+  font-size: 12px;
+  padding: 8px;
+}
+
+/* --- Page-specific layouts --- */
+.role-page .iv-form-inline,
+.menu-page .iv-form-inline {
+  margin-bottom: 0;
+}
+
+.menu-page-grid {
+  display: grid;
+  grid-template-columns: 7fr 15fr;
+  gap: 16px;
+  align-items: flex-start;
+}
+.menu-page-tree {
+  border-right: 1px dashed var(--line);
+  padding-right: 12px;
+  max-height: min(72vh, 720px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+.menu-page-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.menu-page-toolbar-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.menu-page-toolbar-right {
+  flex: 0 0 280px;
+  max-width: 320px;
+}
+
+/* Spinner overlay (treeLoading) */
+.iv-spin-fix {
+  position: relative;
+  min-height: 60px;
+}
+.iv-spin-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--primary);
+}
+
+/* HTML [hidden] mặc định dễ bị display:flex ghi đè — ép ẩn overlay khi đã tải xong */
+.iv-spin-overlay[hidden] {
+  display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .menu-page-grid {
+    grid-template-columns: 1fr;
+  }
+  .menu-page-tree {
+    border-right: 0;
+    border-bottom: 1px dashed var(--line);
+    padding-right: 0;
+    padding-bottom: 12px;
+  }
+}

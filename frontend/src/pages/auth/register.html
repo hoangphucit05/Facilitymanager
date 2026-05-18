@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Đăng ký</title>
+        <link rel="stylesheet" href="../../assets/css/auth.css">
+        <link rel="stylesheet" href="../../assets/css/register-bug-captcha.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    </head>
+    <body>
+        <div id="registBox" class="box register">
+            <div class="login">
+                <div class="loginBx">
+                    <h2>
+                        <img class="title-icon" src="../../assets/images/logo-left.png" alt="logo icon">
+                        <span class="title-text">Welcome to Catepie</span>
+                        <img class="title-icon" src="../../assets/images/logo-right.png" alt="logo icon" style="transform:  scaleX(-1);">
+                    </h2>
+                </div>
+            </div>
+            <div class="modern-login-embed">
+                <div class="container">
+                    <div class="login-card">
+                        <div class="icon">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+
+                        <h2>Đăng ký</h2>
+                        <p>Tạo tài khoản mới (vai trò mặc định: sinh viên)</p>
+                        <form id="registForm" method="post" action="#">
+                            <div class="field-group">
+                                <div class="input-group">
+                                    <i class="fa-regular fa-user"></i>
+                                    <input id="username" name="username" type="text" autocomplete="username" placeholder="Tên đăng nhập">
+                                </div>
+                                <p id="usernameErr" class="field-error" role="alert"></p>
+                            </div>
+
+                            <div class="field-group">
+                                <div class="input-group">
+                                    <i class="fa-regular fa-id-card"></i>
+                                    <input id="nickname" name="nickname" type="text" autocomplete="name" placeholder="Họ và tên">
+                                </div>
+                                <p id="nicknameErr" class="field-error" role="alert"></p>
+                            </div>
+
+                            <div class="field-group">
+                                <div class="input-group">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <input id="password" name="password" type="password" placeholder="Mật khẩu (ít nhất 6 ký tự)" autocomplete="new-password">
+                                    <i class="fa-regular fa-eye eye"></i>
+                                </div>
+                                <p id="passwordErr" class="field-error" role="alert"></p>
+                            </div>
+
+                            <button type="submit">ĐĂNG KÝ</button>
+                            <p id="registFormError" class="auth-error auth-error-form"></p>
+                            <p class="auth-alt-link">
+                                <a href="login.html">Đã có tài khoản? Đăng nhập</a>
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="bugCaptchaOverlay" class="bug-captcha-overlay" aria-hidden="true">
+            <div class="bug-captcha-box bug-captcha-panel" id="bugCaptchaPanel">
+                <div class="bug-captcha-header">
+                    <div class="bug-captcha-header-text">
+                        <p>Chọn tất cả ô có</p>
+                        <h1>bugs</h1>
+                        <p>Nếu không có, nhấn <button type="button" class="bug-captcha-skip" id="bugCaptchaSkip">skip</button></p>
+                    </div>
+                    <div class="bug-captcha-header-icon" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <ellipse cx="24" cy="28" rx="16" ry="12" stroke="currentColor" stroke-width="2.2"/>
+                            <path d="M10 26c-4-6-2-14 4-16M38 26c4-6 2-14-4-16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                            <line x1="24" y1="10" x2="24" y2="6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                            <line x1="16" y1="12" x2="14" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="32" y1="12" x2="34" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="18" cy="26" r="2.2" fill="currentColor"/>
+                            <circle cx="30" cy="26" r="2.2" fill="currentColor"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="bug-captcha-grid" id="bugCaptchaGrid"></div>
+                <div class="bug-captcha-actions">
+                    <div class="bug-captcha-bar">
+                        <div class="bug-captcha-bar-left">
+                            <button type="button" class="bug-captcha-icon-btn" id="bugCaptchaRefresh" title="Làm mới" aria-label="Làm mới">⟳</button>
+                            <button type="button" class="bug-captcha-icon-btn" id="bugCaptchaAudio" title="Âm thanh" aria-label="Âm thanh">♪</button>
+                            <button type="button" class="bug-captcha-icon-btn" id="bugCaptchaInfo" title="Thông tin" aria-label="Thông tin">ⓘ</button>
+                        </div>
+                        <button type="button" class="bug-captcha-verify-inline" id="bugCaptchaVerify">VERIFY</button>
+                    </div>
+                </div>
+            </div>
+            <div class="bug-captcha-box bug-captcha-result" id="bugCaptchaResultPanel">
+                <div style="font-size: 72px" aria-hidden="true">❌</div>
+                <h2>Xác minh thất bại</h2>
+                <p id="bugCaptchaFailReason" style="margin-top: 12px; color: #cbd5e1">
+                    Bỏ sót bug hoặc chọn nhầm ô.
+                </p>
+                <button type="button" class="bug-captcha-retry" id="bugCaptchaRetry">Thử lại</button>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="../../assets/js/auth/auth.js"></script>
+        <script src="../../assets/js/auth/register-bug-captcha.js"></script>
+        <script src="../../assets/js/auth/register.js"></script>
+        <script>
+          (function initRegistBoxClickMode() {
+            const box = document.getElementById("registBox");
+            if (!box) return;
+
+            box.addEventListener("click", () => {
+              box.classList.add("is-open");
+            });
+
+            document.addEventListener("click", (event) => {
+              if (box.contains(event.target)) return;
+              box.classList.remove("is-open");
+            });
+          })();
+        </script>
+    </body>
+</html>

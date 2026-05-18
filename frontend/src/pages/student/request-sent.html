@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="studentRequests.sent.documentTitle">Yêu cầu đã gửi</title>
+    <link rel="stylesheet" href="../../assets/css/base.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/pages.css" />
+    <link rel="stylesheet" href="../../assets/css/student.css" />
+  </head>
+  <body data-required-roles="ADMIN,MANAGER,STAFF,STUDENT" data-student-page="sent-requests">
+    <div class="app app--with-sidebar">
+      <div id="appSidebar"></div>
+      <main class="content content--student">
+        <header class="topbar">
+          <div class="topbar-left">
+            <strong id="topbarRoleText">Administrator</strong>
+          </div>
+          <div class="topbar-right"></div>
+        </header>
+
+        <div class="student-shell">
+          <header class="student-topbar">
+            <button
+              id="studentBackBtn"
+              class="student-back"
+              type="button"
+              data-i18n-title="studentRequests.create.backAria"
+              data-i18n-aria-label="studentRequests.create.backAria"
+              title="Quay lại"
+              aria-label="Quay lại"
+            >
+              &#8592;
+            </button>
+            <span class="student-topbar-title" data-i18n-html="studentRequests.sent.pageTitle">YÊU CẦU ĐÃ GỬI</span>
+          </header>
+
+          <div class="student-main">
+            <div id="studentEmptyState" class="student-list-wrap">
+              <div>
+                <div class="student-empty-icon">&#128230;</div>
+                <div class="student-empty-msg" data-i18n-html="studentRequests.sent.empty">Danh sách yêu cầu rỗng</div>
+              </div>
+            </div>
+            <div id="studentRequestList" class="student-list" hidden></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../assets/js/auth/auth.js"></script>
+    <script src="../../assets/js/shared/menu-store.js"></script>
+    <script src="../../assets/js/auth/guard.js"></script>
+    <script src="../../assets/js/shared/permission.js"></script>
+    <script src="../../assets/js/shared/sidebar.js"></script>
+    <script src="../../assets/js/shared/i18n-manager.js"></script>
+    <script src="../../assets/js/shared/lang-switcher.js"></script>
+    <script src="../../assets/js/components/navigation.js"></script>
+    <script src="../../assets/js/shared/menu-links.js"></script>
+    <script src="../../assets/js/student/requests.js"></script>
+  </body>
+</html>

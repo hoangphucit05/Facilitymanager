@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Khoa - Lớp</title>
+    <link rel="stylesheet" href="../../assets/css/base.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/pages.css" />
+  </head>
+  <body data-required-roles="ADMIN,MANAGER,STAFF">
+    <div class="app app--with-sidebar">
+      <div id="appSidebar"></div>
+      <main class="content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <strong id="topbarRoleText">Administrator</strong>
+          </div>
+          <div class="topbar-right"></div>
+        </header>
+
+        <section class="panel departments-panel">
+          <h1 class="page-title" data-i18n="departments.pageTitle">Quản lý tòa nhà</h1>
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <span data-i18n="toolbar.showRows">Hiển thị</span>
+              <select id="departmentsPageSizeSelect" style="width: 72px; padding: 6px 8px; border: 1px solid #d5dde7; border-radius: 4px">
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+              </select>
+            </div>
+            <div class="toolbar-actions tabs">
+              <a
+                id="departmentsAddRoomLink"
+                class="tab"
+                href="../dashboard/room-add.html?building=E1"
+                data-i18n="departments.addRoom"
+                >Thêm phòng</a>
+              <button type="button" id="departmentsExportJsonBtn" class="tab" data-i18n="toolbar.exportJson">Xuất JSON</button>
+            </div>
+            <div class="toolbar-search">
+              <input
+                id="departmentsSearchInput"
+                class="table-search-input"
+                type="search"
+                data-i18n-placeholder="departments.searchPlaceholder"
+                placeholder="Tìm kiếm"
+              />
+            </div>
+          </div>
+          <table id="departmentsTable" data-dept-search-mode="single">
+            <thead>
+              <tr id="departmentsTableHeadRow">
+                <th data-i18n="departments.colRoomCode">Mã phòng</th>
+                <th data-i18n="departments.colFloor">Tầng</th>
+                <th data-i18n="departments.colClassUsing">Lớp đang sử dụng</th>
+                <th data-i18n="departments.colCapacity">Sức chứa</th>
+                <th data-i18n="departments.colStatus">Trạng thái</th>
+                <th data-i18n="departments.colActions">Chức năng</th>
+              </tr>
+            </thead>
+            <tbody id="roomTableBody">
+              <tr data-room-id="E1-101">
+                <td>E1-101</td>
+                <td>1</td>
+                <td>CNTT</td>
+                <td>60</td>
+                <td>Đang sử dụng</td>
+                <td>-</td>
+              </tr>
+              <tr data-room-id="E1-202">
+                <td>E1-202</td>
+                <td>2</td>
+                <td>50</td>
+                <td>QTKD</td>
+                <td>Đang sử dụng</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../assets/js/auth/auth.js"></script>
+    <script src="../../assets/js/shared/menu-store.js"></script>
+    <script src="../../assets/js/auth/guard.js"></script>
+    <script src="../../assets/js/shared/sidebar.js"></script>
+    <script src="../../assets/js/shared/i18n-manager.js"></script>
+    <script src="../../assets/js/shared/lang-switcher.js"></script>
+    <script src="../../assets/js/components/navigation.js"></script>
+    <script src="../../assets/js/shared/menu-links.js"></script>
+    <script src="../../assets/js/shared/table-controls.js"></script>
+    <script src="../../assets/js/shared/room-helpers.js"></script>
+    <script src="../../assets/js/api/api-client.js"></script>
+    <script src="../../assets/js/shared/export-json.js"></script>
+    <script src="../../assets/js/main.js"></script>
+  </body>
+</html>
