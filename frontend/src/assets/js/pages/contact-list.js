@@ -3,7 +3,6 @@
  */
 (function contactListPage() {
   const grid = document.getElementById("contactUserListSection");
-  const countEl = document.getElementById("contactUserCount");
   if (!grid) return;
 
   function esc(s) {
@@ -41,19 +40,13 @@
 
   function showError(msg) {
     grid.innerHTML = `<p class="contact-error" style="grid-column:1/-1;padding:16px;text-align:center;color:#b3261e">${esc(msg)}</p>`;
-    if (countEl) countEl.hidden = true;
   }
 
   function renderCards(list) {
     if (!Array.isArray(list) || list.length === 0) {
       grid.innerHTML =
         '<p class="contact-empty" style="grid-column:1/-1;padding:24px;text-align:center">Chưa có user trong CSDL.</p>';
-      if (countEl) countEl.hidden = true;
       return;
-    }
-    if (countEl) {
-      countEl.hidden = false;
-      countEl.textContent = `${list.length} user`;
     }
     grid.innerHTML = list
       .map((u) => {
@@ -88,7 +81,6 @@
     }
     grid.innerHTML =
       '<p class="contact-loading" style="grid-column:1/-1;padding:24px;text-align:center">Đang tải dữ liệu…</p>';
-    if (countEl) countEl.hidden = true;
 
     try {
       const list = await Promise.race([

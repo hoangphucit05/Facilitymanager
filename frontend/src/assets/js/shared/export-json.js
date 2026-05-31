@@ -27,7 +27,7 @@
     if (!cell) return false;
     return Boolean(
       cell.querySelector(
-        ".user-action-buttons, .category-icon-actions, .room-action-buttons, .transfer-truck-btn, .liquidation-view-btn, .asset-rerating-btn, .asset-rate-now-btn",
+        ".user-action-buttons, .category-icon-actions, .room-action-buttons, .asset-rerating-btn, .asset-rate-now-btn",
       ),
     );
   }

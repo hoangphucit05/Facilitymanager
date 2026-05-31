@@ -3,23 +3,19 @@
  */
 (function initSharedNavigation() {
   function applyUserHeader() {
-    const role = String(window.AppAuth?.getCurrentUser?.()?.role || "").toUpperCase();
+    const user = window.AppAuth?.getCurrentUser?.();
+    const role = String(user?.role || "").toUpperCase();
     if (!role) return;
 
     const brand = document.getElementById("sidebarBrandText") || document.querySelector(".sidebar .brand");
-    const welcome = document.getElementById("sidebarWelcomeText");
     const sidebarRole = document.getElementById("sidebarRoleText");
     const topbarRole = document.getElementById("topbarRoleText");
-    const fullName = window.AppAuth?.getCurrentUser?.()?.fullName;
-
-    if (welcome) welcome.setAttribute("data-i18n", "sidebar.welcome");
+    const fullName = user?.fullName;
 
     if (role === "STUDENT") {
       if (brand) brand.textContent = "SINH VIÊN";
       if (sidebarRole) sidebarRole.textContent = fullName || "Sinh viên";
-      if (topbarRole) {
-        topbarRole.setAttribute("data-i18n", "nav.roleStudent");
-      }
+      if (topbarRole) topbarRole.setAttribute("data-i18n", "nav.roleStudent");
       window.FmI18n?.apply?.(document.body);
       return;
     }
@@ -27,9 +23,7 @@
     if (role === "ADMIN") {
       if (brand) brand.textContent = "ADMIN";
       if (sidebarRole) sidebarRole.textContent = fullName || "Administrator";
-      if (topbarRole) {
-        topbarRole.setAttribute("data-i18n", "nav.roleAdministrator");
-      }
+      if (topbarRole) topbarRole.setAttribute("data-i18n", "nav.roleAdministrator");
       window.FmI18n?.apply?.(document.body);
       return;
     }
@@ -41,6 +35,21 @@
       topbarRole.textContent = role;
     }
     window.FmI18n?.apply?.(document.body);
+  }
+
+  function mountTopbarExtras() {
+    const menuIcon =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
+
+    document.querySelectorAll(".topbar").forEach((topbar) => {
+      const left = topbar.querySelector(".topbar-left");
+      if (left && !left.querySelector(".topbar-menu-btn")) {
+        left.insertAdjacentHTML(
+          "afterbegin",
+          `<button type="button" class="topbar-menu-btn" aria-label="Thu gọn sidebar" aria-expanded="true">${menuIcon}</button>`
+        );
+      }
+    });
   }
 
   document.addEventListener("click", (e) => {
@@ -117,7 +126,7 @@
     window.location.href = `${"../".repeat(depth)}pages/auth/login.html`;
   });
 
-  document.querySelectorAll(".status-pill:not(.user-status-pill)").forEach((toggle) => {
+  document.querySelectorAll(".status-pill:not(.user-status-pill):not(.asset-status-pill)").forEach((toggle) => {
     toggle.addEventListener("click", () => {
       const isOn = toggle.classList.toggle("on");
       toggle.setAttribute("aria-pressed", isOn ? "true" : "false");
@@ -143,6 +152,7 @@
 
   function afterSidebarReady() {
     applyUserHeader();
+    mountTopbarExtras();
     window.AppPerm?.applyToDOM?.(document);
     loadSidebarDrawer();
   }

@@ -6,6 +6,7 @@
     searchColumnIndexes,
     getRowSearchText,
     customFilter,
+    isDataRow,
   }) => {
     if (!tableBody) return () => {};
     const getRows = () => Array.from(tableBody.querySelectorAll("tr"));
@@ -35,14 +36,20 @@
     let currentPage = 1;
     let totalPages = 1;
     let lastMatchedRows = [];
+    const rowIsData =
+      typeof isDataRow === "function" ? isDataRow : () => true;
 
     const apply = () => {
       const rows = getRows();
       const keyword = searchInput?.value.trim().toLowerCase() || "";
       const size = Number(pageSizeSelect?.value);
-      const pageSize = Number.isFinite(size) && size > 0 ? size : rows.length;
+      const pageSize =
+        Number.isFinite(size) && size > 0
+          ? size
+          : Math.max(1, rows.filter((row) => rowIsData(row)).length || 1);
 
       lastMatchedRows = rows.filter((row) => {
+        if (!rowIsData(row)) return false;
         let rowText = "";
         if (typeof getRowSearchText === "function") {
           const t = getRowSearchText(row);
@@ -67,6 +74,10 @@
       const visibleRows = new Set(lastMatchedRows.slice(start, end));
 
       rows.forEach((row) => {
+        if (!rowIsData(row)) {
+          row.hidden = lastMatchedRows.length > 0;
+          return;
+        }
         row.hidden = !visibleRows.has(row);
       });
 

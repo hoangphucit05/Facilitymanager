@@ -1,6 +1,5 @@
 /**
- * Trang chủ index.html — logic tương đương school front/src/views/home/home.vue .
- * Gọi /myDoor/getMyDoorList6 khi backend zwz có; nếu không thì fallback tĩnh.
+ * Trang chủ index.html — module thường dùng (lưới + công việc).
  */
 (function homePageScope() {
   const auth = window.AppAuth;
@@ -8,36 +7,89 @@
   const menuStore = window.MenuStore;
   if (!auth || !sidebarApi) return;
 
-  const DEFAULT_SHORTCUTS = [
-    { key: "home.shortcuts.assets", href: "pages/dashboard/assets.html" },
-    { key: "home.shortcuts.categories", href: "pages/dashboard/categories.html" },
-    { key: "home.shortcuts.statistics", href: "pages/dashboard/statistics.html" },
-    { key: "home.shortcuts.building", href: "pages/dashboard/departments.html" },
-    { key: "home.shortcuts.liquidation", href: "pages/dashboard/liquidation.html" },
-    { key: "home.shortcuts.users", href: "pages/profile/users.html" },
+  const MAIN_MODULES = [
+    {
+      id: "users",
+      titleKey: "dashboard.cardUsersTitle",
+      subtitleKey: "dashboard.cardUsersSubtitle",
+      href: "pages/profile/users.html",
+      icon: "👤",
+      tone: "orange",
+      menuNames: ["page_users"],
+    },
+    {
+      id: "rooms",
+      titleKey: "dashboard.cardRoomsTitle",
+      subtitleKey: "dashboard.cardRoomsSubtitle",
+      href: "pages/dashboard/room-map.html",
+      icon: "🏫",
+      tone: "blue",
+      menuNames: ["page_room_management", "page_departments"],
+    },
+    {
+      id: "statistics",
+      titleKey: "dashboard.cardStatsShortTitle",
+      subtitleKey: "dashboard.cardStatsSubtitle",
+      href: "pages/dashboard/statistics.html",
+      icon: "📊",
+      tone: "green",
+      menuNames: ["page_statistics"],
+    },
+    {
+      id: "categories",
+      titleKey: "dashboard.cardCategoriesTitle",
+      subtitleKey: "dashboard.cardCategoriesSubtitle",
+      href: "pages/dashboard/categories.html",
+      icon: "📁",
+      tone: "purple",
+      menuNames: ["page_categories"],
+    },
+    {
+      id: "assets",
+      titleKey: "dashboard.cardAssetsTitle",
+      subtitleKey: "dashboard.cardAssetsSubtitle",
+      href: "pages/dashboard/assets.html",
+      icon: "📦",
+      tone: "brown",
+      menuNames: ["page_assets"],
+    },
+    {
+      id: "inspection",
+      titleKey: "dashboard.cardInspectionTitle",
+      subtitleKey: "dashboard.cardInspectionSubtitle",
+      href: "pages/dashboard/audit-periodic.html",
+      icon: "📋",
+      tone: "pink",
+      menuNames: ["page_audit_periodic"],
+    },
   ];
 
-  const TITLE_MAP = {
-    "Tài sản": "home.shortcuts.assets",
-    "Danh mục": "home.shortcuts.categories",
-    "Thống kê": "home.shortcuts.statistics",
-    "Tòa nhà": "home.shortcuts.building",
-    "Thanh lý / điều chuyển": "home.shortcuts.liquidation",
-    "Điều chuyển / thanh lý": "home.shortcuts.liquidation",
-    "Người dùng": "home.shortcuts.users",
-    Assets: "home.shortcuts.assets",
-    Categories: "home.shortcuts.categories",
-    Statistics: "home.shortcuts.statistics",
-    Buildings: "home.shortcuts.building",
-    "Disposal / transfer": "home.shortcuts.liquidation",
-    Users: "home.shortcuts.users",
-    資産: "home.shortcuts.assets",
-    分類: "home.shortcuts.categories",
-    統計: "home.shortcuts.statistics",
-    建物: "home.shortcuts.building",
-    "廃棄・移管": "home.shortcuts.liquidation",
-    ユーザー: "home.shortcuts.users",
-  };
+  const TASK_MODULES = [
+    {
+      id: "pending",
+      titleKey: "dashboard.taskPending",
+      href: "pages/dashboard/requests.html?view=pending",
+      icon: "📋",
+      tone: "orange",
+      menuNames: ["page_work_pending"],
+    },
+    {
+      id: "open",
+      titleKey: "dashboard.taskOpen",
+      href: "pages/dashboard/requests.html?view=incomplete",
+      icon: "🕐",
+      tone: "blue",
+      menuNames: ["page_work_incomplete"],
+    },
+    {
+      id: "mine",
+      titleKey: "dashboard.taskMine",
+      href: "pages/dashboard/requests.html?view=mine",
+      icon: "👤",
+      tone: "green",
+      menuNames: ["page_work_mine"],
+    },
+  ];
 
   function pad(n) {
     return String(n).padStart(2, "0");
@@ -50,9 +102,9 @@
     try {
       dateEl.textContent = new Intl.DateTimeFormat(intlLoc, {
         weekday: "long",
+        day: "2-digit",
+        month: "2-digit",
         year: "numeric",
-        month: "long",
-        day: "numeric",
       }).format(d);
     } catch {
       dateEl.textContent = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -60,14 +112,13 @@
     clockEl.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   }
 
-  /** @returns {Promise<Map<string,string>>} permission name → href */
+  /** @returns {Promise<Map<string,string>>} */
   async function loadNameToHref() {
     const map = new Map();
     try {
       if (!menuStore?.loadMenu) return map;
       const { roots } = await menuStore.loadMenu(false);
 
-      /** @param {any[]} nodes */
       function walk(nodes) {
         for (const n of nodes || []) {
           const pt = n.permissionType;
@@ -83,113 +134,101 @@
         }
       }
 
-      const top = roots.length === 1 && roots[0].permissionType === -1 && roots[0].children?.length ? roots[0].children : roots;
+      const top =
+        roots.length === 1 && roots[0].permissionType === -1 && roots[0].children?.length
+          ? roots[0].children
+          : roots;
       walk(top);
     } catch {
-      /* menu lỗi → chỉ dùng default */
+      /* ignore */
     }
     return map;
   }
 
-  /**
-   * @param {HTMLElement} grid
-   * @param {Map<string,string>} nameToHref
-   */
-  function renderShortcuts(grid, nameToHref, list) {
-    grid.innerHTML = "";
-    list.forEach((item) => {
-      const rawTitle = (item.title || "").trim() || "—";
-      const name = item.name != null ? String(item.name) : "";
-      const badName = !name || name === "null";
-      const unset = rawTitle === "尚未添加" || rawTitle === "Chưa thêm";
-      const href = !badName ? nameToHref.get(name) : null;
-
-      if (href) {
-        const a = document.createElement("a");
-        a.className = "home-shortcut-tile";
-        a.href = href;
-        if (unset) {
-          a.setAttribute("data-i18n", "common.shortcutEmpty");
-          a.textContent = "";
-        } else {
-          const i18nKey = TITLE_MAP[rawTitle];
-          if (i18nKey) a.setAttribute("data-i18n", i18nKey);
-          a.textContent = rawTitle;
-        }
-        grid.appendChild(a);
-        return;
-      }
-
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "home-shortcut-tile is-placeholder";
-      btn.disabled = true;
-      const i18nKeyBtn = TITLE_MAP[rawTitle];
-      if (i18nKeyBtn && !badName && !unset) btn.setAttribute("data-i18n", i18nKeyBtn);
-      btn.textContent = badName || unset ? "" : rawTitle;
-      if (badName || unset) btn.setAttribute("data-i18n", "common.shortcutEmpty");
-      grid.appendChild(btn);
-    });
+  function resolveModuleHref(def, nameToHref) {
+    if (def.href) {
+      return sidebarApi.resolveHref?.(def.href) || def.href;
+    }
+    for (const name of def.menuNames || []) {
+      const hit = nameToHref.get(name);
+      if (hit) return hit;
+    }
+    return null;
   }
 
-  /** @param {HTMLElement} grid */
-  function renderDefaultAnchors(grid) {
-    grid.innerHTML = "";
-    DEFAULT_SHORTCUTS.forEach((s) => {
-      const a = document.createElement("a");
-      a.className = "home-shortcut-tile";
-      a.href = s.href;
-      a.setAttribute("data-i18n", s.key);
-      a.textContent = " ";
-      grid.appendChild(a);
-    });
-    window.FmI18n?.apply?.(grid);
+  function createMainModuleCard(def, href) {
+    const el = document.createElement(href ? "a" : "button");
+    el.className = "home-module-card home-module-card--tile";
+    if (!href) {
+      el.type = "button";
+      el.disabled = true;
+      el.classList.add("is-disabled");
+    } else {
+      el.href = href;
+    }
+
+    el.innerHTML = `
+      <span class="home-module-icon home-module-icon--${def.tone}" aria-hidden="true">${def.icon}</span>
+      <span class="home-module-text">
+        <p class="home-module-title" data-i18n="${def.titleKey}"></p>
+        <p class="home-module-subtitle" data-i18n="${def.subtitleKey}"></p>
+      </span>
+      <span class="home-module-arrow" aria-hidden="true">›</span>`;
+    return el;
   }
 
-  async function loadMyDoorShortcuts(grid, nameToHref) {
-    try {
-      const res = await auth.rbacFetch("/myDoor/getMyDoorList6", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-        body: "",
+  function createTaskCard(def, href) {
+    const el = document.createElement(href ? "a" : "button");
+    el.className = "home-task-card";
+    if (!href) {
+      el.type = "button";
+      el.disabled = true;
+      el.classList.add("is-disabled");
+    } else {
+      el.href = href;
+    }
+
+    el.innerHTML = `
+      <span class="home-task-icon home-task-icon--${def.tone}" aria-hidden="true">${def.icon}</span>
+      <span class="home-task-title" data-i18n="${def.titleKey}"></span>
+      <span class="home-module-arrow" aria-hidden="true">›</span>`;
+    return el;
+  }
+
+  function renderModules(mainGrid, taskList, nameToHref) {
+    if (mainGrid) {
+      mainGrid.innerHTML = "";
+      MAIN_MODULES.forEach((def) => {
+        mainGrid.appendChild(createMainModuleCard(def, resolveModuleHref(def, nameToHref)));
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || data.success === false) throw new Error("myDoor");
-      const rows = Array.isArray(data.result) ? data.result : Array.isArray(data.data) ? data.data : null;
-      if (!rows || !rows.length) throw new Error("empty");
-      const mapped = rows.map((r) => ({
-        name: r.name,
-        title: r.title || r.name,
-      }));
-      renderShortcuts(grid, nameToHref, mapped);
-      window.FmI18n?.apply?.(grid);
-    } catch {
-      renderDefaultAnchors(grid);
+      window.FmI18n?.apply?.(mainGrid);
+    }
+    if (taskList) {
+      taskList.innerHTML = "";
+      TASK_MODULES.forEach((def) => {
+        taskList.appendChild(createTaskCard(def, resolveModuleHref(def, nameToHref)));
+      });
+      window.FmI18n?.apply?.(taskList);
     }
   }
 
-  function bindTaskButtons() {
-    document.querySelectorAll(".home-task-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        window.alert("Tính năng đang được phát triển.");
-      });
-    });
-  }
-
   window.addEventListener("fm-i18n-applied", () => {
-    const grid = document.getElementById("homeShortcutGrid");
-    if (grid) window.FmI18n?.apply?.(grid);
+    const mainGrid = document.getElementById("homeModuleGrid");
+    const taskList = document.getElementById("homeTaskList");
+    if (mainGrid) window.FmI18n?.apply?.(mainGrid);
+    if (taskList) window.FmI18n?.apply?.(taskList);
     const dateEl = document.getElementById("homeDate");
     const clockEl = document.getElementById("homeClock");
     if (dateEl && clockEl) updateClock(dateEl, clockEl);
   });
 
   document.addEventListener("DOMContentLoaded", async () => {
-    const grid = document.getElementById("homeShortcutGrid");
+    const mainGrid = document.getElementById("homeModuleGrid");
+    const taskList = document.getElementById("homeTaskList");
     const dateEl = document.getElementById("homeDate");
     const clockEl = document.getElementById("homeClock");
     const nameEl = document.getElementById("homeUserName");
-    if (!grid || !dateEl || !clockEl || !nameEl) return;
+    if (!mainGrid || !taskList || !dateEl || !clockEl || !nameEl) return;
 
     const u = auth.getCurrentUser?.();
     const session = auth.getSession?.();
@@ -198,9 +237,7 @@
     updateClock(dateEl, clockEl);
     setInterval(() => updateClock(dateEl, clockEl), 1000);
 
-    bindTaskButtons();
-
     const nameToHref = await loadNameToHref();
-    await loadMyDoorShortcuts(grid, nameToHref);
+    renderModules(mainGrid, taskList, nameToHref);
   });
 })();

@@ -1,90 +1,100 @@
 :root {
-  /* =======================
-     1) PRIMARY BLUE
-     Main actions / links / active states
-     ======================= */
-  --blue-50: #eef4ff;
-  --blue-200: #bfd5ff;
-  --blue-600: #2f6fed;
-  --blue-800: #234fb4;
+  /* ━━━ FPT Orange — single source of truth ━━━ */
+  --color-primary: #ff6600;
+  --color-primary-light: #ff8533;
+  --color-primary-lighter: #ffa366;
+  --color-primary-pale: #fff0e6;
+  --color-primary-dark: #cc5200;
+  --color-primary-deeper: #99390a;
+  --color-accent: #ffb347;
+  --color-white: #ffffff;
+  --color-text-on-primary: #ffffff;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #4a4a4a;
+  --color-border: #ffd4b3;
+  --color-bg-page: #fff8f4;
+  --color-bg-card: #ffffff;
+  --color-success: #2d8a4e;
+  --color-error: #d94040;
+  --color-warning: #ff6600;
+  --color-info: #ff8533;
 
-  /* =======================
-     2) NEUTRAL SLATE
-     Sidebar / background / borders / text hierarchy
-     ======================= */
-  --slate-50: #fcfaf6;
-  --slate-200: #ddd5c8;
-  --slate-600: #6b6257;
-  --slate-800: #3b342d;
-  --slate-900: #26221d;
+  /* Semantic aliases (used across the app) */
+  --bg: var(--color-bg-page);
+  --card: var(--color-bg-card);
+  --text: var(--color-text-primary);
+  --muted: var(--color-text-secondary);
+  --line: var(--color-border);
 
-  /* =======================
-     3) SUCCESS TEAL
-     Success states / active status
-     ======================= */
-  --teal-50: #eefbf7;
-  --teal-200: #a9ead8;
-  --teal-600: #1d8f78;
-  --teal-800: #146354;
+  --primary: var(--color-primary);
+  --primary-600: var(--color-primary);
+  --primary-700: var(--color-primary-dark);
+  --primary-soft: var(--color-primary-pale);
+  --primary-soft-strong: rgba(255, 102, 0, 0.15);
 
-  /* =======================
-     4) WARNING AMBER
-     ======================= */
-  --amber-50: #fff8e8;
-  --amber-200: #f6dd9a;
-  --amber-600: #c9831f;
-  --amber-800: #8a5511;
+  --success: var(--color-success);
+  --success-soft: #e8f5ec;
+  --warning: var(--color-warning);
+  --warning-soft: var(--color-primary-pale);
+  --error: var(--color-error);
+  --error-soft: #fdecec;
+  --info: var(--color-info);
+  --info-soft: var(--color-primary-pale);
+  --accent: var(--color-accent);
 
-  /* =======================
-     5) DANGER RED
-     ======================= */
-  --red-50: #fff1f1;
-  --red-200: #f6c2c2;
-  --red-600: #cb3a3a;
-  --red-800: #8f2222;
+  /* Legacy scale tokens → FPT mapping */
+  --blue-50: var(--color-primary-pale);
+  --blue-200: var(--color-primary-lighter);
+  --blue-600: var(--color-primary);
+  --blue-800: var(--color-primary-dark);
 
-  /* =======================
-     6) ACCENT PURPLE
-     ======================= */
-  --violet-50: #f6f2ff;
-  --violet-200: #ded2ff;
-  --violet-600: #7a43d6;
-  --violet-800: #56309c;
+  --slate-50: var(--color-primary-pale);
+  --slate-200: var(--color-border);
+  --slate-600: var(--color-text-secondary);
+  --slate-800: var(--color-text-primary);
+  --slate-900: #141414;
 
-  /* App aliases */
-  --bg: var(--slate-50);
-  --card: #ffffff;
-  --text: var(--slate-800);
-  --muted: var(--slate-600);
-  --line: var(--slate-200);
+  --teal-50: var(--success-soft);
+  --teal-200: #b8dcc4;
+  --teal-600: var(--color-success);
+  --teal-800: #1f6b3a;
 
-  --primary: var(--blue-600);
-  --primary-600: var(--blue-600);
-  --primary-700: var(--blue-800);
-  --primary-soft: var(--blue-50);
-  --primary-soft-strong: rgba(47, 111, 237, 0.2);
+  --amber-50: var(--color-primary-pale);
+  --amber-200: var(--color-primary-lighter);
+  --amber-600: var(--color-accent);
+  --amber-800: var(--color-primary-dark);
 
-  --success: var(--teal-600);
-  --success-soft: var(--teal-50);
-  --warning: var(--amber-600);
-  --warning-soft: var(--amber-50);
-  --error: var(--red-600);
-  --error-soft: var(--red-50);
-  --info: var(--violet-600);
-  --info-soft: var(--violet-50);
+  --red-50: var(--error-soft);
+  --red-200: #f5b8b8;
+  --red-600: var(--color-error);
+  --red-800: #a82e2e;
 
-  --accent: var(--violet-600);
+  --violet-50: var(--color-primary-pale);
+  --violet-200: var(--color-primary-lighter);
+  --violet-600: var(--color-info);
+  --violet-800: var(--color-primary-dark);
 
-  --sidebar-bg: #1e3a5f;
-  --sidebar-bg-deep: #152a45;
-  --sidebar-hover: #2a4d7a;
-  --sidebar-active: var(--blue-600);
-  --sidebar-active-bg: var(--sidebar-active);
-  --sidebar-active-shadow: rgba(47, 111, 237, 0.34);
-  --sidebar-text: #dce6f2;
-  --sidebar-text-strong: #f8fafc;
-  --sidebar-muted: #94a3b8;
-  --sidebar-border: rgba(255, 255, 255, 0.12);
+  --orange-500: var(--color-primary-light);
+  --orange-600: var(--color-primary);
+  --orange-700: var(--color-primary-dark);
+  --orange-800: var(--color-primary-deeper);
+
+  /* Sidebar / shell — cam FPT (#ff6600) như thanh MANAGER */
+  --sidebar-bg: #ff6600;
+  --sidebar-bg-deep: #e85c00;
+  --sidebar-hover: rgba(255, 255, 255, 0.14);
+  --sidebar-active: rgba(255, 255, 255, 0.22);
+  --sidebar-active-bg: rgba(255, 255, 255, 0.16);
+  --sidebar-active-shadow: rgba(0, 0, 0, 0.15);
+  --sidebar-text: rgba(255, 255, 255, 0.78);
+  --sidebar-text-strong: var(--color-text-on-primary);
+  --sidebar-muted: rgba(255, 255, 255, 0.65);
+  --sidebar-border: rgba(255, 255, 255, 0.18);
+
+  --focus-ring: 0 0 0 3px rgba(255, 102, 0, 0.15);
+  --overlay-backdrop: rgba(153, 57, 10, 0.3);
+  --selection-bg: rgba(255, 102, 0, 0.25);
+  --placeholder-color: #ffaa80;
 }
 
 * {
@@ -104,20 +114,47 @@ body {
   display: flex;
   flex-direction: column;
   font-family: Arial, Helvetica, sans-serif;
-  color: var(--text);
-  background: var(--bg);
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
 }
 
 h1,
 h2,
 h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  color: var(--color-primary-dark);
+}
+
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.5rem;
+}
+h3 {
+  font-size: 1.25rem;
+}
+
 p {
   margin: 0;
+  color: var(--color-text-primary);
 }
 
 a {
-  color: inherit;
+  color: var(--color-primary);
   text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+::selection {
+  background: var(--selection-bg);
 }
 
 table {
@@ -127,10 +164,26 @@ table {
 
 th,
 td {
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-border);
   padding: 10px;
   font-size: 14px;
   text-align: left;
+}
+
+thead th {
+  background: var(--color-primary-pale);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+tbody tr:hover td {
+  background: rgba(255, 102, 0, 0.05);
+}
+
+tbody tr.is-selected td,
+tbody tr.selected td {
+  background: rgba(255, 102, 0, 0.12);
+  border-left: 3px solid var(--color-primary);
 }
 
 input,
@@ -140,14 +193,78 @@ button {
   font: inherit;
 }
 
-/* i18n: smooth refresh when locale bundle applies */
+input::placeholder,
+textarea::placeholder {
+  color: var(--placeholder-color);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,
+textarea {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-primary);
+}
+
+input[type="range"] {
+  accent-color: var(--color-primary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary-lighter) var(--color-primary-pale);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-primary-pale);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-primary-lighter);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* i18n */
 html.fm-i18n-transitioning .app,
 html.fm-i18n-transitioning body {
   transition: opacity 0.18s ease;
   opacity: 0.94;
 }
 
-/* Furigana (日本語): ẩn đọc <rt> cho đến khi tick; chỉ áp dụng khi lang = ja */
 html[data-fm-lang]:not([data-fm-lang="ja"]) ruby rt {
   display: none !important;
 }
@@ -162,4 +279,22 @@ html[data-fm-lang="ja"][data-fm-furigana="1"] ruby rt {
   line-height: 1.1;
   font-weight: 500;
   user-select: none;
+}
+
+@media print {
+  :root {
+    --color-primary: #ff6600;
+    --color-primary-dark: #ff6600;
+    --sidebar-bg: #ff6600;
+    --sidebar-bg-deep: #ff6600;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  a {
+    color: #ff6600 !important;
+  }
 }

@@ -11,10 +11,15 @@
     "/profile/users": "pages/profile/users.html",
     "/profile/rbac-roles": "pages/profile/rbac-roles.html",
     "/dashboard/departments": "pages/dashboard/departments.html",
+    "/dashboard/room-map": "pages/dashboard/room-map.html",
     "/dashboard/categories": "pages/dashboard/categories.html",
     "/dashboard/assets": "pages/dashboard/assets.html",
-    "/dashboard/liquidation": "pages/dashboard/liquidation.html",
     "/dashboard/statistics": "pages/dashboard/statistics.html",
+    "/dashboard/audit-periodic.html": "pages/dashboard/audit-periodic.html",
+    "/dashboard/requests": "pages/dashboard/requests.html",
+    "/dashboard/work/pending": "pages/dashboard/requests.html?view=pending",
+    "/dashboard/work/incomplete": "pages/dashboard/requests.html?view=incomplete",
+    "/dashboard/work/mine": "pages/dashboard/requests.html?view=mine",
     "/profile/contact": "pages/profile/contact.html",
     "/student/request-create": "pages/student/request-create.html",
     "/student/request-sent": "pages/student/request-sent.html",
@@ -29,6 +34,9 @@
     "Quản lý user": "menu.manageUsers",
     "User management": "menu.manageUsers",
     "ユーザー管理": "menu.manageUsers",
+    "Quản lí phòng học": "menu.manageRoomManagement",
+    "Quản lý phòng học": "menu.manageRoomManagement",
+    "Room management": "menu.manageRoomManagement",
     "Tòa nhà & phòng": "menu.buildings",
     "Buildings & rooms": "menu.buildings",
     "建物と部屋": "menu.buildings",
@@ -36,6 +44,7 @@
     "Building / room list": "menu.buildingRoomList",
     "建物・部屋リスト": "menu.buildingRoomList",
     "Tòa nhà": "menu.building",
+    "Phòng học": "menu.building",
     "Buildings": "menu.building",
     "建物": "menu.building",
     "Danh mục": "menu.categories",
@@ -53,10 +62,6 @@
     "Thống kê": "menu.statistics",
     "Statistics": "menu.statistics",
     "統計": "menu.statistics",
-    "Thanh lý / điều chuyển": "menu.liquidation",
-    "Điều chuyển / thanh lý": "menu.liquidation",
-    "Disposal / transfer": "menu.liquidation",
-    "廃棄・移管": "menu.liquidation",
     "Liên hệ": "menu.contact",
     "Contacts": "menu.contact",
     "連絡先": "menu.contact",
@@ -79,6 +84,27 @@
     "処理依頼を作成": "menu.studentCreateRequest",
     "送信済みの依頼": "menu.studentSent",
     "下書きの依頼": "menu.studentDrafts",
+    "Quản lý công việc": "menu.workMgmt",
+    "Work management": "menu.workMgmt",
+    "業務管理": "menu.workMgmt",
+    "Chờ xử lí": "menu.workPending",
+    "Chờ xử lý": "menu.workPending",
+    "Pending": "menu.workPending",
+    "処理待ち": "menu.workPending",
+    "Chưa hoàn thành": "menu.workIncomplete",
+    "Incomplete": "menu.workIncomplete",
+    "未完了": "menu.workIncomplete",
+    "Công việc của tôi": "menu.workMine",
+    "My tasks": "menu.workMine",
+    "自分の業務": "menu.workMine",
+    "Yêu cầu xử lý": "menu.requestsNav",
+    "Request handling": "menu.requestsNav",
+    "Kiểm tra": "menu.inspection",
+    "Inspection": "menu.inspection",
+    "点検": "menu.inspection",
+    "Kiểm kê định kỳ": "menu.auditPeriodic",
+    "Periodic inventory": "menu.auditPeriodic",
+    "定期棚卸": "menu.auditPeriodic",
   };
 
   /** Ẩn nhóm "Phòng" / Room và toàn bộ menu con (theo title hoặc mã name từ API). */
@@ -101,9 +127,15 @@
 
   function annotateSidebarMenuI18n(navRoot) {
     if (!navRoot) return;
-    navRoot.querySelectorAll("a.nav-item, a.nav-subitem").forEach((a) => {
-      const t = (a.textContent || "").trim();
+    navRoot.querySelectorAll("a.nav-item").forEach((a) => {
+      const label = a.querySelector(".nav-item-label");
+      const t = ((label || a).textContent || "").trim();
       const key = MENU_TITLE_TO_I18N_KEY[t];
+      if (key && label) {
+        label.setAttribute("data-i18n", key);
+        a.removeAttribute("data-i18n");
+        return;
+      }
       if (key) {
         a.setAttribute("data-i18n", key);
         return;
@@ -111,14 +143,26 @@
       const keep = a.getAttribute("data-i18n");
       if (keep && (keep.startsWith("sidebar.") || keep.startsWith("nav."))) return;
       a.removeAttribute("data-i18n");
+      label?.removeAttribute("data-i18n");
+    });
+    navRoot.querySelectorAll("a.nav-subitem").forEach((a) => {
+      const t = (a.textContent || "").trim();
+      const key = MENU_TITLE_TO_I18N_KEY[t];
+      if (key) {
+        a.setAttribute("data-i18n", key);
+        return;
+      }
+      const keep = a.getAttribute("data-i18n");
+      if (keep && (keep.startsWith("sidebar.") || keep.startsWith("nav.") || keep.startsWith("menu."))) return;
+      a.removeAttribute("data-i18n");
     });
     navRoot.querySelectorAll(".nav-group-toggle").forEach((btn) => {
-      const sp = btn.querySelector("span");
-      if (!sp) return;
-      const t = sp.textContent.replace(/▾/g, "").trim();
+      const label = btn.querySelector(".nav-item-label");
+      if (!label) return;
+      const t = label.textContent.trim();
       const key = MENU_TITLE_TO_I18N_KEY[t];
-      if (key) sp.setAttribute("data-i18n", key);
-      else sp.removeAttribute("data-i18n");
+      if (key) label.setAttribute("data-i18n", key);
+      else label.removeAttribute("data-i18n");
     });
 
     const VENUE_TITLE_TO_KEY = {
@@ -128,7 +172,7 @@
 
     navRoot.querySelectorAll("a.nav-item, a.nav-subitem").forEach((a) => {
       const t = (a.textContent || "").trim();
-      const m = t.match(/^Tòa nhà\s+(.+)$/i);
+      const m = t.match(/^(?:Tòa nhà|Phòng học)\s+(.+)$/i);
       if (m) {
         a.setAttribute("data-i18n", "menu.buildingNamed");
         a.setAttribute("data-i18n-params", JSON.stringify({ name: m[1].trim() }));
@@ -245,6 +289,12 @@
         return (linkBuilding || "") === (curBuilding || "");
       }
 
+      const linkView = absUrl.searchParams.get("view");
+      const curView = curUrl.searchParams.get("view");
+      if (linkView != null || curView != null) {
+        return (linkView || "") === (curView || "");
+      }
+
       if (linkHash) return linkHash === curHash;
       return !curHash;
     } catch (_) {
@@ -258,6 +308,150 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  const NAV_ICON_SVGS = {
+    home:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+    users:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>',
+    room:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>',
+    folder:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+    asset:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+    mail:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+    shield:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 20 7v6c0 5-3.5 8-8 8s-8-3-8-8V7z"/><path d="m9 12 2 2 4-4"/></svg>',
+    student:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 8l10 5 10-5-10-5z"/><path d="M6 11v4c0 2.5 2.7 4.5 6 4.5s6-2 6-4.5v-4"/></svg>',
+    chart:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V4"/><path d="M4 20h16"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="8" width="3" height="9"/><rect x="17" y="5" width="3" height="12"/></svg>',
+    work:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 4v4M16 4v4M4 10h16"/><path d="M9 14h2M13 14h2M9 17h6"/></svg>',
+    pending:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    incomplete:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M5 6h.01M5 12h.01M5 18h.01"/></svg>',
+    mine:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/><path d="M16 11l2 2 4-4"/></svg>',
+    logout:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>',
+    inspection:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 12 2 2 4-4"/></svg>',
+    dot: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>',
+  };
+
+  const NAV_ICON_BY_TITLE = {
+    "Trang chủ": "home",
+    Home: "home",
+    ホーム: "home",
+    "Người dùng": "users",
+    Users: "users",
+    ユーザー: "users",
+    "Phòng học": "room",
+    "Tòa nhà & phòng": "room",
+    "Buildings & rooms": "room",
+    建物と部屋: "room",
+    "Danh mục": "folder",
+    Categories: "folder",
+    カテゴリ: "folder",
+    "Tài sản": "asset",
+    Assets: "asset",
+    資産: "asset",
+    "Liên hệ": "mail",
+    Contacts: "mail",
+    連絡先: "mail",
+    "Phân quyền": "shield",
+    "Access control": "shield",
+    権限管理: "shield",
+    "Sinh viên": "student",
+    Students: "student",
+    学生: "student",
+    "Thống kê": "chart",
+    Statistics: "chart",
+    統計: "chart",
+    "Quản lý tài sản": "asset",
+    "Asset management": "asset",
+    "資産管理": "asset",
+    "Quản lý công việc": "work",
+    "Work management": "work",
+    "業務管理": "work",
+    "Chờ xử lí": "pending",
+    "Chờ xử lý": "pending",
+    Pending: "pending",
+    処理待ち: "pending",
+    "Chưa hoàn thành": "incomplete",
+    Incomplete: "incomplete",
+    未完了: "incomplete",
+    "Công việc của tôi": "mine",
+    "My tasks": "mine",
+    自分の業務: "mine",
+    "Đăng xuất": "logout",
+    "Kiểm tra": "inspection",
+    Inspection: "inspection",
+    点検: "inspection",
+    "Kiểm kê định kỳ": "inspection",
+    "Periodic inventory": "inspection",
+    定期棚卸: "inspection",
+  };
+
+  function navIconKey(node, fallbackTitle) {
+    const title = String(node?.title || fallbackTitle || "").trim();
+    if (NAV_ICON_BY_TITLE[title]) return NAV_ICON_BY_TITLE[title];
+    const name = menuNodeName(node).toLowerCase();
+    if (name.includes("user")) return "users";
+    if (name.includes("asset")) return "asset";
+    if (name.includes("categor")) return "folder";
+    if (name.includes("contact")) return "mail";
+    if (name.includes("rbac") || name.includes("role")) return "shield";
+    if (name.includes("student")) return "student";
+    if (name.includes("building") || name.includes("room") || name.includes("department") || name.includes("phong")) {
+      return "room";
+    }
+    if (name.includes("stat")) return "chart";
+    if (name.includes("work_pending")) return "pending";
+    if (name.includes("work_incomplete")) return "incomplete";
+    if (name.includes("work_mine")) return "mine";
+    if (name.includes("work_mgmt") || name.includes("work_")) return "work";
+    if (name.includes("request")) return "work";
+    if (name.includes("inspection") || name.includes("audit")) return "inspection";
+    return "dot";
+  }
+
+  function navIconSvg(key) {
+    return NAV_ICON_SVGS[key] || NAV_ICON_SVGS.dot;
+  }
+
+  function fillNavRow(el, label, iconKey, options) {
+    const opts = options || {};
+    el.textContent = "";
+    const icon = document.createElement("span");
+    icon.className = "nav-item-icon";
+    icon.innerHTML = navIconSvg(iconKey);
+    icon.setAttribute("aria-hidden", "true");
+    const text = document.createElement("span");
+    text.className = "nav-item-label";
+    text.textContent = label;
+    el.appendChild(icon);
+    el.appendChild(text);
+    if (opts.chevron !== false) {
+      const chevron = document.createElement("span");
+      chevron.className = "nav-item-chevron";
+      chevron.setAttribute("aria-hidden", "true");
+      chevron.textContent = "›";
+      el.appendChild(chevron);
+    }
+  }
+
+  function buildGroupToggle(node) {
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "nav-group-toggle";
+    fillNavRow(toggle, node.title || "", navIconKey(node));
+    return toggle;
   }
 
   function slugFromCanonicalPath(canon) {
@@ -297,7 +491,7 @@
     const title = String(node?.title || "").trim();
     if (title === "Giảng đường Đa Năng") return "GDDN";
     if (title === "Căn Tin") return "CANTIN";
-    const tm = title.match(/^Tòa nhà\s+(.+)$/i);
+    const tm = title.match(/^(?:Tòa nhà|Phòng học)\s+(.+)$/i);
     if (tm) return tm[1].trim();
     return null;
   }
@@ -308,6 +502,9 @@
 
   function resolveMenuCanonical(node) {
     const menuName = menuNodeName(node).toLowerCase();
+    if (menuName === "nav_building" || menuName === "page_room_management") {
+      return "pages/dashboard/room-map.html";
+    }
     if (menuName === "page_departments") {
       return "pages/dashboard/departments.html";
     }
@@ -337,10 +534,10 @@
     }
     const href = resolveHref(canon);
     const a = document.createElement("a");
-    a.className = variant === "top" ? "nav-item" : "nav-subitem";
+    a.className = variant === "top" ? "nav-item" : "nav-subitem nav-subitem--with-icon";
     if (isActiveHref(href)) a.classList.add("active");
     a.href = href;
-    a.textContent = node.title || node.name || "";
+    fillNavRow(a, node.title || node.name || "", navIconKey(node));
     const canonBase = String(canon).split("#")[0];
     const tagName = menuNodeName(node) || slugFromCanonicalPath(canonBase);
     const canonForDataset = canonBase.replace(/^\/+/, "");
@@ -362,10 +559,7 @@
     const group = document.createElement("div");
     group.className = "nav-group";
 
-    const toggle = document.createElement("button");
-    toggle.type = "button";
-    toggle.className = "nav-group-toggle";
-    toggle.innerHTML = `<span>${escapeHtml(node.title || "")}</span><span>▾</span>`;
+    const toggle = buildGroupToggle(node);
 
     const sub = document.createElement("div");
     sub.className = "nav-submenu";
@@ -402,8 +596,8 @@
     const homeA = document.createElement("a");
     homeA.className = "nav-item";
     homeA.href = hrefToFrontendPage("index.html");
-    homeA.setAttribute("data-i18n", "sidebar.home");
-    homeA.textContent = "Trang chủ";
+    fillNavRow(homeA, "Trang chủ", "home");
+    homeA.querySelector(".nav-item-label")?.setAttribute("data-i18n", "sidebar.home");
     homeA.dataset.pageCanonical = "index.html";
     homeA.dataset.pageName = "home_index";
     homeA.dataset.pageTitle = "Trang chủ";
@@ -419,10 +613,7 @@
         const group = document.createElement("div");
         group.className = "nav-group";
 
-        const toggle = document.createElement("button");
-        toggle.type = "button";
-        toggle.className = "nav-group-toggle";
-        toggle.innerHTML = `<span>${escapeHtml(node.title || "")}</span><span>▾</span>`;
+        const toggle = buildGroupToggle(node);
 
         const sub = document.createElement("div");
         sub.className = "nav-submenu";
@@ -466,43 +657,62 @@
       const aside = document.createElement("aside");
       aside.className = "sidebar";
 
+      const sidebarTop = document.createElement("div");
+      sidebarTop.className = "sidebar-top";
+
       const brand = document.createElement("div");
       brand.id = "sidebarBrandText";
       brand.className = "brand";
       brand.textContent = "CSVC";
 
+      const logoutBtn = document.createElement("button");
+      logoutBtn.type = "button";
+      logoutBtn.className = "sidebar-logout-btn nav-action-btn";
+      logoutBtn.setAttribute("data-action", "logout");
+      logoutBtn.setAttribute("aria-label", "Đăng xuất");
+      const logoutIcon = document.createElement("span");
+      logoutIcon.className = "nav-item-icon";
+      logoutIcon.innerHTML = navIconSvg("logout");
+      logoutIcon.setAttribute("aria-hidden", "true");
+      const logoutLabel = document.createElement("span");
+      logoutLabel.className = "sidebar-logout-label nav-item-label";
+      logoutLabel.setAttribute("data-i18n", "sidebar.logout");
+      logoutLabel.textContent = "Đăng xuất";
+      logoutBtn.appendChild(logoutIcon);
+      logoutBtn.appendChild(logoutLabel);
+
+      sidebarTop.appendChild(brand);
+      sidebarTop.appendChild(logoutBtn);
+
       const profile = document.createElement("div");
       profile.className = "profile-box";
-      const avatarSrc = hrefToFrontendPage("assets/images/avatar_1.jpg");
       const u = window.AppAuth?.getCurrentUser?.();
+      const avatarSrc =
+        window.UserAvatar?.resolve?.(u) ||
+        hrefToFrontendPage("assets/images/avatar/avatar_1.jpg");
       const displayName = u?.fullName || u?.username || "—";
       profile.innerHTML = `
-        <img src="${avatarSrc}" alt="avatar" />
-        <div>
-          <p id="sidebarWelcomeText" data-i18n="sidebar.welcome">Xin chào,</p>
-          <strong id="sidebarRoleText">${escapeHtml(displayName)}</strong>
+        <img src="${escapeHtml(avatarSrc)}" alt="" />
+        <div class="profile-greeting">
+          <span id="sidebarWelcomeText" class="profile-greeting-line" data-i18n="sidebar.welcome">Xin chào,</span>
+          <strong id="sidebarRoleText" class="sidebar-user-name">${escapeHtml(displayName)}</strong>
         </div>`;
 
       const nav = document.createElement("nav");
+      const menuScroll = document.createElement("div");
+      menuScroll.className = "sidebar-nav-menu";
+
       if (!roots.length) {
-        nav.innerHTML = `<p style="padding:8px;color:var(--muted,#666)" data-i18n="sidebar.emptyMenu">Không có menu.</p>`;
+        menuScroll.innerHTML = `<p style="padding:8px;color:var(--muted,#666)" data-i18n="sidebar.emptyMenu">Không có menu.</p>`;
       } else {
-        renderRoots(nav, roots);
+        renderRoots(menuScroll, roots);
       }
 
-      annotateSidebarMenuI18n(nav);
+      annotateSidebarMenuI18n(menuScroll);
 
-      const logoutBtn = document.createElement("button");
-      logoutBtn.type = "button";
-      logoutBtn.className = "nav-item nav-action-btn";
-      logoutBtn.setAttribute("data-action", "logout");
-      logoutBtn.setAttribute("data-i18n", "sidebar.logout");
-      logoutBtn.textContent = "Đăng xuất";
-      logoutBtn.style.width = "100%";
-      logoutBtn.style.textAlign = "left";
-      nav.appendChild(logoutBtn);
+      nav.appendChild(menuScroll);
 
-      aside.appendChild(brand);
+      aside.appendChild(sidebarTop);
       aside.appendChild(profile);
       aside.appendChild(nav);
 

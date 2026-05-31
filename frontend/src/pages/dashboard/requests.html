@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="requests.pageTitle">Quản lý yêu cầu</title>
+    <link rel="stylesheet" href="../../assets/css/base.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/pages.css" />
+    <link rel="stylesheet" href="../../assets/css/pages/requests.css" />
+  </head>
+  <body data-required-roles="ADMIN,MANAGER,STAFF">
+    <div class="app app--with-sidebar">
+      <div id="appSidebar"></div>
+      <main class="content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <strong id="topbarRoleText">Administrator</strong>
+          </div>
+          <div class="topbar-right"></div>
+        </header>
+
+        <section class="panel">
+          <h1 class="page-title" data-i18n="requests.pageTitle">Quản lý yêu cầu sinh viên</h1>
+
+          <div class="table-toolbar statistics-filters" style="margin-bottom: 16px">
+            <label class="statistics-filter">
+              <span data-i18n="requests.filterStatus">Trạng thái</span>
+              <select id="requestsFilterStatus">
+                <option value="" data-i18n="requests.filterAll">Tất cả</option>
+                <option value="NEW" data-i18n="requests.status.new">Mới</option>
+                <option value="IN_PROGRESS" data-i18n="requests.status.inProgress">Đang xử lý</option>
+                <option value="RESOLVED" data-i18n="requests.status.resolved">Đã xử lý</option>
+                <option value="CLOSED" data-i18n="requests.status.closed">Đã đóng</option>
+              </select>
+            </label>
+            <label class="statistics-filter">
+              <span data-i18n="requests.filterPriority">Ưu tiên</span>
+              <select id="requestsFilterPriority">
+                <option value="" data-i18n="requests.filterAll">Tất cả</option>
+                <option value="HIGH" data-i18n="requests.priority.high">Khẩn cấp</option>
+                <option value="NORMAL" data-i18n="requests.priority.normal">Bình thường</option>
+                <option value="LOW" data-i18n="requests.priority.low">Theo dõi</option>
+              </select>
+            </label>
+            <label class="statistics-filter">
+              <span data-i18n="requests.filterGroup">Nhóm QL</span>
+              <select id="requestsFilterGroup">
+                <option value="" data-i18n="requests.filterAll">Tất cả</option>
+                <option value="CSVC" data-i18n="requests.group.facilities">CSVC</option>
+                <option value="CNTT" data-i18n="requests.group.it">CNTT</option>
+                <option value="THIET_BI" data-i18n="requests.group.equipment">Thiết bị</option>
+              </select>
+            </label>
+            <button type="button" class="btn btn-primary" id="requestsRefreshBtn" data-i18n="requests.refresh">
+              Làm mới
+            </button>
+          </div>
+
+          <div class="toolbar requests-table-toolbar">
+            <div class="toolbar-left">
+              <span data-i18n="toolbar.showRows">Hiển thị</span>
+              <select
+                id="requestsPageSizeSelect"
+                style="width: 72px; padding: 6px 8px; border: 1px solid #ffd4b3; border-radius: 4px"
+              >
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="statistics-table-wrap">
+            <table class="statistics-summary-table" id="requestsTable">
+              <thead>
+                <tr>
+                  <th data-i18n="requests.colId">ID</th>
+                  <th data-i18n="requests.colTitle">Tiêu đề</th>
+                  <th data-i18n="requests.colGroup">Nhóm QL</th>
+                  <th data-i18n="requests.colPriority">Ưu tiên</th>
+                  <th data-i18n="requests.colStatus">Trạng thái</th>
+                  <th data-i18n="requests.colSender">Người gửi</th>
+                  <th data-i18n="requests.colTime">Thời gian</th>
+                  <th id="requestsColActions" data-i18n="requests.colActions">Chức năng</th>
+                </tr>
+              </thead>
+              <tbody id="requestsTableBody">
+                <tr>
+                  <td colspan="8" class="statistics-placeholder" data-i18n="requests.loading">Đang tải…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="iv-modal-mask" id="requestDetailMask" aria-hidden="true">
+      <div class="iv-modal iv-modal-lg" role="dialog" aria-labelledby="requestDetailModalHeading">
+        <div class="iv-modal-header">
+          <span id="requestDetailModalHeading" data-i18n="requests.modalTitle">Chi tiết yêu cầu</span>
+          <button type="button" class="iv-modal-close" id="requestDetailCloseBtn" aria-label="Close">×</button>
+        </div>
+        <form id="requestDetailForm" class="iv-modal-body iv-form-vertical" autocomplete="off">
+          <div id="requestDetailError" class="request-detail-error" hidden role="alert"></div>
+          <p id="requestDetailLoading" class="request-detail-loading" hidden data-i18n="requests.modalLoading">Đang tải chi tiết…</p>
+          <input type="hidden" name="id" id="requestDetailId" />
+          <div class="iv-form-row">
+            <div class="iv-form-item iv-form-item-full">
+              <label class="iv-form-item-label" for="requestDetailTitleField" data-i18n="requests.colTitle">Tiêu đề</label>
+              <input class="iv-input" type="text" id="requestDetailTitleField" name="title" readonly />
+            </div>
+            <div class="iv-form-item">
+              <label class="iv-form-item-label" for="requestDetailGroup" data-i18n="requests.colGroup">Nhóm QL</label>
+              <input class="iv-input" type="text" id="requestDetailGroup" readonly />
+            </div>
+            <div class="iv-form-item">
+              <label class="iv-form-item-label" for="requestDetailPriority" data-i18n="requests.colPriority">Ưu tiên</label>
+              <input class="iv-input" type="text" id="requestDetailPriority" readonly />
+            </div>
+            <div class="iv-form-item">
+              <label class="iv-form-item-label" for="requestDetailStatus" data-i18n="requests.colStatus">Trạng thái</label>
+              <select class="iv-input" id="requestDetailStatus" name="status">
+                <option value="NEW" data-i18n="requests.status.new">Mới</option>
+                <option value="IN_PROGRESS" data-i18n="requests.status.inProgress">Đang xử lý</option>
+                <option value="RESOLVED" data-i18n="requests.status.resolved">Đã xử lý</option>
+                <option value="CLOSED" data-i18n="requests.status.closed">Đã đóng</option>
+              </select>
+            </div>
+            <div class="iv-form-item">
+              <label class="iv-form-item-label" for="requestDetailSender" data-i18n="requests.colSender">Người gửi</label>
+              <input class="iv-input" type="text" id="requestDetailSender" readonly />
+            </div>
+            <div class="iv-form-item">
+              <label class="iv-form-item-label" for="requestDetailTime" data-i18n="requests.labelCreatedAt">Thời gian gửi</label>
+              <input class="iv-input" type="text" id="requestDetailTime" readonly />
+            </div>
+            <div class="iv-form-item iv-form-item-full">
+              <label class="iv-form-item-label" for="requestDetailManagerName" data-i18n="requests.labelManagerName">Người phụ trách</label>
+              <input
+                class="iv-input"
+                type="text"
+                id="requestDetailManagerName"
+                name="managerName"
+                readonly
+                data-i18n-placeholder="requests.assigneeUnassigned"
+                placeholder="Chưa phân công"
+              />
+            </div>
+            <div class="iv-form-item iv-form-item-full">
+              <label class="iv-form-item-label" for="requestDetailNote" data-i18n="requests.note">Ghi chú</label>
+              <textarea class="iv-input" id="requestDetailNote" name="note" rows="4"></textarea>
+            </div>
+            <div class="iv-form-item iv-form-item-full" id="requestDetailAttachmentWrap" hidden>
+              <label class="iv-form-item-label" data-i18n="requests.labelAttachment">Đính kèm</label>
+              <p class="iv-form-hint" id="requestDetailAttachment"></p>
+            </div>
+          </div>
+        </form>
+        <div class="iv-modal-footer">
+          <button type="button" class="iv-btn iv-btn-text" id="requestDetailCancelBtn" data-i18n="requests.modalClose">Đóng</button>
+          <button type="button" class="iv-btn iv-btn-md iv-btn-solid-primary" id="requestDetailSaveBtn" data-i18n="requests.modalSave">Lưu thay đổi</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="iv-modal-mask" id="requestAssignMask" aria-hidden="true">
+      <div class="iv-modal" role="dialog" aria-labelledby="requestAssignTitle">
+        <div class="iv-modal-header">
+          <span id="requestAssignTitle" data-i18n="requests.assignTitle">Phân việc xử lý</span>
+          <button type="button" class="iv-modal-close" id="requestAssignCloseBtn" aria-label="Close">×</button>
+        </div>
+        <form id="requestAssignForm" class="iv-modal-body iv-form-vertical" autocomplete="off">
+          <input type="hidden" id="requestAssignRequestId" />
+          <p id="requestAssignError" class="request-detail-error" hidden role="alert"></p>
+          <div class="iv-form-item iv-form-item-full">
+            <label class="iv-form-item-label iv-form-item-required" for="requestAssignUserId" data-i18n="requests.assignHandler">Người xử lý</label>
+            <select class="iv-input" id="requestAssignUserId" name="assignedToUserId" required>
+              <option value="" data-i18n="requests.assignSelectPlaceholder">— Chọn người xử lý —</option>
+            </select>
+          </div>
+        </form>
+        <div class="iv-modal-footer">
+          <button type="button" class="iv-btn iv-btn-text" id="requestAssignCancelBtn" data-i18n="requests.modalClose">Đóng</button>
+          <button type="button" class="iv-btn iv-btn-md iv-btn-solid-primary" id="requestAssignConfirmBtn" data-i18n="requests.assignConfirm">Xác nhận phân việc</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../assets/js/auth/auth.js"></script>
+    <script src="../../assets/js/shared/menu-store.js"></script>
+    <script src="../../assets/js/auth/guard.js"></script>
+    <script src="../../assets/js/shared/sidebar.js"></script>
+    <script src="../../assets/js/shared/i18n-manager.js"></script>
+    <script src="../../assets/js/shared/lang-switcher.js"></script>
+    <script src="../../assets/js/components/navigation.js"></script>
+    <script src="../../assets/js/shared/menu-links.js"></script>
+    <script src="../../assets/js/shared/table-controls.js"></script>
+    <script src="../../assets/js/api/api-client.js"></script>
+    <script src="../../assets/js/pages/requests-page.js?v=8"></script>
+  </body>
+</html>

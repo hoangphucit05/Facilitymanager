@@ -1,8 +1,6 @@
 (function initStudentRequests(window) {
-  const DRAFT_KEY = "student.requests.drafts";
-  const SENT_KEY = "student.requests.sent";
+  const api = () => window.FmApi || window.CoSoApi;
 
-  /** Đường dẫn tương đối đúng cả khi Live Server mở gốc = thư mục `frontend` (không dùng `/frontend/...`). */
   function hrefFromFrontendRoot(relativePath) {
     const rel = String(relativePath || "").replace(/^\/+/, "");
     const fn = window.AppSidebar?.hrefToFrontendPage;
@@ -19,8 +17,8 @@
       .replace(/"/g, "&quot;");
   }
 
-  function tMsg(key, fallback) {
-    const v = window.FmI18n?.t?.(key);
+  function tMsg(key, fallback, params) {
+    const v = window.FmI18n?.t?.(key, params);
     return v != null && v !== key ? v : fallback;
   }
 
@@ -31,17 +29,77 @@
     return "en-US";
   }
 
-  const readList = (key) => {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(key) || "[]");
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (_) {
-      return [];
-    }
+  const labelPriority = (code) => {
+    const c = String(code || "").toUpperCase();
+    if (c === "HIGH") return tMsg("studentRequests.priority.high", "Khẩn cấp");
+    if (c === "LOW") return tMsg("studentRequests.priority.low", "Theo dõi");
+    return tMsg("studentRequests.priority.normal", "Bình thường");
   };
 
-  const writeList = (key, list) => {
-    localStorage.setItem(key, JSON.stringify(list));
+  const priorityClass = (code) => {
+    const c = String(code || "").toUpperCase();
+    if (c === "HIGH") return "request-priority--high";
+    if (c === "LOW") return "request-priority--low";
+    return "request-priority--normal";
+  };
+
+  const sortByIdAsc = (list) =>
+    list.slice().sort((a, b) => {
+      const na = Number(a?.id);
+      const nb = Number(b?.id);
+      if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+      return String(a?.id ?? "").localeCompare(String(b?.id ?? ""), undefined, { numeric: true });
+    });
+
+  const labelStatus = (code) => {
+    const c = String(code || "").toUpperCase();
+    if (c === "IN_PROGRESS") return tMsg("studentRequests.status.inProgress", "Đang xử lý");
+    if (c === "RESOLVED") return tMsg("studentRequests.status.resolved", "Đã xử lý");
+    if (c === "DRAFT") return tMsg("studentRequests.status.draft", "Nháp");
+    if (c === "CLOSED") return tMsg("studentRequests.status.closed", "Đã đóng");
+    return tMsg("studentRequests.status.new", "Mới");
+  };
+
+  const labelManagerGroup = (code) => {
+    const c = String(code || "").toUpperCase();
+    if (c === "THIET_BI") return tMsg("studentRequests.create.optEquipment", "Thiết bị");
+    return code || "—";
+  };
+
+  const mapManagerGroupToApi = (raw) => {
+    const s = String(raw || "").trim();
+    if (!s) return "";
+    if (s === "Thiết bị" || s.toUpperCase() === "THIET_BI") return "THIET_BI";
+    return s.toUpperCase();
+  };
+
+  const mapPriorityToApi = (raw) => {
+    const s = String(raw || "").trim();
+    if (s === "Khẩn cấp") return "HIGH";
+    if (s === "Theo dõi") return "LOW";
+    if (s === "Bình thường") return "NORMAL";
+    return s || "NORMAL";
+  };
+
+  const buildPayload = (attachment) => {
+    const title = String(document.getElementById("studentRequestTitle")?.value || "").trim();
+    const note = String(document.getElementById("studentRequestNote")?.value || "").trim();
+    const managerGroup = mapManagerGroupToApi(document.getElementById("studentManagerGroup")?.value);
+    const priority = mapPriorityToApi(document.getElementById("studentRequestPriority")?.value);
+    const managerName = String(document.getElementById("studentManagerName")?.value || "").trim();
+    const body = {
+      title,
+      note,
+      managerGroup,
+      priority,
+      managerName: managerName || null,
+    };
+    if (attachment?.dataUrl && attachment.dataUrl.length <= 255) {
+      body.attachmentUrl = attachment.dataUrl;
+    } else if (attachment?.name) {
+      body.attachmentUrl = attachment.name;
+    }
+    return body;
   };
 
   const goBackOrHome = () => {
@@ -52,31 +110,8 @@
     window.location.href = hrefFromFrontendRoot("index.html");
   };
 
-  const buildPayload = (attachment) => {
-    const title = String(document.getElementById("studentRequestTitle")?.value || "").trim();
-    const note = String(document.getElementById("studentRequestNote")?.value || "").trim();
-    const managerGroup = String(document.getElementById("studentManagerGroup")?.value || "").trim();
-    const status = String(document.getElementById("studentStatus")?.value || "").trim();
-    const managerName = String(document.getElementById("studentManagerName")?.value || "").trim();
-    return {
-      id: `req_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      title,
-      note,
-      managerGroup,
-      status,
-      managerName,
-      attachment: attachment || null,
-      createdAt: new Date().toISOString(),
-    };
-  };
-
-  const goTo = (path) => {
-    window.location.href = path;
-  };
-
   const initBackButton = () => {
-    const backBtn = document.getElementById("studentBackBtn");
-    backBtn?.addEventListener("click", goBackOrHome);
+    document.getElementById("studentBackBtn")?.addEventListener("click", goBackOrHome);
   };
 
   const initCreatePage = () => {
@@ -103,7 +138,6 @@
     attachmentInput?.addEventListener("change", () => {
       const file = attachmentInput.files?.[0];
       if (!file) return;
-
       const isImage = file.type.startsWith("image/");
       const isVideo = file.type.startsWith("video/");
       const reader = new FileReader();
@@ -113,7 +147,6 @@
           name: file.name,
           dataUrl: typeof reader.result === "string" ? reader.result : "",
         };
-
         if (uploadPlaceholder) uploadPlaceholder.hidden = true;
         if (uploadFileName) {
           const k = "studentRequests.create.filePicked";
@@ -139,10 +172,16 @@
         window.alert(tMsg("studentRequests.alerts.draftNeedContent", "Nhập tiêu đề hoặc ghi chú trước khi lưu tạm."));
         return;
       }
-      const drafts = readList(DRAFT_KEY);
-      drafts.unshift(payload);
-      writeList(DRAFT_KEY, drafts);
-      goTo(hrefFromFrontendRoot("pages/student/request-drafts.html"));
+      void (async () => {
+        try {
+          if (!api()?.luuNhapYeuCau) throw new Error("no api");
+          await api().luuNhapYeuCau(payload);
+          goTo(hrefFromFrontendRoot("pages/student/request-drafts.html"));
+        } catch (e) {
+          console.warn(e);
+          window.alert(tMsg("studentRequests.alerts.saveFail", "Không lưu được nháp. Kiểm tra đăng nhập và backend."));
+        }
+      })();
     });
 
     sendBtn?.addEventListener("click", () => {
@@ -151,51 +190,75 @@
         window.alert(tMsg("studentRequests.alerts.sendNeedTitleNote", "Vui lòng nhập tiêu đề và ghi chú trước khi gửi."));
         return;
       }
-      const sent = readList(SENT_KEY);
-      sent.unshift(payload);
-      writeList(SENT_KEY, sent);
-      goBackOrHome();
+      void (async () => {
+        try {
+          if (!api()?.taoYeuCau) throw new Error("no api");
+          await api().taoYeuCau(payload);
+          goTo(hrefFromFrontendRoot("pages/student/request-sent.html"));
+        } catch (e) {
+          console.warn(e);
+          window.alert(tMsg("studentRequests.alerts.sendFail", "Không gửi được yêu cầu. Kiểm tra đăng nhập và backend."));
+        }
+      })();
     });
   };
 
-  const renderList = (listId, key) => {
+  const goTo = (path) => {
+    window.location.href = path;
+  };
+
+  const renderList = async (listId, emptyId, isDraft) => {
     const listEl = document.getElementById(listId);
-    const emptyEl = document.getElementById("studentEmptyState");
+    const emptyEl = document.getElementById(emptyId);
     if (!listEl || !emptyEl) return;
 
-    const list = readList(key);
-    if (list.length === 0) {
-      emptyEl.hidden = false;
-      listEl.hidden = true;
-      window.FmI18n?.apply?.(emptyEl);
-      return;
-    }
-
+    listEl.hidden = true;
     emptyEl.hidden = true;
-    listEl.hidden = false;
-    const loc = dateLocaleTag();
-    const mg = tMsg("studentRequests.list.managerGroup", "Nhóm quản lý");
-    const st = tMsg("studentRequests.list.status", "Trạng thái");
-    const tm = tMsg("studentRequests.list.time", "Thời gian");
-    const noTitleRaw = window.FmI18n?.t?.("studentRequests.list.noTitle");
-    const noTitle = noTitleRaw != null && noTitleRaw !== "studentRequests.list.noTitle" ? noTitleRaw : "(Không tiêu đề)";
+    listEl.innerHTML = "";
 
-    listEl.innerHTML = list
-      .map((item) => {
-        const time = new Date(item.createdAt).toLocaleString(loc);
-        const userTitle = String(item.title || "").trim();
-        const titleHtml = userTitle ? escAttr(userTitle) : noTitle;
-        return `<article class="student-card">
+    try {
+      if (!api()?.layDanhSachYeuCau) throw new Error("no api");
+      const list = await api().layDanhSachYeuCau({
+        isDraft: String(isDraft),
+        createdByMe: "true",
+      });
+      const rows = sortByIdAsc(Array.isArray(list) ? list : []);
+      if (!rows.length) {
+        emptyEl.hidden = false;
+        window.FmI18n?.apply?.(emptyEl);
+        return;
+      }
+      const loc = dateLocaleTag();
+      const mg = tMsg("studentRequests.list.managerGroup", "Nhóm quản lý");
+      const pr = tMsg("studentRequests.list.priority", "Mức ưu tiên");
+      const st = tMsg("studentRequests.list.status", "Trạng thái");
+      const tm = tMsg("studentRequests.list.time", "Thời gian");
+      const noTitleRaw = window.FmI18n?.t?.("studentRequests.list.noTitle");
+      const noTitle = noTitleRaw != null && noTitleRaw !== "studentRequests.list.noTitle" ? noTitleRaw : "(Không tiêu đề)";
+
+      listEl.innerHTML = rows
+        .map((item) => {
+          const time = item.createdAt ? new Date(item.createdAt).toLocaleString(loc) : "—";
+          const userTitle = String(item.title || "").trim();
+          const titleHtml = userTitle ? escAttr(userTitle) : noTitle;
+          return `<article class="student-card">
           <h3 class="student-item-title">${titleHtml}</h3>
-          <p class="student-item-meta">${escAttr(mg)}: ${escAttr(item.managerGroup || "-")}</p>
-          <p class="student-item-meta">${escAttr(st)}: ${escAttr(item.status || "-")}</p>
+          <p class="student-item-meta">${escAttr(mg)}: ${escAttr(labelManagerGroup(item.managerGroup))}</p>
+          <p class="student-item-meta">${escAttr(pr)}: <span class="request-priority ${priorityClass(item.priority)}">${escAttr(labelPriority(item.priority))}</span></p>
+          <p class="student-item-meta">${escAttr(st)}: ${escAttr(labelStatus(item.status))}</p>
           <p class="student-item-meta">${escAttr(tm)}: ${escAttr(time)}</p>
           <p>${escAttr(item.note || "")}</p>
         </article>`;
-      })
-      .join("");
-
-    window.FmI18n?.apply?.(listEl);
+        })
+        .join("");
+      emptyEl.hidden = true;
+      listEl.hidden = false;
+      window.FmI18n?.apply?.(listEl);
+    } catch (e) {
+      console.warn(e);
+      emptyEl.hidden = false;
+      emptyEl.textContent = tMsg("studentRequests.alerts.loadFail", "Không tải được danh sách yêu cầu.");
+    }
   };
 
   const page = document.body.getAttribute("data-student-page");
@@ -205,16 +268,16 @@
   }
   if (page === "sent-requests") {
     initBackButton();
-    renderList("studentRequestList", SENT_KEY);
+    void renderList("studentRequestList", "studentEmptyState", false);
   }
   if (page === "draft-requests") {
     initBackButton();
-    renderList("studentRequestList", DRAFT_KEY);
+    void renderList("studentRequestList", "studentEmptyState", true);
   }
 
   window.addEventListener("fm-i18n-applied", () => {
-    if (page === "sent-requests") renderList("studentRequestList", SENT_KEY);
-    if (page === "draft-requests") renderList("studentRequestList", DRAFT_KEY);
+    if (page === "sent-requests") void renderList("studentRequestList", "studentEmptyState", false);
+    if (page === "draft-requests") void renderList("studentRequestList", "studentEmptyState", true);
     if (page === "create-request") {
       const noteField = document.getElementById("studentRequestNote");
       const noteCount = document.getElementById("studentNoteCount");

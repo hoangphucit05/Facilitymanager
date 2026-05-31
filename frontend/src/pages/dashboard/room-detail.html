@@ -13,7 +13,7 @@
       }
 
       body {
-        background: #f1f5f9;
+        background: #fff8f4;
         padding: 20px;
       }
 
@@ -32,12 +32,18 @@
       .title {
         font-size: 28px;
         font-weight: bold;
-        color: #1e293b;
+        color: #1a1a1a;
         margin-bottom: 20px;
       }
 
       .room-code {
-        color: #2563eb;
+        color: #ff6600;
+      }
+
+      .schedule-hint {
+        font-size: 14px;
+        color: #666;
+        margin: -8px 0 16px;
       }
 
       .info-grid {
@@ -47,10 +53,10 @@
       }
 
       .info-box {
-        background: #f8fafc;
+        background: #fff0e6;
         padding: 14px;
         border-radius: 14px;
-        border-left: 6px solid #2563eb;
+        border-left: 6px solid #ff6600;
         transition: 0.3s;
         display: flex;
         align-items: center;
@@ -63,7 +69,7 @@
 
       .label {
         font-size: 14px;
-        color: #64748b;
+        color: #4a4a4a;
         margin-bottom: 6px;
       }
 
@@ -71,7 +77,7 @@
         width: 52px;
         height: 52px;
         border-radius: 50%;
-        background: #e7f0fc;
+        background: #fff0e6;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -81,7 +87,7 @@
       .field-icon {
         width: 26px;
         height: 26px;
-        color: #2563eb;
+        color: #ff6600;
       }
 
       .box-content {
@@ -91,7 +97,7 @@
       .value {
         font-size: 20px;
         font-weight: bold;
-        color: #0f172a;
+        color: #1a1a1a;
       }
 
       .btn-area {
@@ -100,7 +106,7 @@
       }
 
       .btn {
-        background: #2563eb;
+        background: #ff6600;
         color: white;
         border: none;
         padding: 12px 28px;
@@ -111,7 +117,7 @@
       }
 
       .btn:hover {
-        background: #1d4ed8;
+        background: #cc5200;
         transform: scale(1.05);
       }
 
@@ -131,8 +137,9 @@
       <div class="card">
         <div class="title">
           Chi tiết phòng -
-          <span id="roomCodeLabel" class="room-code">E1-101</span>
+          <span id="roomCodeLabel" class="room-code">—</span>
         </div>
+        <p id="roomScheduleContext" class="schedule-hint" hidden></p>
 
         <div class="info-grid">
           <div class="info-box">
@@ -141,7 +148,7 @@
             </span>
             <div class="box-content">
               <div class="label">Giảng viên dạy</div>
-              <div id="roomTeacher" class="value">Nguyễn Văn A</div>
+              <div id="roomTeacher" class="value">—</div>
             </div>
           </div>
           <div class="info-box">
@@ -150,7 +157,7 @@
             </span>
             <div class="box-content">
               <div class="label">Lớp đang học</div>
-              <div id="roomClass" class="value">CNTT</div>
+              <div id="roomClass" class="value">—</div>
             </div>
           </div>
           <div class="info-box">
@@ -159,7 +166,7 @@
             </span>
             <div class="box-content">
               <div class="label">Số bàn</div>
-              <div id="roomDesks" class="value">30</div>
+              <div id="roomDesks" class="value">—</div>
             </div>
           </div>
           <div class="info-box">
@@ -168,7 +175,7 @@
             </span>
             <div class="box-content">
               <div class="label">Số ghế</div>
-              <div id="roomChairs" class="value">60</div>
+              <div id="roomChairs" class="value">—</div>
             </div>
           </div>
           <div class="info-box">
@@ -177,7 +184,7 @@
             </span>
             <div class="box-content">
               <div class="label">Loa</div>
-              <div id="roomSpeakers" class="value">2</div>
+              <div id="roomSpeakers" class="value">—</div>
             </div>
           </div>
           <div class="info-box">
@@ -186,7 +193,7 @@
             </span>
             <div class="box-content">
               <div class="label">Điều hòa</div>
-              <div id="roomAirConditioner" class="value">2</div>
+              <div id="roomAirConditioner" class="value">—</div>
             </div>
           </div>
           <div class="info-box">
@@ -195,7 +202,7 @@
             </span>
             <div class="box-content">
               <div class="label">Micro</div>
-              <div id="roomMicrophone" class="value">1</div>
+              <div id="roomMicrophone" class="value">—</div>
             </div>
           </div>
           <div class="info-box">
@@ -204,7 +211,7 @@
             </span>
             <div class="box-content">
               <div class="label">Cửa kính</div>
-              <div id="roomGlassDoor" class="value">Không vỡ</div>
+              <div id="roomGlassDoor" class="value">—</div>
             </div>
           </div>
           <div class="info-box">
@@ -213,7 +220,7 @@
             </span>
             <div class="box-content">
               <div class="label">Quạt trần</div>
-              <div id="roomCeilingFan" class="value">4</div>
+              <div id="roomCeilingFan" class="value">—</div>
             </div>
           </div>
           <div class="info-box">
@@ -222,7 +229,7 @@
             </span>
             <div class="box-content">
               <div class="label">Rèm cửa</div>
-              <div id="roomCurtain" class="value">Có</div>
+              <div id="roomCurtain" class="value">—</div>
             </div>
           </div>
         </div>

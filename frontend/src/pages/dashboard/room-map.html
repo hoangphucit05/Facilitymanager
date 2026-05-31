@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sơ đồ phòng học</title>
+    <link rel="stylesheet" href="../../assets/css/base.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/pages.css" />
+  </head>
+  <body data-required-roles="ADMIN,MANAGER,STAFF">
+    <div class="app app--with-sidebar">
+      <div id="appSidebar"></div>
+      <main class="content content--room-map">
+        <header class="topbar">
+          <div class="topbar-left">
+            <strong id="topbarRoleText">Administrator</strong>
+          </div>
+          <div class="topbar-right"></div>
+        </header>
+
+        <section class="panel room-map-panel">
+          <h1 class="page-title">Sơ đồ phòng học</h1>
+          <p class="room-map-hint">Chọn tòa nhà trên sơ đồ để xem danh sách phòng.</p>
+
+          <div class="campus-map-wrap" role="region" aria-label="Sơ đồ khuôn viên">
+            <div class="campus-map">
+              <div class="campus-map__plot">
+                <a class="campus-building area-e10" href="../dashboard/departments.html?building=E10" data-building="E10"><span class="campus-building__label">Nhà E10</span></a>
+                <a class="campus-building area-e6" href="../dashboard/departments.html?building=E6" data-building="E6"><span class="campus-building__label">Nhà E6</span></a>
+                <a class="campus-building area-e9" href="../dashboard/departments.html?building=E9" data-building="E9"><span class="campus-building__label">Nhà E9</span></a>
+                <a class="campus-building area-e7" href="../dashboard/departments.html?building=E7" data-building="E7"><span class="campus-building__label">Nhà E7</span></a>
+                <a class="campus-building area-e1" href="../dashboard/departments.html?building=E1" data-building="E1"><span class="campus-building__label">Nhà E1</span></a>
+                <a class="campus-building area-e5" href="../dashboard/departments.html?building=E5" data-building="E5"><span class="campus-building__label">Nhà E5</span></a>
+                <a class="campus-building area-e4" href="../dashboard/departments.html?building=E4" data-building="E4"><span class="campus-building__label">Nhà E4</span></a>
+                <a class="campus-building area-e3" href="../dashboard/departments.html?building=E3" data-building="E3"><span class="campus-building__label">Nhà E3</span></a>
+                <div class="campus-block area-nhaxe"><span class="campus-building__label">Nhà xe</span></div>
+                <a class="campus-building area-e8" href="../dashboard/departments.html?building=E8" data-building="E8"><span class="campus-building__label">Nhà E8</span></a>
+                <a class="campus-building area-eb8" href="../dashboard/departments.html?building=EB8" data-building="EB8"><span class="campus-building__label">Nhà EB8</span></a>
+                <a class="campus-building area-gddn" href="../dashboard/departments.html?building=GDDN" data-building="GDDN"><span class="campus-building__label">Tòa nhà đa năng</span></a>
+                <a class="campus-building area-c2" href="../dashboard/departments.html?building=C2" data-building="C2"><span class="campus-building__label">Nhà C2</span></a>
+                <a class="campus-building area-c1" href="../dashboard/departments.html?building=C1" data-building="C1"><span class="campus-building__label">Nhà C1</span></a>
+                <a class="campus-building area-cantin" href="../dashboard/departments.html?building=CANTIN" data-building="CANTIN"><span class="campus-building__label">Căn Tin</span></a>
+                <a class="campus-building area-c3" href="../dashboard/departments.html?building=C3" data-building="C3"><span class="campus-building__label">Nhà C3</span></a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../assets/js/auth/auth.js"></script>
+    <script src="../../assets/js/shared/menu-store.js"></script>
+    <script src="../../assets/js/auth/guard.js"></script>
+    <script src="../../assets/js/shared/sidebar.js"></script>
+    <script src="../../assets/js/shared/i18n-manager.js"></script>
+    <script src="../../assets/js/shared/lang-switcher.js"></script>
+    <script src="../../assets/js/components/navigation.js"></script>
+    <script src="../../assets/js/shared/menu-links.js"></script>
+    <script src="../../assets/js/pages/room-map-page.js"></script>
+  </body>
+</html>

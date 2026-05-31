@@ -36,7 +36,7 @@
 .rb-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(17, 14, 30, 0.55);
+  background: var(--overlay-backdrop);
   display: none;
   align-items: center;
   justify-content: center;
@@ -54,7 +54,7 @@
   overflow: hidden;
   border-radius: 12px;
   background: var(--card);
-  border: 1px solid rgba(136, 128, 255, 0.25);
+  border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
 }
@@ -65,7 +65,9 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(148, 140, 255, 0.15);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
 }
 
 .rb-modal-heading h3 {
@@ -121,7 +123,7 @@
   flex: 0 0 auto;
   width: 16px;
   height: 16px;
-  accent-color: var(--primary, #2563eb);
+  accent-color: var(--color-primary);
   cursor: pointer;
 }
 

@@ -20,4 +20,11 @@ if (existsSync(dist)) {
 
 mkdirSync(dist, { recursive: true });
 cpSync(src, dist, { recursive: true });
+// Alias locales → i18n trong dist (i18n-manager thử cả /locales/ và /i18n/)
+const locales = join(src, "locales");
+const distI18n = join(dist, "i18n");
+if (existsSync(locales)) {
+  mkdirSync(distI18n, { recursive: true });
+  cpSync(locales, distI18n, { recursive: true });
+}
 console.log("Built:", dist);

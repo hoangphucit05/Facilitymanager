@@ -21,15 +21,25 @@
         </header>
 
         <section class="panel departments-panel">
-          <h1 class="page-title" data-i18n="departments.pageTitle">Quản lý tòa nhà</h1>
+          <div class="departments-head">
+            <a
+              id="departmentsBackToMap"
+              class="departments-back-map"
+              href="../dashboard/room-map.html"
+              data-i18n="departments.backToMap"
+              >← Quay lại sơ đồ</a>
+            <h1 class="page-title" data-i18n="departments.pageTitle">Quản lý tòa nhà</h1>
+          </div>
           <div class="toolbar">
             <div class="toolbar-left">
-              <span data-i18n="toolbar.showRows">Hiển thị</span>
-              <select id="departmentsPageSizeSelect" style="width: 72px; padding: 6px 8px; border: 1px solid #d5dde7; border-radius: 4px">
-                <option>10</option>
-                <option>20</option>
-                <option>50</option>
+              <span data-i18n="departments.selectShift">Ca</span>
+              <select id="departmentsShiftSelect" style="min-width: 110px; padding: 6px 8px; border: 1px solid #d5dde7; border-radius: 4px; margin-left: 6px">
+                <option value="MORNING" selected data-i18n="departments.shiftMorning">Sáng</option>
+                <option value="AFTERNOON" data-i18n="departments.shiftAfternoon">Chiều</option>
+                <option value="EVENING" data-i18n="departments.shiftEvening">Tối</option>
               </select>
+              <span data-i18n="departments.selectDate" style="margin-left: 12px">Ngày</span>
+              <input id="departmentsDateInput" type="date" style="padding: 5px 8px; border: 1px solid #d5dde7; border-radius: 4px; margin-left: 6px" />
             </div>
             <div class="toolbar-actions tabs">
               <a
@@ -56,27 +66,14 @@
                 <th data-i18n="departments.colRoomCode">Mã phòng</th>
                 <th data-i18n="departments.colFloor">Tầng</th>
                 <th data-i18n="departments.colClassUsing">Lớp đang sử dụng</th>
+                <th data-i18n="departments.colTeacher">Giảng viên</th>
                 <th data-i18n="departments.colCapacity">Sức chứa</th>
-                <th data-i18n="departments.colStatus">Trạng thái</th>
                 <th data-i18n="departments.colActions">Chức năng</th>
               </tr>
             </thead>
             <tbody id="roomTableBody">
-              <tr data-room-id="E1-101">
-                <td>E1-101</td>
-                <td>1</td>
-                <td>CNTT</td>
-                <td>60</td>
-                <td>Đang sử dụng</td>
-                <td>-</td>
-              </tr>
-              <tr data-room-id="E1-202">
-                <td>E1-202</td>
-                <td>2</td>
-                <td>50</td>
-                <td>QTKD</td>
-                <td>Đang sử dụng</td>
-                <td>-</td>
+              <tr>
+                <td colspan="6" style="text-align:center;padding:24px" data-i18n="departments.loading">Đang tải dữ liệu…</td>
               </tr>
             </tbody>
           </table>

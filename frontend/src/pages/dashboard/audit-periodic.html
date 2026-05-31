@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="audit.pageTitle">Kiểm kê định kỳ</title>
+    <link rel="stylesheet" href="../../assets/css/base.css" />
+    <link rel="stylesheet" href="../../assets/css/layout.css" />
+    <link rel="stylesheet" href="../../assets/css/components.css" />
+    <link rel="stylesheet" href="../../assets/css/pages.css" />
+    <style>
+      .audit-create-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-end;
+        margin-bottom: 16px;
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+      }
+      .audit-create-form label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 13px;
+      }
+      .audit-create-form input,
+      .audit-create-form select {
+        min-width: 140px;
+        padding: 6px 8px;
+        border: 1px solid #d5dde7;
+        border-radius: 4px;
+      }
+      .audit-meta {
+        margin-bottom: 12px;
+        font-size: 14px;
+        color: #475569;
+      }
+      .audit-meta strong {
+        color: #0f172a;
+      }
+      #auditDetailsTable input[type="number"],
+      #auditDetailsTable input[type="text"] {
+        width: 100%;
+        max-width: 88px;
+        padding: 4px 6px;
+        border: 1px solid #d5dde7;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+      #auditDetailsTable input.audit-note-input {
+        max-width: 220px;
+      }
+      #auditDetailsTable .audit-col-stt {
+        width: 48px;
+        text-align: center;
+        color: #64748b;
+      }
+      tr.audit-row-mismatch td {
+        background: #fff7ed;
+      }
+      tr.audit-row-match td {
+        background: #f0fdf4;
+      }
+      .audit-scope-room {
+        display: none;
+      }
+      .audit-scope-room.is-visible {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body data-required-roles="ADMIN,MANAGER,STAFF">
+    <div class="app app--with-sidebar">
+      <div id="appSidebar"></div>
+      <main class="content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <strong id="topbarRoleText">Administrator</strong>
+          </div>
+          <div class="topbar-right"></div>
+        </header>
+
+        <section class="panel">
+          <h1 class="page-title" data-i18n="audit.pageTitle">Kiểm kê định kỳ</h1>
+
+          <div class="audit-create-form" id="auditCreateSection">
+            <label>
+              <span data-i18n="audit.fieldName">Tên đợt</span>
+              <input id="auditNameInput" type="text" maxlength="200" placeholder="Kiểm kê E10 T5/2026" />
+            </label>
+            <label>
+              <span data-i18n="audit.fieldScope">Phạm vi</span>
+              <select id="auditScopeTypeSelect">
+                <option value="BUILDING" data-i18n="audit.scopeBuilding">Theo tòa</option>
+                <option value="ROOM" data-i18n="audit.scopeRoom">Theo phòng</option>
+              </select>
+            </label>
+            <label id="auditBuildingLabel">
+              <span data-i18n="audit.fieldBuilding">Mã tòa</span>
+              <input id="auditBuildingInput" type="text" value="E10" placeholder="E10" />
+            </label>
+            <label id="auditRoomLabel" class="audit-scope-room">
+              <span data-i18n="audit.fieldRoom">Mã phòng</span>
+              <input id="auditRoomInput" type="text" placeholder="E10-201" />
+            </label>
+            <button type="button" class="tab tab-active" id="auditCreateBtn" data-i18n="audit.btnCreate">Tạo đợt</button>
+          </div>
+
+          <div class="toolbar" style="margin-bottom: 12px">
+            <div class="toolbar-left">
+              <label>
+                <span data-i18n="audit.selectAudit">Chọn đợt</span>
+                <select id="auditSelect" style="min-width: 260px; margin-left: 8px; padding: 6px 8px">
+                  <option value="" data-i18n="audit.selectPlaceholder">— Chọn đợt kiểm kê —</option>
+                </select>
+              </label>
+            </div>
+            <div class="toolbar-actions tabs">
+              <button type="button" class="tab" id="auditSaveBtn" disabled data-i18n="audit.btnSave">Lưu</button>
+              <button type="button" class="tab" id="auditCompleteBtn" disabled data-i18n="audit.btnComplete">Hoàn tất</button>
+              <button type="button" class="tab" id="auditExportJsonBtn" disabled data-i18n="toolbar.exportJson">Xuất JSON</button>
+            </div>
+            <div class="toolbar-search">
+              <input
+                id="auditSearchInput"
+                class="table-search-input"
+                type="search"
+                data-i18n-placeholder="audit.searchPlaceholder"
+                placeholder="Tìm theo mã thẻ, tên tài sản, phòng…"
+              />
+            </div>
+          </div>
+
+          <div id="auditMeta" class="audit-meta" hidden></div>
+
+          <div style="overflow-x: auto">
+            <table id="auditDetailsTable">
+              <thead>
+                <tr>
+                  <th class="audit-col-stt" data-i18n="audit.colStt">STT</th>
+                  <th data-i18n="audit.colRoom">Phòng</th>
+                  <th data-i18n="audit.colName">Tên tài sản</th>
+                  <th data-i18n="audit.colBookQty">SL sổ</th>
+                  <th data-i18n="audit.colActualQty">SL thực</th>
+                  <th data-i18n="audit.colNote">Ghi chú</th>
+                </tr>
+              </thead>
+              <tbody id="auditDetailsBody">
+                <tr>
+                  <td colspan="6" data-i18n="audit.emptyHint">Tạo hoặc chọn một đợt kiểm kê để bắt đầu.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../../assets/js/auth/auth.js"></script>
+    <script src="../../assets/js/shared/menu-store.js"></script>
+    <script src="../../assets/js/auth/guard.js"></script>
+    <script src="../../assets/js/shared/sidebar.js"></script>
+    <script src="../../assets/js/shared/i18n-manager.js"></script>
+    <script src="../../assets/js/shared/lang-switcher.js"></script>
+    <script src="../../assets/js/components/navigation.js"></script>
+    <script src="../../assets/js/shared/menu-links.js"></script>
+    <script src="../../assets/js/shared/table-controls.js"></script>
+    <script src="../../assets/js/shared/export-json.js"></script>
+    <script src="../../assets/js/api/api-client.js"></script>
+    <script src="../../assets/js/pages/audit-periodic-page.js?v=4"></script>
+  </body>
+</html>

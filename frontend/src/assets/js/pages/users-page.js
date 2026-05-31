@@ -37,9 +37,13 @@
     pill.title = active ? "Đang hoạt động — bấm để khóa" : "Đã khóa — bấm để mở khóa";
   }
 
+  function layApiNguoiDung() {
+    return window.FmApi || window.CoSoApi || null;
+  }
+
   async function capNhatTrangThaiUser(userId, active) {
-    const api = window.FmApi;
-    if (!api) throw new Error("FmApi chưa sẵn sàng");
+    const api = layApiNguoiDung();
+    if (!api) throw new Error("API chưa sẵn sàng");
     const body = { active, status: active ? "ACTIVE" : "INACTIVE" };
     if (typeof api.patchNguoiDung === "function") {
       try {
@@ -55,9 +59,10 @@
   }
 
   async function taiBangNguoiDungTuApi() {
-    if (!window.FmApi?.layDanhSachNguoiDung) return;
+    const api = layApiNguoiDung();
+    if (!api?.layDanhSachNguoiDung) return;
     try {
-      const list = await window.FmApi.layDanhSachNguoiDung();
+      const list = await api.layDanhSachNguoiDung();
       if (!Array.isArray(list)) return;
       if (list.length === 0) {
         usersTableBody.innerHTML =
@@ -88,13 +93,13 @@
                 <td>
                   <div class="user-action-buttons">
                     <button class="icon-btn user-view-btn" type="button" title="Xem thông tin chi tiết">
-                      <img src="../../assets/icons/view-info.svg" alt="Xem thông tin" />
+                      <img src="/assets/icons/view-info.svg" alt="Xem thông tin" />
                     </button>
                     <button class="icon-btn user-update-btn" type="button" title="Cập nhật user">
-                      <img src="../../assets/icons/update.svg" alt="Cập nhật user" />
+                      <img src="/assets/icons/update.svg" alt="Cập nhật user" />
                     </button>
                     <button class="icon-btn user-delete-btn" type="button" title="Xóa user">
-                      <img src="../../assets/icons/delete.svg" alt="Xóa user" />
+                      <img src="/assets/icons/delete.svg" alt="Xóa user" />
                     </button>
                   </div>
                 </td>
@@ -179,10 +184,10 @@
         const userName = row.cells[2]?.textContent?.trim() || "user này";
         if (!window.confirm(`Bạn có chắc muốn xóa ${userName}?`)) return;
         const idNguoiDung = row.dataset.userId || row.cells[0]?.textContent?.trim() || "";
-        if (idNguoiDung && window.FmApi?.xoaNguoiDung) {
+        if (idNguoiDung && layApiNguoiDung()?.xoaNguoiDung) {
           void (async () => {
             try {
-              await window.FmApi.xoaNguoiDung(idNguoiDung);
+              await layApiNguoiDung().xoaNguoiDung(idNguoiDung);
               row.remove();
               refreshUsersTable();
             } catch {

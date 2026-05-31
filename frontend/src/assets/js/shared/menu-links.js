@@ -2,21 +2,9 @@ const categoryMenuHashMap = {
   "Quản lý danh mục": "",
   "Category management": "",
   "カテゴリ管理": "",
-  "Máy móc, thiết bị": "may-moc-thiet-bi",
-  "Machinery & equipment": "may-moc-thiet-bi",
-  "機械・設備": "may-moc-thiet-bi",
-  "Công cụ, dụng cụ": "cong-cu-dung-cu",
-  "Tools & instruments": "cong-cu-dung-cu",
-  "工具・器具": "cong-cu-dung-cu",
   "Nguồn kinh phí": "nguon-kinh-phi",
   "Funding sources": "nguon-kinh-phi",
   "資金源": "nguon-kinh-phi",
-  "Nhà cung cấp": "nha-cung-cap",
-  "Suppliers": "nha-cung-cap",
-  "仕入先": "nha-cung-cap",
-  Nước: "nuoc",
-  Countries: "nuoc",
-  国・地域: "nuoc",
 };
 
 const withOptionalHash = (href, hash) => {
@@ -30,19 +18,6 @@ document.querySelectorAll('.nav-submenu a[href$="categories.html"]').forEach((li
   const label = link.textContent?.trim() || "";
   const hash = categoryMenuHashMap[label];
   if (hash === undefined) return;
-  const currentHref = link.getAttribute("href") || "";
-  link.setAttribute("href", withOptionalHash(currentHref, hash));
-});
-
-const liquidationMenuHashMap = {
-  "Điều chuyển tài sản": "dieu-chuyen",
-  "Thanh lý tài sản": "thanh-ly",
-};
-
-document.querySelectorAll('.nav-submenu a[href$="liquidation.html"]').forEach((link) => {
-  const label = link.textContent?.trim() || "";
-  const hash = liquidationMenuHashMap[label];
-  if (!hash) return;
   const currentHref = link.getAttribute("href") || "";
   link.setAttribute("href", withOptionalHash(currentHref, hash));
 });
@@ -112,7 +87,7 @@ function fixBuildingMenuLinks(root) {
     }
     if (!code) {
       const title = (link.textContent || "").trim();
-      const tm = title.match(/^Tòa nhà\s+(.+)$/i);
+      const tm = title.match(/^(?:Tòa nhà|Phòng học)\s+(.+)$/i);
       code = tm ? tm[1].trim() : titleToCode[title];
     }
     if (!code) return;

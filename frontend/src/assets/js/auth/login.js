@@ -90,6 +90,8 @@ $(function onLoginPageReady() {
         const msg = result.message || "Đăng nhập thất bại.";
         if (isCaptchaMessage(msg)) {
           showFieldError($captchaErr, msg);
+        } else if (/không hoạt động|inactive|đã khóa/i.test(msg)) {
+          showFieldError($formErr, msg.includes("hoạt động") ? msg : "Tài khoản đã bị khóa. Liên hệ quản trị viên.");
         } else {
           showFieldError($passwordErr, msg);
         }

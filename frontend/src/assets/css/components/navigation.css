@@ -1,18 +1,67 @@
+.nav-item,
+.nav-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .nav-item {
-  display: block;
   padding: 10px 12px;
-  border-radius: 8px;
-  margin-bottom: 6px;
+  border-radius: 10px;
+  margin-bottom: 4px;
   color: var(--sidebar-text);
+  text-decoration: none;
+  border-left: 3px solid transparent;
 }
 
 button.nav-item.nav-action-btn {
-  width: 100%;
   border: none;
   background: transparent;
   text-align: left;
   cursor: pointer;
   font: inherit;
+}
+
+.nav-item-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  color: var(--color-text-on-primary);
+}
+
+.nav-item.active .nav-item-icon,
+.nav-group.open > .nav-group-toggle .nav-item-icon {
+  opacity: 1;
+}
+
+.nav-item-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.nav-item-label {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-item-chevron {
+  flex-shrink: 0;
+  opacity: 0.75;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--color-text-on-primary);
 }
 
 .nav-item:hover,
@@ -22,50 +71,36 @@ button.nav-item.nav-action-btn {
 }
 
 .nav-item.active {
-  background: var(--sidebar-active-bg, var(--sidebar-active));
-  box-shadow: 0 4px 12px var(--sidebar-active-shadow, rgba(37, 99, 235, 0.38));
+  background: var(--sidebar-active-bg);
+  border-left-color: transparent;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.95), 0 0 0 4px rgba(255, 255, 255, 0.35);
 }
 
 .nav-group {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   width: 100%;
   min-width: 0;
 }
 
 .nav-group-toggle {
-  width: 100%;
   border: none;
   background: transparent;
   color: var(--sidebar-text);
   text-align: left;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: flex-start;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  box-sizing: border-box;
-  min-height: 40px;
+  min-height: 42px;
+  border-left: 3px solid transparent;
 }
 
-.nav-group-toggle span:first-child {
-  flex: 1;
-  min-width: 0;
-  text-align: left;
+.nav-group-toggle .nav-item-chevron {
+  transform: rotate(0deg);
 }
 
-.nav-group-toggle span:last-child {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.85;
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.nav-group.open > .nav-group-toggle span:last-child {
-  transform: rotate(-180deg);
+.nav-group.open > .nav-group-toggle .nav-item-chevron {
+  transform: rotate(90deg);
 }
 
 .nav-group-toggle:hover,
@@ -74,12 +109,16 @@ button.nav-item.nav-action-btn {
   color: var(--sidebar-text-strong);
 }
 
+.nav-group.open > .nav-group-toggle {
+  border-left-color: rgba(255, 255, 255, 0.85);
+}
+
 .nav-submenu {
   display: block;
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  margin-left: 10px;
+  margin-left: 14px;
   border-left: 1px solid var(--sidebar-border);
   padding-left: 8px;
   padding-top: 0;
@@ -92,7 +131,6 @@ button.nav-item.nav-action-btn {
   will-change: max-height;
 }
 
-/* Chỉ submenu trực tiếp (>) — tránh submenu nhóm con bị mở nhầm */
 .nav-group.open > .nav-submenu {
   max-height: min(4000px, 85vh);
   opacity: 1;
@@ -101,11 +139,47 @@ button.nav-item.nav-action-btn {
 }
 
 .nav-subitem {
-  display: block;
-  padding: 8px 12px;
-  border-radius: 6px;
-  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin: 3px 0;
   color: var(--sidebar-muted);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+}
+
+.nav-subitem::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  flex-shrink: 0;
+}
+
+/* Menu con dùng icon minh họa (giống nhóm Tài sản) — ẩn chấm tròn */
+.nav-subitem.nav-subitem--with-icon::before,
+.nav-subitem:has(.nav-item-icon)::before {
+  display: none !important;
+  content: none !important;
+}
+
+.nav-subitem .nav-item-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.85;
+}
+
+.nav-subitem .nav-item-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.nav-subitem.active .nav-item-icon,
+.nav-subitem:hover .nav-item-icon {
+  opacity: 1;
 }
 
 .nav-subitem:hover,
@@ -114,16 +188,18 @@ button.nav-item.nav-action-btn {
 }
 
 .nav-subitem:hover {
-  background: var(--sidebar-hover);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .nav-subitem.active {
-  background: var(--sidebar-active-bg, var(--sidebar-active));
+  background: rgba(255, 255, 255, 0.14);
+  border-left-color: transparent;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.95), 0 0 0 4px rgba(255, 255, 255, 0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .nav-submenu,
-  .nav-group-toggle span:last-child {
+  .nav-item-chevron {
     transition: none;
   }
 }

@@ -1,0 +1,81 @@
+#requestDetailMask,
+#requestAssignMask {
+  z-index: 10000;
+}
+
+#requestAssignMask.is-open {
+  display: flex !important;
+}
+
+#requestDetailMask.is-open {
+  display: flex !important;
+}
+
+.request-detail-loading {
+  padding: 12px 0;
+  color: var(--color-text-secondary, #666);
+  font-size: 14px;
+}
+
+.request-detail-error {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.request-detail-error[hidden] {
+  display: none !important;
+}
+
+#requestDetailForm.is-loading {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.requests-table-toolbar {
+  margin-bottom: 12px;
+}
+
+#requestsTable th:last-child,
+#requestsTable .requests-actions-cell {
+  white-space: nowrap;
+  min-width: 300px;
+  width: 1%;
+}
+
+#requestsTable .requests-actions {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 6px;
+  max-width: none;
+}
+
+#requestsTable .requests-actions .btn {
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.requests-table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Chưa hoàn thành — không có cột Chức năng */
+body.requests-view-incomplete #requestsColActions,
+body.requests-view-incomplete .requests-actions-cell,
+.requests-table--no-actions #requestsColActions,
+.requests-table--no-actions .requests-actions-cell {
+  display: none !important;
+}

@@ -1,0 +1,68 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: facility-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "1234567891"
+      MYSQL_DATABASE: asset_management
+    # Host 3307 tránh xung đột với MySQL cài sẵn trên Windows (thường chiếm 3306)
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/mysql/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/mysql/seed_tkb.sql:/docker-entrypoint-initdb.d/02_seed_tkb.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p1234567891"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: facility-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: facility-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      MYSQL_PASSWORD: "1234567891"
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/asset_management?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: "1234567891"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: facility-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  mysql_data:

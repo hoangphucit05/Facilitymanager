@@ -5,7 +5,7 @@ HTML screens grouped by area:
 | Folder | Purpose |
 |--------|---------|
 | `auth/` | Login, register, 404, unauthorized |
-| `dashboard/` | Assets, categories, rooms, statistics, liquidation |
+| `dashboard/` | Assets, categories, rooms, statistics |
 | `profile/` | Users, RBAC roles, contacts |
 | `student/` | Service requests |
 

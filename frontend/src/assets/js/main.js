@@ -17,7 +17,7 @@ if (!setupTableControls || !K65_CLASS_OPTIONS || !getRoomProfile || !mapRoomApiT
   throw new Error("Missing shared frontend helpers. Ensure shared scripts are loaded before main.js.");
 }
 
-/** Live Server / nhiá»u server tÄ©nh má»Ÿ URL khÃ´ng cÃ³ Ä‘uÃ´i .html â€” pháº£i khá»›p cáº£ hai dáº¡ng. */
+/** Live Server / nhiều server tĩnh mở URL không có đuôi .html — phải khớp cả hai dạng. */
 function duongDanLaTrang(tenFileHtml) {
   const p = (window.location.pathname || "").replace(/\/+$/, "");
   const basename = String(tenFileHtml).replace(/^\//, "");
@@ -25,140 +25,126 @@ function duongDanLaTrang(tenFileHtml) {
   return p.endsWith("/" + basename) || p.endsWith("/" + khongDuoi);
 }
 
-const sampleClasses = K65_CLASS_OPTIONS;
-const timeSlots = [
-  "Ca 1 (07:00 - 09:30)",
-  "Ca 2 (09:45 - 12:00)",
-  "Ca 3 (13:00 - 15:30)",
-  "Ca 4 (15:45 - 18:00)",
-];
+/** Phòng theo tòa — chỉ từ API, không seed tĩnh. */
+let buildingRooms = {};
 
-const detectFloor = (roomCode) => {
-  const match = roomCode.match(/(\d)/);
-  return match ? match[1] : "1";
+/** Các tòa E chỉ 1 tầng — không lấy chữ số trong mã phòng (P2E6 ≠ tầng 2). */
+const SINGLE_FLOOR_BUILDINGS = new Set(["E3", "E4", "E5", "E6", "E8", "EB8"]);
+
+const roomRowForUi = (row) => {
+  const roomCode = String(row?.[0] ?? "").trim();
+  const floor = String(row?.[1] ?? "").trim();
+  const classStudying = String(row?.[2] ?? "").trim();
+  const teacher = String(row?.[3] ?? "").trim();
+  const capacity = String(row?.[4] ?? row?.[5] ?? "").trim();
+  return [roomCode, floor, classStudying || "-", teacher || "--", capacity || ""];
 };
 
-const toRows = (roomCodes) =>
-  roomCodes.map((code, index) => [
-    code,
-    detectFloor(code),
-    sampleClasses[index % sampleClasses.length],
-    timeSlots[index % timeSlots.length],
-    "Äang sá»­ dá»¥ng",
-    `${45 + (index % 4) * 5}`,
-  ]);
+const sortRoomRowsByFloor = (rows) =>
+  [...(Array.isArray(rows) ? rows : [])].sort((a, b) => {
+    const fa = Number(String(a?.[1] ?? "").replace(/\D/g, "")) || 0;
+    const fb = Number(String(b?.[1] ?? "").replace(/\D/g, "")) || 0;
+    if (fa !== fb) return fa - fb;
+    return String(a?.[0] ?? "").localeCompare(String(b?.[0] ?? ""), undefined, { numeric: true });
+  });
 
-const roomCodeMap = {
-  E3: ["P1E3", "P2E3", "P3E3"],
-  E4: ["P1E4", "P2E4", "P3E4"],
-  E5: ["P2E5", "P3E5"],
-  E6: ["P1E6", "P2E6", "P3E6", "P4E6"],
-  E8: ["P3E8", "P4E8", "P5E8", "P5E8B"],
-  E9: ["P2E9-1", "P2E9-2", "P3E9-1", "P3E9-2", "P4E9"],
-  GDDN: [
-    "201DN",
-    "202DN",
-    "203DN",
-    "204DN",
-    "301DN",
-    "303DN",
-    "304DN",
-    "401DN",
-    "402DN",
-    "403DN",
-    "404DN",
-    "501DN",
-    "502DN",
-    "503DN",
-    "504DN",
-  ],
-  C2: [
-    "P101C2",
-    "P102C2",
-    "P103C2",
-    "P104C2",
-    "P201C2",
-    "P202C2",
-    "P203C2",
-    "P301C2",
-    "P302C2",
-    "P303C2",
-    "P304C2",
-    "P401C2",
-    "P402C2",
-    "P403C2",
-    "P404C2",
-    "P501C2",
-    "P502C2",
-    "P503C2",
-    "P504C2",
-  ],
-};
-
-let buildingRooms = {
-  E1: [
-    ["E1-101", "1", "CNTT", "Ca 1 (07:00 - 09:30)", "Äang sá»­ dá»¥ng", "60"],
-    ["E1-202", "2", "QTKD", "Ca 2 (09:45 - 12:00)", "Äang sá»­ dá»¥ng", "55"],
-  ],
-  E7: [
-    ["P102E7", "1", "CNTT", "Ca 1 (07:00 - 09:30)", "Äang sá»­ dá»¥ng", "55"],
-    ["P106E7", "1", "CNTT_N_1", "Ca 2 (09:45 - 12:00)", "Äang sá»­ dá»¥ng", "50"],
-    ["P111E7", "1", "KTTH", "Ca 3 (13:00 - 15:30)", "Äang sá»­ dá»¥ng", "45"],
-    ["P202E7", "2", "CNTT_N_2", "Ca 1 (07:00 - 09:30)", "Äang sá»­ dá»¥ng", "55"],
-    ["P203E7", "2", "KDQT", "Ca 2 (09:45 - 12:00)", "Äang sá»­ dá»¥ng", "50"],
-    ["P204E7", "2", "KTÄTVT", "Ca 3 (13:00 - 15:30)", "Äang sá»­ dá»¥ng", "50"],
-    ["P205E7", "2", "KTCÄT", "Ca 4 (15:45 - 18:00)", "Äang sá»­ dá»¥ng", "45"],
-    ["P206E7", "2", "QTKD", "Ca tá»‘i (18:30 - 20:30)", "Äang sá»­ dá»¥ng", "45"],
-  ],
-  ...Object.fromEntries(Object.entries(roomCodeMap).map(([building, rooms]) => [building, toRows(rooms)])),
-  CANTIN: [["CT-01", "1", "-", "-", "Trá»‘ng", "80"]],
-};
-
-const fallbackRooms = [["NA-001", "1", "-", "-", "Trá»‘ng", "40"]];
-
-/** MÃ£ phÃ²ng (sá»‘ tháº») â†’ id DB Ä‘á»ƒ gá»i DELETE/PUT /api/rooms/{id} (dÃ¹ng chung cÃ¡c trang) */
+/** Mã phòng (số thẻ) → id DB để gọi DELETE/PUT /api/rooms/{id} (dùng chung các trang) */
 window.maPhongTuDinhDanh = window.maPhongTuDinhDanh || Object.create(null);
 
-const taiPhongTuMayChu = async () => {
-  const api = window.FmApi;
+const xacDinhHocKyTuNgay = (isoDate) => {
+  const ref = isoDate ? new Date(`${isoDate}T00:00:00`) : new Date();
+  const hk2Start = new Date("2026-03-02T00:00:00");
+  const hk2End = new Date("2026-06-06T23:59:59");
+  const hk1Start = new Date("2025-09-03T00:00:00");
+  const hk1End = new Date("2026-01-10T23:59:59");
+  if (ref >= hk2Start && ref <= hk2End) return "HK2-2025-2026";
+  if (ref >= hk1Start && ref <= hk1End) return "HK1-2025-2026";
+  return ref >= hk2Start ? "HK2-2025-2026" : "HK1-2025-2026";
+};
+
+const taiPhongTuMayChu = async (opts = {}) => {
+  const api = window.CoSoApi;
   if (!api || typeof api.layDanhSachPhong !== "function") return;
   try {
-    const ds = await api.layDanhSachPhong();
-    if (!Array.isArray(ds) || ds.length === 0) return;
-    // XÃ³a dá»¯ liá»‡u cá»©ng, chá»‰ dÃ¹ng dá»¯ liá»‡u tá»« MySQL
-    Object.keys(buildingRooms).forEach((k) => { buildingRooms[k] = []; });
+    const params = {};
+    const isoDate = opts.date || "";
+    params.semester = xacDinhHocKyTuNgay(isoDate);
+    if (isoDate) params.date = isoDate;
+    if (opts.shift) params.shift = opts.shift;
+    const buildingCode =
+      opts.building ||
+      String(new URLSearchParams(window.location.search).get("building") || "").trim();
+    if (buildingCode) params.building = buildingCode;
+    const ds = await api.layDanhSachPhong(params);
+    if (!Array.isArray(ds) || ds.length === 0) {
+      const code =
+        opts.building ||
+        String(new URLSearchParams(window.location.search).get("building") || "").trim();
+      if (code) buildingRooms[code] = [];
+      return;
+    }
+    Object.keys(buildingRooms).forEach((k) => {
+      buildingRooms[k] = [];
+    });
     for (const r of ds) {
       const b = String(r.buildingCode || r.building || r.building_code || "").trim() || "KHAC";
       const code = String(r.roomCode || r.room_code || "").trim();
       if (!code) continue;
       if (r.id != null) window.maPhongTuDinhDanh[code] = String(r.id);
       if (!buildingRooms[b]) buildingRooms[b] = [];
-      const lop =
+      const coLocLich = Boolean(opts.date || opts.shift);
+      const lopRaw =
         r.classStudying ||
         r.class_studying ||
         r.classUsing ||
         r.class_using ||
-        "-";
-      const hang = [
+        "";
+      const gvRaw =
+        r.teacherName ||
+        r.teacher_name ||
+        r.teacher ||
+        r.giangVien ||
+        "";
+      const lop =
+        lopRaw && String(lopRaw).trim()
+          ? String(lopRaw).trim()
+          : coLocLich
+            ? "Trống"
+            : "-";
+      const gv =
+        gvRaw && String(gvRaw).trim()
+          ? String(gvRaw).trim()
+          : coLocLich
+            ? "--"
+            : "-";
+      const floorUi = SINGLE_FLOOR_BUILDINGS.has(b)
+        ? "1"
+        : String(r.floor ?? r.tang ?? "");
+      const hang = roomRowForUi([
         code,
-        String(r.floor ?? r.tang ?? ""),
+        floorUi,
         lop,
-        "-",
-        window.AppRoomHelpers?.mapRoomStatusLabel?.(r.status || r.trangThai) || r.status || r.trangThai || "Trá»‘ng",
+        gv,
         String(r.capacity ?? r.sucChua ?? ""),
-      ];
+      ]);
       buildingRooms[b].push(hang);
     }
+    Object.keys(buildingRooms).forEach((k) => {
+      buildingRooms[k] = sortRoomRowsByFloor(buildingRooms[k]);
+    });
   } catch (err) {
-    console.warn("[PhÃ²ng] KhÃ´ng táº£i Ä‘Æ°á»£c tá»« API, dÃ¹ng dá»¯ liá»‡u cá»¥c bá»™:", err);
+    console.warn("[Phòng] Không tải được từ API:", err);
+    const code =
+      opts.building ||
+      String(new URLSearchParams(window.location.search).get("building") || "").trim();
+    if (code) buildingRooms[code] = [];
   }
 };
 
 const isRoomCodeTakenInBuilding = (buildingCode, roomCode) => {
   const staticRows = buildingRooms[buildingCode] || [];
   if (staticRows.some((r) => r[0] === roomCode)) return true;
-  const added = getRoomAdditions()[buildingCode] || [];
-  return added.some((r) => r[0] === roomCode);
+  return false;
 };
 
 if (duongDanLaTrang("departments.html")) {
@@ -166,19 +152,49 @@ if (duongDanLaTrang("departments.html")) {
   const departmentsTable = document.getElementById("departmentsTable");
   const departmentsTableHeadRow = document.getElementById("departmentsTableHeadRow");
   const departmentsSearchInput = document.getElementById("departmentsSearchInput");
-  const departmentsPageSizeSelect = document.getElementById("departmentsPageSizeSelect");
+  const departmentsShiftSelect = document.getElementById("departmentsShiftSelect");
+  const departmentsDateInput = document.getElementById("departmentsDateInput");
   const deptPageTitle = document.querySelector(".departments-panel .page-title");
   const addRoomTabLink = document.querySelector('a.tab[href*="room-add"]');
   let refreshDepartmentTable = () => {};
 
-  /** TiÃªu Ä‘á» trang luÃ´n chá»‰ Â«Quáº£n lÃ½ tÃ²a nhÃ Â» (khÃ´ng gáº¯n mÃ£ tÃ²a E1/E3â€¦). */
-  const giuTieuDeTrangPhong = () => {
+  const DEPT_HK2_START = new Date("2026-03-02T00:00:00");
+  const DEPT_HK2_END = new Date("2026-06-06T23:59:59");
+  const DEPT_HK1_START = new Date("2025-09-03T00:00:00");
+  const DEPT_HK1_END = new Date("2026-01-10T23:59:59");
+
+  const layKhoangHocKyHienTai = () => {
+    const now = new Date();
+    if (now >= DEPT_HK2_START && now <= DEPT_HK2_END) {
+      return { start: DEPT_HK2_START, end: DEPT_HK2_END };
+    }
+    if (now >= DEPT_HK1_START && now <= DEPT_HK1_END) {
+      return { start: DEPT_HK1_START, end: DEPT_HK1_END };
+    }
+    return now >= DEPT_HK2_START
+      ? { start: DEPT_HK2_START, end: DEPT_HK2_END }
+      : { start: DEPT_HK1_START, end: DEPT_HK1_END };
+  };
+
+  /** Tiêu đề trang theo tòa đang chọn: «Quản lí nhà E1», «Quản lí nhà E3», ... */
+  const giuTieuDeTrangPhong = (buildingCode) => {
     if (!deptPageTitle) return;
-    deptPageTitle.setAttribute("data-i18n", "departments.pageTitle");
+    const code = chuanHoaMaToa(buildingCode || maToaHienTai());
+    deptPageTitle.removeAttribute("data-i18n");
     deptPageTitle.removeAttribute("data-i18n-params");
-    const text = deptT("departments.pageTitle");
-    if (window.FmI18n?.apply) window.FmI18n.apply(deptPageTitle);
-    else deptPageTitle.textContent = text;
+    if (!code) {
+      deptPageTitle.textContent = "Quản lí phòng học";
+      return;
+    }
+    if (code === "GDDN") {
+      deptPageTitle.textContent = "Quản lí Giảng đường Đa Năng";
+      return;
+    }
+    if (code === "CANTIN") {
+      deptPageTitle.textContent = "Quản lí Căn Tin";
+      return;
+    }
+    deptPageTitle.textContent = `Quản lí nhà ${code}`;
   };
 
   const chuanHoaMaToa = (code) => {
@@ -222,6 +238,41 @@ if (duongDanLaTrang("departments.html")) {
     return v != null && v !== key ? v : key;
   };
 
+  const formatIsoDate = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+
+  const tinhNgayMacDinh = () => {
+    const { start, end } = layKhoangHocKyHienTai();
+    const now = new Date();
+    if (now < start) return formatIsoDate(start);
+    if (now > end) return formatIsoDate(end);
+    return formatIsoDate(now);
+  };
+
+  const khoiTaoBoLoc = (resetNgay = false) => {
+    if (departmentsDateInput) {
+      departmentsDateInput.min = formatIsoDate(DEPT_HK1_START);
+      departmentsDateInput.max = formatIsoDate(DEPT_HK2_END);
+      if (resetNgay || !departmentsDateInput.value) {
+        departmentsDateInput.value = tinhNgayMacDinh();
+      }
+      const v = departmentsDateInput.value;
+      if (v && departmentsDateInput.min && v < departmentsDateInput.min) {
+        departmentsDateInput.value = departmentsDateInput.min;
+      }
+      if (v && departmentsDateInput.max && v > departmentsDateInput.max) {
+        departmentsDateInput.value = departmentsDateInput.max;
+      }
+    }
+    if (departmentsShiftSelect && !departmentsShiftSelect.value) {
+      departmentsShiftSelect.value = "MORNING";
+    }
+  };
+
   const buildingLabelForCode = (code) => {
     if (!code) return deptT("menu.building");
     if (code === "GDDN") return deptT("menu.venueLectureHall");
@@ -237,8 +288,8 @@ if (duongDanLaTrang("departments.html")) {
     <th>${deptT("departments.colRoomCode")}</th>
     <th>${deptT("departments.colFloor")}</th>
     <th>${deptT("departments.colClassUsing")}</th>
+    <th>${deptT("departments.colTeacher")}</th>
     <th>${deptT("departments.colCapacity")}</th>
-    <th>${deptT("departments.colStatus")}</th>
     <th>${deptT("departments.colActions")}</th>
   `;
       return;
@@ -247,8 +298,8 @@ if (duongDanLaTrang("departments.html")) {
     <th>${deptT("departments.colRoomCode")}</th>
     <th>${deptT("departments.colFloor")}</th>
     <th>${deptT("departments.colClassUsing")}</th>
+    <th>${deptT("departments.colTeacher")}</th>
     <th>${deptT("departments.colCapacity")}</th>
-    <th>${deptT("departments.colStatus")}</th>
     <th>${deptT("departments.colActions")}</th>
   `;
   };
@@ -267,33 +318,45 @@ if (duongDanLaTrang("departments.html")) {
           <td>
             <div class="room-action-buttons user-action-buttons">
               <button class="icon-btn room-view-btn" type="button" data-room-code="${roomCode}" title="${deptT("departments.viewRoom")}">
-                <img src="../../assets/icons/view-info.svg" alt="${deptT("departments.viewRoom")}" />
+                <img src="/assets/icons/view_infor.svg" alt="${deptT("departments.viewRoom")}" />
               </button>
               <button class="icon-btn room-update-btn" type="button" data-room-code="${roomCode}" title="${deptT("departments.updateRoom")}">
-                <img src="../../assets/icons/update.svg" alt="${deptT("departments.updateRoom")}" />
+                <img src="/assets/icons/update.svg" alt="${deptT("departments.updateRoom")}" />
               </button>
               <button class="icon-btn room-delete-btn" type="button" data-room-code="${roomCode}" title="${deptT("departments.deleteRoom")}">
-                <img src="../../assets/icons/delete.svg" alt="${deptT("departments.deleteRoom")}" />
+                <img src="/assets/icons/delete.svg" alt="${deptT("departments.deleteRoom")}" />
               </button>
             </div>
           </td>`;
 
   const buildDepartmentRoomTr = (room, buildingCode, { withBuildingColumn }) => {
-    const roomFloor = room[1] != null && String(room[1]).trim() !== "" ? String(room[1]).trim() : "";
-    const roomClass = room[2] != null && String(room[2]).trim() !== "" && room[2] !== "-" ? String(room[2]).trim() : "-";
-    const roomStatus = room[4] != null && String(room[4]).trim() !== "" ? String(room[4]).trim() : "";
-    const roomCapacity = room[5] != null && String(room[5]).trim() !== "" ? String(room[5]).trim() : "";
-    const idPhong = (window.maPhongTuDinhDanh && window.maPhongTuDinhDanh[room[0]]) || "";
+    const uiRow = roomRowForUi(room);
+    const roomFloor = uiRow[1] != null && String(uiRow[1]).trim() !== "" ? String(uiRow[1]).trim() : "";
+    const roomClass =
+      uiRow[2] != null && String(uiRow[2]).trim() !== "" && uiRow[2] !== "-"
+        ? String(uiRow[2]).trim()
+        : "Trống";
+    const roomTeacher =
+      uiRow[3] != null && String(uiRow[3]).trim() !== "" && uiRow[3] !== "-"
+        ? String(uiRow[3]).trim()
+        : "--";
+    const roomCapacity =
+      uiRow[4] != null && String(uiRow[4]).trim() !== ""
+        ? String(uiRow[4]).trim()
+        : room[5] != null && String(room[5]).trim() !== ""
+          ? String(room[5]).trim()
+          : "";
+    const idPhong = (window.maPhongTuDinhDanh && window.maPhongTuDinhDanh[uiRow[0]]) || "";
     const bCell = withBuildingColumn ? `<td>${buildingLabelForCode(buildingCode)}</td>` : "";
     return `
         <tr data-building="${buildingCode}" data-room-id="${idPhong}">
           ${bCell}
-          <td>${room[0]}</td>
+          <td>${uiRow[0]}</td>
           <td>${roomFloor}</td>
           <td>${roomClass}</td>
+          <td>${roomTeacher}</td>
           <td>${roomCapacity}</td>
-          <td>${roomStatus}</td>
-          ${roomActionCells(room[0])}
+          ${roomActionCells(uiRow[0])}
         </tr>`;
   };
 
@@ -301,13 +364,10 @@ if (duongDanLaTrang("departments.html")) {
     if (!body || !departmentsTable) return;
     departmentsTable.setAttribute("data-dept-search-mode", "global");
     renderDeptTableHead("global");
-    const codes = new Set([...Object.keys(buildingRooms), ...Object.keys(getRoomAdditions() || {})]);
+    const codes = new Set(Object.keys(buildingRooms));
     const out = [];
     for (const code of Array.from(codes).sort()) {
-      const base = buildingRooms[code] || [];
-      const extra = getRoomAdditions()[code] || [];
-      const baseCodes = new Set(base.map((r) => r[0]));
-      const rows = [...base, ...extra.filter((r) => !baseCodes.has(r[0]))];
+      const rows = sortRoomRowsByFloor(buildingRooms[code] || []);
       for (const room of rows) {
         out.push(buildDepartmentRoomTr(room, code, { withBuildingColumn: true }));
       }
@@ -325,12 +385,16 @@ if (duongDanLaTrang("departments.html")) {
     renderDeptTableHead("single");
     setAddRoomLink(code);
     dongBoBuildingTrenUrl(code);
-    const base = buildingRooms[code] || fallbackRooms;
-    const extra = getRoomAdditions()[code] || [];
-    const baseCodes = new Set(base.map((r) => r[0]));
-    const rows = [...base, ...extra.filter((r) => !baseCodes.has(r[0]))];
-    body.innerHTML = rows.map((room) => buildDepartmentRoomTr(room, code, { withBuildingColumn: false })).join("");
-    giuTieuDeTrangPhong();
+    const rows = sortRoomRowsByFloor(buildingRooms[code] || []);
+    if (rows.length === 0) {
+      body.innerHTML =
+        '<tr><td colspan="6" style="text-align:center;padding:24px">Không có phòng.</td></tr>';
+    } else {
+      body.innerHTML = rows
+        .map((room) => buildDepartmentRoomTr(room, code, { withBuildingColumn: false }))
+        .join("");
+    }
+    giuTieuDeTrangPhong(code);
     refreshDepartmentTable();
   };
 
@@ -347,12 +411,36 @@ if (duongDanLaTrang("departments.html")) {
   refreshDepartmentTable = setupTableControls({
     tableBody: body,
     searchInput: departmentsSearchInput,
-    pageSizeSelect: departmentsPageSizeSelect,
     getRowSearchText: (row) => {
       const mode = document.getElementById("departmentsTable")?.getAttribute("data-dept-search-mode");
-      const cols = mode === "global" ? [3, 4] : [2, 3];
+      const cols = mode === "global" ? [3, 4, 5] : [2, 3, 4];
       return cols.map((i) => row.children[i]?.textContent?.trim() || "").join(" ");
     },
+  });
+
+  const taiLaiPhongTheoBoLoc = async () => {
+    const building = maToaHienTai();
+    const date = departmentsDateInput?.value || "";
+    const shift = departmentsShiftSelect?.value || "";
+    await taiPhongTuMayChu({
+      building,
+      date: date || undefined,
+      shift: shift || undefined,
+    });
+    if (departmentsSearchInput?.value.trim()) {
+      renderAllBuildingsForSearch();
+    } else {
+      taiTheoUrl();
+    }
+  };
+
+  const onDateOrShiftFilterChange = () => {
+    void taiLaiPhongTheoBoLoc();
+  };
+  departmentsDateInput?.addEventListener("change", onDateOrShiftFilterChange);
+  departmentsDateInput?.addEventListener("input", onDateOrShiftFilterChange);
+  departmentsShiftSelect?.addEventListener("change", () => {
+    void taiLaiPhongTheoBoLoc();
   });
 
   const taiTheoUrl = () => {
@@ -364,18 +452,15 @@ if (duongDanLaTrang("departments.html")) {
   window.addEventListener("fm-i18n-applied", () => {
     const mode = departmentsTable?.getAttribute("data-dept-search-mode");
     renderDeptTableHead(mode === "global" ? "global" : "single");
+    khoiTaoBoLoc(false);
     queueMicrotask(giuTieuDeTrangPhong);
   });
 
   giuTieuDeTrangPhong();
 
   void (async () => {
-    await taiPhongTuMayChu();
-    if (departmentsSearchInput?.value.trim()) {
-      renderAllBuildingsForSearch();
-    } else {
-      taiTheoUrl();
-    }
+    khoiTaoBoLoc(true);
+    await taiLaiPhongTheoBoLoc();
     giuTieuDeTrangPhong();
   })();
 
@@ -396,6 +481,13 @@ if (duongDanLaTrang("departments.html")) {
       const idPhong = tr?.getAttribute("data-room-id") || "";
       const q = new URLSearchParams({ room: roomCode });
       if (idPhong) q.set("id", idPhong);
+      const ngayLoc = departmentsDateInput?.value?.trim() || "";
+      const caLoc = departmentsShiftSelect?.value?.trim() || "";
+      const toaLoc =
+        tr?.getAttribute("data-building") || maToaHienTai() || "";
+      if (ngayLoc) q.set("date", ngayLoc);
+      if (caLoc) q.set("shift", caLoc);
+      if (toaLoc) q.set("building", toaLoc);
       window.location.href = `../dashboard/room-detail.html?${q.toString()}`;
       return;
     }
@@ -425,10 +517,10 @@ if (duongDanLaTrang("departments.html")) {
       const confirmed = window.confirm(deptT("departments.confirmDeleteRoom", { code: roomCode }));
       if (!confirmed) return;
       const idPhong = row.getAttribute("data-room-id") || "";
-      if (idPhong && window.FmApi && typeof window.FmApi.xoaPhong === "function") {
+      if (idPhong && window.CoSoApi && typeof window.CoSoApi.xoaPhong === "function") {
         void (async () => {
           try {
-            await window.FmApi.xoaPhong(idPhong);
+            await window.CoSoApi.xoaPhong(idPhong);
             row.remove();
             refreshDepartmentTable();
           } catch (e) {
@@ -453,6 +545,7 @@ if (duongDanLaTrang("departments.html")) {
   });
 }
 
+/* users.html -> users-page.js */
 
 if (duongDanLaTrang("users-add.html")) {
   const userFormPageTitle = document.getElementById("userFormPageTitle");
@@ -471,37 +564,37 @@ if (duongDanLaTrang("users-add.html")) {
     "tien-hop": {
       username: "canbo",
       password: "******",
-      fullname: "Tráº§n Tiáº¿n Há»£p",
-      address: "BÃ¬nh Äá»‹nh",
+      fullname: "Trần Tiến Hợp",
+      address: "Bình Định",
       phone: "1263751380",
-      role: "CÃ¡n bá»™ quáº£n lÃ½ tÃ i sáº£n",
+      role: "Cán bộ quản lý tài sản",
       avatar: "/assets/images/avatar/avatar_1.jpg",
     },
     "nhat-thanh": {
       username: "canbonhanvien",
       password: "******",
-      fullname: "Äá»— Nháº­t Thanh",
+      fullname: "Đỗ Nhật Thanh",
       address: "An Giang",
       phone: "1263751380",
-      role: "CÃ¡n bá»™ quáº£n lÃ½ tÃ i sáº£n",
+      role: "Cán bộ quản lý tài sản",
       avatar: "/assets/images/avatar/avatar_2.jpg",
     },
     "hoang-phuc": {
       username: "ht",
       password: "******",
-      fullname: "VÃµ HoÃ ng PhÃºc",
-      address: "SÃ³c TrÄƒng",
+      fullname: "Võ Hoàng Phúc",
+      address: "Sóc Trăng",
       phone: "1234459015",
-      role: "Hiá»‡u trÆ°á»Ÿng",
+      role: "Hiệu trưởng",
       avatar: "/assets/images/avatar/avatar_3.jpg",
     },
     "huynh-hoa-phuc": {
       username: "nv",
       password: "******",
-      fullname: "Tráº§n Huá»³nh HÃ²a PhÃºc",
-      address: "Tiá»n Giang",
+      fullname: "Trần Huỳnh Hòa Phúc",
+      address: "Tiền Giang",
       phone: "1263751380",
-      role: "Lao CÃ´ng",
+      role: "Lao Công",
       avatar: "/assets/images/avatar/avatar_4.jpg",
     },
   };
@@ -514,9 +607,9 @@ if (duongDanLaTrang("users-add.html")) {
 
   const dienFormNguoiDung = (info) => {
     if (!info) return;
-    if (userFormPageTitle) userFormPageTitle.textContent = "Cáº­p nháº­t user";
-    if (userFormTabLabel) userFormTabLabel.textContent = "Cáº­p nháº­t user";
-    if (userFormSubmitBtn) userFormSubmitBtn.textContent = "Cáº­p nháº­t";
+    if (userFormPageTitle) userFormPageTitle.textContent = "Cập nhật user";
+    if (userFormTabLabel) userFormTabLabel.textContent = "Cập nhật user";
+    if (userFormSubmitBtn) userFormSubmitBtn.textContent = "Cập nhật";
     if (userUsernameInput) userUsernameInput.value = info.username || "";
     if (userPasswordInput) userPasswordInput.value = info.password || "******";
     if (userFullnameInput) userFullnameInput.value = info.fullname || "";
@@ -534,10 +627,10 @@ if (duongDanLaTrang("users-add.html")) {
     dienFormNguoiDung(userInfo);
   }
 
-  if (isEditMode && editIdFromUrl && window.FmApi?.layNguoiDungTheoId) {
+  if (isEditMode && editIdFromUrl && window.CoSoApi?.layNguoiDungTheoId) {
     void (async () => {
       try {
-        const u = await window.FmApi.layNguoiDungTheoId(editIdFromUrl);
+        const u = await window.CoSoApi.layNguoiDungTheoId(editIdFromUrl);
         dienFormNguoiDung({
           username: u.username || "",
           password: "******",
@@ -572,7 +665,7 @@ if (duongDanLaTrang("users-add.html")) {
         try {
           const fileInput = document.getElementById("avatarInput");
           const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
-          if (hasFile && window.FmApi?.capNhatNguoiDungMultipart && maNguoiDungCapNhat) {
+          if (hasFile && window.CoSoApi?.capNhatNguoiDungMultipart && maNguoiDungCapNhat) {
             const fd = new FormData();
             fd.append("username", userUsernameInput.value.trim());
             if (userPasswordInput?.value) fd.append("password", userPasswordInput.value);
@@ -581,9 +674,9 @@ if (duongDanLaTrang("users-add.html")) {
             fd.append("phoneNumber", userPhoneInput?.value.trim() || "");
             fd.append("role", userRoleInput.value.trim());
             fd.append("avatar", fileInput.files[0]);
-            await window.FmApi.capNhatNguoiDungMultipart(String(maNguoiDungCapNhat), fd);
-          } else if (window.FmApi?.capNhatNguoiDung && maNguoiDungCapNhat) {
-            await window.FmApi.capNhatNguoiDung(String(maNguoiDungCapNhat), {
+            await window.CoSoApi.capNhatNguoiDungMultipart(String(maNguoiDungCapNhat), fd);
+          } else if (window.CoSoApi?.capNhatNguoiDung && maNguoiDungCapNhat) {
+            await window.CoSoApi.capNhatNguoiDung(String(maNguoiDungCapNhat), {
               username: userUsernameInput.value.trim(),
               password: userPasswordInput?.value || undefined,
               fullName: userFullnameInput.value.trim(),
@@ -593,11 +686,11 @@ if (duongDanLaTrang("users-add.html")) {
             });
           }
         } catch (e) {
-          console.warn("[User] Cáº­p nháº­t API:", e);
+          console.warn("[User] Cập nhật API:", e);
         }
       })();
       sessionStorage.setItem("pendingUserUpdate", JSON.stringify(payload));
-      window.alert("Cáº­p nháº­t user thÃ nh cÃ´ng!");
+      window.alert("Cập nhật user thành công!");
       if (window.history.length > 1) {
         window.history.back();
         return;
@@ -610,7 +703,7 @@ if (duongDanLaTrang("users-add.html")) {
       try {
         const fileInput = document.getElementById("avatarInput");
         const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
-        if (hasFile && window.FmApi?.taoNguoiDungMultipart) {
+        if (hasFile && window.CoSoApi?.taoNguoiDungMultipart) {
           const fd = new FormData();
           fd.append("username", userUsernameInput.value.trim());
           fd.append("password", userPasswordInput?.value || "");
@@ -619,9 +712,9 @@ if (duongDanLaTrang("users-add.html")) {
           fd.append("phoneNumber", userPhoneInput?.value.trim() || "");
           fd.append("role", userRoleInput.value.trim());
           fd.append("avatar", fileInput.files[0]);
-          await window.FmApi.taoNguoiDungMultipart(fd);
-        } else if (window.FmApi?.taoNguoiDung) {
-          await window.FmApi.taoNguoiDung({
+          await window.CoSoApi.taoNguoiDungMultipart(fd);
+        } else if (window.CoSoApi?.taoNguoiDung) {
+          await window.CoSoApi.taoNguoiDung({
             username: userUsernameInput.value.trim(),
             password: userPasswordInput?.value || "",
             fullName: userFullnameInput.value.trim(),
@@ -631,10 +724,10 @@ if (duongDanLaTrang("users-add.html")) {
           });
         }
       } catch (e) {
-        console.warn("[User] ThÃªm API:", e);
+        console.warn("[User] Thêm API:", e);
       }
     })();
-    window.alert("ThÃªm user thÃ nh cÃ´ng!");
+    window.alert("Thêm user thành công!");
     if (window.history.length > 1) {
       window.history.back();
       return;
@@ -678,138 +771,69 @@ if (duongDanLaTrang("categories.html")) {
 
   const categoryConfigs = {
     default: {
-      title: "Quáº£n lÃ½ danh má»¥c tÃ i sáº£n",
-      listTabText: "Táº¥t cáº£ danh má»¥c",
-      addTabText: "ThÃªm danh má»¥c",
+      title: "Quản lý danh mục tài sản",
+      listTabText: "Tất cả danh mục",
+      addTabText: "Thêm danh mục",
       extraTabText: "",
-      columns: ["ID", "MÃ£ danh má»¥c", "TÃªn danh má»¥c", "Chá»©c nÄƒng"],
-      nameLabel: "TÃªn danh má»¥c",
-      codeLabel: "MÃ£ danh má»¥c",
-      namePlaceholder: "Nháº­p tÃªn danh má»¥c",
-      codePlaceholder: "VÃ­ dá»¥: MM-TB",
+      columns: ["ID", "Mã danh mục", "Tên danh mục", "Chức năng"],
+      nameLabel: "Tên danh mục",
+      codeLabel: "Mã danh mục",
+      namePlaceholder: "Nhập tên danh mục",
+      codePlaceholder: "Ví dụ: MM-TB",
       extraNameLabel: "",
       extraCodeLabel: "",
       extraNamePlaceholder: "",
-      rows: [
-        ["1", "MM-TB", "MÃ¡y mÃ³c, thiáº¿t bá»‹", "Sá»­a/XÃ³a"],
-        ["2", "CC-DC", "CÃ´ng cá»¥, dá»¥ng cá»¥", "Sá»­a/XÃ³a"],
-      ],
-    },
-    "may-moc-thiet-bi": {
-      title: "Quáº£n lÃ½ danh má»¥c mÃ¡y mÃ³c, thiáº¿t bá»‹",
-      listTabText: "MÃ¡y mÃ³c, thiáº¿t bá»‹",
-      addTabText: "ThÃªm MÃ¡y mÃ³c, thiáº¿t bá»‹",
-      extraTabText: "",
-      columns: ["ID", "MÃ£", "TÃªn", "Chá»©c nÄƒng"],
-      nameLabel: "TÃªn",
-      codeLabel: "MÃ£",
-      namePlaceholder: "Nháº­p tÃªn",
-      codePlaceholder: "VÃ­ dá»¥: MM-01",
-      extraNameLabel: "",
-      extraCodeLabel: "",
-      extraNamePlaceholder: "",
-      rows: [
-        ["1", "MM-01", "Gháº¿", "Sá»­a/XÃ³a"],
-        ["2", "MM-02", "Ká»‡ gÃ³c", "Sá»­a/XÃ³a"],
-        ["3", "MM-03", "Báº£ng Meci", "Sá»­a/XÃ³a"],
-        ["4", "MM-04", "BÃ n vi tÃ­nh", "Sá»­a/XÃ³a"],
-        ["5", "MM-05", "BÃ n", "Sá»­a/XÃ³a"],
-        ["6", "MM-06", "Tá»§", "Sá»­a/XÃ³a"],
-      ],
-    },
-    "cong-cu-dung-cu": {
-      title: "Quáº£n lÃ½ danh má»¥c cÃ´ng cá»¥, dá»¥ng cá»¥",
-      listTabText: "CÃ´ng cá»¥, dá»¥ng cá»¥",
-      addTabText: "ThÃªm CÃ´ng cá»¥, dá»¥ng cá»¥",
-      extraTabText: "",
-      columns: ["ID", "MÃ£", "TÃªn", "Chá»©c nÄƒng"],
-      nameLabel: "TÃªn",
-      codeLabel: "MÃ£",
-      namePlaceholder: "Nháº­p tÃªn",
-      codePlaceholder: "VÃ­ dá»¥: CC-01",
-      extraNameLabel: "",
-      extraCodeLabel: "",
-      extraNamePlaceholder: "",
-      rows: [
-        ["1", "CC-01", "KÃ¬m Ä‘iá»‡n", "Sá»­a/XÃ³a"],
-        ["2", "CC-02", "Cá» lÃª", "Sá»­a/XÃ³a"],
-        ["3", "CC-03", "Má» láº¿t", "Sá»­a/XÃ³a"],
-      ],
+      rows: [],
     },
     "nguon-kinh-phi": {
-      title: "Quáº£n lÃ½ nguá»“n kinh phÃ­",
-      listTabText: "Nguá»“n kinh phÃ­",
-      addTabText: "ThÃªm nguá»“n kinh phÃ­",
-      extraTabText: "Bá»• sung nguá»“n kinh phÃ­",
-      columns: ["ID", "MÃ£ NKP", "TÃªn nguá»“n kinh phÃ­", "Tá»•ng ngÃ¢n sÃ¡ch", "Tá»•ng chi", "Tá»•ng thanh lÃ½", "CÃ²n láº¡i", "Chá»©c nÄƒng"],
-      nameLabel: "TÃªn nguá»“n kinh phÃ­",
-      codeLabel: "MÃ£ nguá»“n kinh phÃ­",
-      namePlaceholder: "Vui lÃ²ng nháº­p tÃªn nguá»“n kinh phÃ­",
-      codePlaceholder: "Vui lÃ²ng nháº­p mÃ£ nguá»“n kinh phÃ­",
-      extraNameLabel: "ThÃªm kinh phÃ­",
-      extraCodeLabel: "Loáº¡i kinh phÃ­",
-      extraNamePlaceholder: "Vui lÃ²ng nháº­p sá»‘ tiá»n cáº§n bá»• sung",
-      rows: [
-        ["1", "", "NhÃ  trÆ°á»ng", "500.000.000 Ä‘", "386.409.000 Ä‘", "237.100.000 Ä‘", "113.591.000 Ä‘", "Sá»­a/XÃ³a"],
-        ["2", "DA", "Dá»± Ã¡n", "400.000.000 Ä‘", "269.870.000 Ä‘", "120.000.000 Ä‘", "130.130.000 Ä‘", "Sá»­a/XÃ³a"],
-      ],
-    },
-    "nha-cung-cap": {
-      title: "Quáº£n lÃ½ nhÃ  cung cáº¥p",
-      listTabText: "Táº¥t cáº£ nhÃ  cung cáº¥p",
-      addTabText: "ThÃªm nhÃ  cung cáº¥p má»›i",
+      title: "Quản lý nguồn kinh phí",
+      listTabText: "Nguồn kinh phí",
+      addTabText: "Thêm nguồn kinh phí",
       extraTabText: "",
-      columns: ["ID", "MÃ£ nhÃ  cung cáº¥p", "TÃªn nhÃ  cung cáº¥p", "Äá»‹a chá»‰", "Email", "SDT", "Chá»©c nÄƒng"],
-      nameLabel: "TÃªn nhÃ  cung cáº¥p",
-      codeLabel: "MÃ£ nhÃ  cung cáº¥p",
-      namePlaceholder: "Vui lÃ²ng nháº­p tÃªn nhÃ  cung cáº¥p",
-      codePlaceholder: "Vui lÃ²ng nháº­p mÃ£ nhÃ  cung cáº¥p",
+      columns: ["ID", "Mã NKP", "Tên nguồn kinh phí", "Tổng ngân sách", "Tổng chi", "Tổng thanh lý", "Còn lại", "Chức năng"],
+      nameLabel: "Tên nguồn kinh phí",
+      codeLabel: "Mã nguồn kinh phí",
+      namePlaceholder: "Vui lòng nhập tên nguồn kinh phí",
+      codePlaceholder: "Vui lòng nhập mã nguồn kinh phí",
       extraNameLabel: "",
       extraCodeLabel: "",
       extraNamePlaceholder: "",
-      rows: [
-        ["1", "", "CÃ´ng ty MTV Quang Minh táº¡i Quáº£ng Nam", "Tam ká»³ quáº£ng Nam", "quangminh@gmail.com", "120202345", "Sá»­a/XÃ³a"],
-        ["2", "", "CÃ´ng ty TNHH Tráº§n TÃ¢m", "Háº£i ChÃ¢u ÄÃ  Náºµng", "trantam@gmail.com", "126784774", "Sá»­a/XÃ³a"],
-        ["3", "", "CÃ´ng ty cung cáº¥p mÃ¡y tÃ­nh Tam Ká»³", "117 LÃª Lá»£i TP Tam Ká»³ Quáº£ng Nam", "maytinhtamky@gmail.com", "126784774", "Sá»­a/XÃ³a"],
-        ["4", "", "CÃ´ng ty TNHH Ã‚m nháº¡c Tam ká»³", "Tam An PhÃº Ninh Quáº£ng Nam", "amnhactamky@gmail.com", "1230012574", "Sá»­a/XÃ³a"],
-      ],
-    },
-    nuoc: {
-      title: "Quáº£n lÃ½ nÆ°á»›c",
-      listTabText: "NÆ°á»›c",
-      addTabText: "ThÃªm nÆ°á»›c",
-      extraTabText: "",
-      columns: ["ID", "MÃ£ nÆ°á»›c", "TÃªn nÆ°á»›c", "Chá»©c nÄƒng"],
-      nameLabel: "TÃªn nÆ°á»›c",
-      codeLabel: "MÃ£ nÆ°á»›c",
-      namePlaceholder: "Vui lÃ²ng nháº­p tÃªn nÆ°á»›c",
-      codePlaceholder: "Vui lÃ²ng nháº­p mÃ£ nÆ°á»›c",
-      extraNameLabel: "",
-      extraCodeLabel: "",
-      extraNamePlaceholder: "",
-      rows: [
-        ["1", "BL", "Ba Lan", "Sá»­a/XÃ³a"],
-        ["2", "HL", "HÃ  Lan", "Sá»­a/XÃ³a"],
-        ["3", "", "HÃ n Quá»‘c", "Sá»­a/XÃ³a"],
-        ["4", "", "Nga", "Sá»­a/XÃ³a"],
-        ["5", "", "Viá»‡t Nam", "Sá»­a/XÃ³a"],
-      ],
+      rows: [],
     },
   };
 
-  const taiDanhMucMacDinhTuApi = async () => {
-    if (!window.FmApi || typeof window.FmApi.layDanhSachDanhMuc !== "function") return;
+  const mapDanhMucThanhHang = (list, configKey) => {
+    const sorted = [...(Array.isArray(list) ? list : [])].sort((a, b) => {
+      const idA = Number(a?.id);
+      const idB = Number(b?.id);
+      if (Number.isFinite(idA) && Number.isFinite(idB)) return idA - idB;
+      return String(a?.id ?? "").localeCompare(String(b?.id ?? ""), undefined, { numeric: true });
+    });
+    const rows = sorted.map((c) => {
+      const id = String(c.id != null ? c.id : "");
+      const code = String(c.code || c.categoryCode || "");
+      const name = String(c.name || c.categoryName || "");
+      if (configKey === "nguon-kinh-phi") {
+        return [id, code, name, "—", "—", "—", "—", "Sửa/Xóa"];
+      }
+      return [id, code, name, "Sửa/Xóa"];
+    });
+    return rows;
+  };
+
+  const taiDanhMucTuApi = async (type, configKey = "default") => {
+    const api = window.FmApi || window.CoSoApi;
+    const cfg = categoryConfigs[configKey] || categoryConfigs.default;
+    if (!api || typeof api.layDanhSachDanhMuc !== "function") return false;
     try {
-      const list = await window.FmApi.layDanhSachDanhMuc();
-      if (!Array.isArray(list) || list.length === 0) return;
-      categoryConfigs.default.rows = list.map((c) => [
-        String(c.id != null ? c.id : ""),
-        String(c.code || c.categoryCode || ""),
-        String(c.name || c.categoryName || ""),
-        "Sá»­a/XÃ³a",
-      ]);
+      const thamSo = type ? { type } : {};
+      const list = await api.layDanhSachDanhMuc(thamSo);
+      cfg.rows = mapDanhMucThanhHang(list, configKey);
+      return true;
     } catch (err) {
-      console.warn("[Danh má»¥c] KhÃ´ng táº£i Ä‘Æ°á»£c tá»« API:", err);
+      console.warn("[Danh mục] Không tải được từ API:", err);
+      cfg.rows = [];
+      return false;
     }
   };
 
@@ -856,12 +880,12 @@ if (duongDanLaTrang("categories.html")) {
     categoryCodeSelect.value = "";
     const reqKey = "categories.validationRequired";
     categoryNameError.setAttribute("data-i18n", reqKey);
-    categoryNameError.textContent = window.FmI18n?.t?.(reqKey) || "HÃ£y nháº­p danh má»¥c cá»§a báº¡n !";
+    categoryNameError.textContent = window.FmI18n?.t?.(reqKey) || "Hãy nhập danh mục của bạn !";
     categoryNameError.hidden = true;
   };
 
   const toMoneyNumber = (text) => Number((text || "").replace(/[^\d]/g, "")) || 0;
-  const formatMoney = (value) => `${Number(value || 0).toLocaleString("vi-VN")} Ä‘`;
+  const formatMoney = (value) => `${Number(value || 0).toLocaleString("vi-VN")} đ`;
 
   const escapeCategoryAttr = (v) =>
     String(v ?? "")
@@ -875,17 +899,17 @@ if (duongDanLaTrang("categories.html")) {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-  /** Cá»™t chá»©c nÄƒng: cáº­p nháº­t + xÃ³a (Ã´ vuÃ´ng, icon; khÃ´ng cÃ³ xem chi tiáº¿t) */
+  /** Cột chức năng: cập nhật + xóa (ô vuông, icon; không có xem chi tiết) */
   const categoryActionButtonsHtml = (id, code) => {
     const a = escapeCategoryAttr(id);
     const b = escapeCategoryAttr(code);
     return `<td>
       <div class="category-icon-actions">
-        <button class="category-icon-btn category-update-btn" type="button" data-category-id="${a}" data-category-code="${b}" data-i18n-title="categories.actions.updateTitle" title="Cáº­p nháº­t">
-          <img src="../../assets/icons/update.svg" alt="" />
+        <button class="category-icon-btn category-update-btn" type="button" data-category-id="${a}" data-category-code="${b}" data-i18n-title="categories.actions.updateTitle" title="Cập nhật">
+          <img src="/assets/icons/update.svg" alt="" />
         </button>
-        <button class="category-icon-btn category-delete-btn" type="button" data-category-id="${a}" data-category-code="${b}" data-i18n-title="categories.actions.deleteTitle" title="XÃ³a">
-          <img src="../../assets/icons/delete.svg" alt="" />
+        <button class="category-icon-btn category-delete-btn" type="button" data-category-id="${a}" data-category-code="${b}" data-i18n-title="categories.actions.deleteTitle" title="Xóa">
+          <img src="/assets/icons/delete.svg" alt="" />
         </button>
       </div>
     </td>`;
@@ -919,29 +943,6 @@ if (duongDanLaTrang("categories.html")) {
       .join("");
   };
 
-  const CATEGORY_ROW_PATCHES_KEY = "categoryRowPatches";
-
-  const mergeCategoryPatches = (configKey, baseRows) => {
-    let table = null;
-    try {
-      const raw = sessionStorage.getItem(CATEGORY_ROW_PATCHES_KEY);
-      if (!raw) return baseRows;
-      const patches = JSON.parse(raw);
-      table = patches[configKey];
-    } catch {
-      return baseRows;
-    }
-    if (!table || typeof table !== "object") return baseRows;
-    return baseRows.map((row) => {
-      const id = String(row[0] ?? "");
-      const patch = table[id];
-      if (patch && Array.isArray(patch) && patch.length) {
-        return [...patch, "Sá»­a/XÃ³a"];
-      }
-      return row;
-    });
-  };
-
   const populateBudgetTypeSelect = () => {
     if (!categoryCodeSelect || !categoryTableBody) return;
     const options = Array.from(categoryTableBody.querySelectorAll("tr"))
@@ -956,7 +957,7 @@ if (duongDanLaTrang("categories.html")) {
       .filter((item) => item.value);
 
     categoryCodeSelect.innerHTML = `
-      <option value="" data-i18n="categories.budgetSelectPlaceholder">-- Chá»n loáº¡i kinh phÃ­ --</option>
+      <option value="" data-i18n="categories.budgetSelectPlaceholder">-- Chọn loại kinh phí --</option>
       ${options.map((item) => `<option value="${item.value}">${item.label}</option>`).join("")}
     `;
     window.FmI18n?.apply?.(categoryCodeSelect);
@@ -976,9 +977,19 @@ if (duongDanLaTrang("categories.html")) {
   };
 
   const applyCategoryView = async () => {
-    const viewKey = window.location.hash.replace("#", "").trim();
+    let viewKey = window.location.hash.replace("#", "").trim();
+    if (viewKey && viewKey !== "default" && viewKey !== "nguon-kinh-phi") {
+      viewKey = "default";
+      try {
+        const url = new URL(window.location.href);
+        url.hash = "";
+        window.history.replaceState(null, "", url);
+      } catch (_) {}
+    }
     if (!viewKey || viewKey === "default") {
-      await taiDanhMucMacDinhTuApi();
+      await taiDanhMucTuApi("ASSET", "default");
+    } else if (viewKey === "nguon-kinh-phi") {
+      await taiDanhMucTuApi("FUND_SOURCE", "nguon-kinh-phi");
     }
     const config = categoryConfigs[viewKey] || categoryConfigs.default;
     activeCategoryConfigKey = categoryConfigs[viewKey] ? viewKey : "default";
@@ -1034,14 +1045,14 @@ if (duongDanLaTrang("categories.html")) {
     const submitBtn = categoryForm?.querySelector('button[type="submit"]');
     if (submitBtn) {
       submitBtn.setAttribute("data-i18n", vp("submitBtn"));
-      submitBtn.textContent = ct("submitBtn", window.FmI18n?.t?.("buttons.add") || "ThÃªm");
+      submitBtn.textContent = ct("submitBtn", window.FmI18n?.t?.("buttons.add") || "Thêm");
     }
     if (categoryResetBtn) {
       categoryResetBtn.setAttribute("data-i18n", vp("resetBtn"));
-      categoryResetBtn.textContent = ct("resetBtn", window.FmI18n?.t?.("userForm.btnReset") || "Nháº­p láº¡i");
+      categoryResetBtn.textContent = ct("resetBtn", window.FmI18n?.t?.("userForm.btnReset") || "Nhập lại");
     }
     renderCategoryHead(config.columns);
-    renderCategoryRows(mergeCategoryPatches(activeCategoryConfigKey, config.rows));
+    renderCategoryRows(config.rows);
     setActiveCategoryMenuItem(categoryConfigs[viewKey] ? viewKey : "");
     resetCategoryForm();
     switchCategoryTab("list");
@@ -1149,17 +1160,25 @@ if (duongDanLaTrang("categories.html")) {
       return;
     }
     if (deleteBtn) {
-      const delMsg = window.FmI18n?.t?.("categories.confirmDelete", { name }) || `Báº¡n cÃ³ cháº¯c muá»‘n xÃ³a danh má»¥c "${name}"?`;
+      const delMsg = window.FmI18n?.t?.("categories.confirmDelete", { name }) || `Bạn có chắc muốn xóa danh mục "${name}"?`;
       if (!window.confirm(delMsg)) return;
       const idDanhMuc = cells[0]?.textContent?.trim() || "";
-      if (idDanhMuc && window.FmApi?.xoaDanhMuc) {
+      if (idDanhMuc && window.CoSoApi?.xoaDanhMuc) {
         void (async () => {
           try {
-            await window.FmApi.xoaDanhMuc(idDanhMuc);
-            row.remove();
+            await window.CoSoApi.xoaDanhMuc(idDanhMuc);
+            if (activeCategoryConfigKey === "nguon-kinh-phi") {
+              await taiDanhMucTuApi("FUND_SOURCE", "nguon-kinh-phi");
+            } else if (!activeCategoryConfigKey || activeCategoryConfigKey === "default") {
+              await taiDanhMucTuApi("ASSET", "default");
+            } else {
+              row.remove();
+            }
+            const cfg = categoryConfigs[activeCategoryConfigKey] || categoryConfigs.default;
+            renderCategoryRows(cfg.rows);
             refreshCategoryTable();
           } catch (e) {
-            window.alert(window.FmI18n?.t?.("categories.deleteServerFail") || "XÃ³a danh má»¥c trÃªn mÃ¡y chá»§ tháº¥t báº¡i.");
+            window.alert(window.FmI18n?.t?.("categories.deleteServerFail") || "Xóa danh mục trên máy chủ thất bại.");
           }
         })();
         return;
@@ -1181,98 +1200,44 @@ if (duongDanLaTrang("categories.html")) {
       categoryNameError.hidden = false;
       const reqKey = "categories.validationRequired";
       categoryNameError.setAttribute("data-i18n", reqKey);
-      categoryNameError.textContent = window.FmI18n?.t?.(reqKey) || "HÃ£y nháº­p danh má»¥c cá»§a báº¡n !";
+      categoryNameError.textContent = window.FmI18n?.t?.(reqKey) || "Hãy nhập danh mục của bạn !";
       categoryNameInput.focus();
       return;
     }
 
     categoryNameError.hidden = true;
-    const jsonDanhMuc = {
-      code: categoryCode,
-      name: categoryName,
-      type: activeCategoryConfigKey === "default" ? "ASSET" : activeCategoryConfigKey,
-    };
-    void (async () => {
-      try {
-        if (window.FmApi?.taoDanhMuc) await window.FmApi.taoDanhMuc(jsonDanhMuc);
-      } catch (e) {
-        console.warn("[Danh má»¥c] ThÃªm API tháº¥t báº¡i:", e);
-      }
-    })();
-    const newRow = document.createElement("tr");
-    const isBudgetView = activeCategoryConfigKey === "nguon-kinh-phi";
-    const isExtraBudgetTab = isBudgetView && activeCategoryTab === "extra";
 
-    if (isExtraBudgetTab) {
-      const addedBudget = toMoneyNumber(categoryName);
-      if (addedBudget <= 0) {
-        categoryNameError.hidden = false;
-        const emKey = "categories.validationExtraMoney";
-        categoryNameError.setAttribute("data-i18n", emKey);
-        categoryNameError.textContent = window.FmI18n?.t?.(emKey) || "Vui lÃ²ng nháº­p sá»‘ tiá»n há»£p lá»‡";
-        categoryNameInput.focus();
-        return;
-      }
-      const reqKey = "categories.validationRequired";
-      categoryNameError.setAttribute("data-i18n", reqKey);
-      categoryNameError.textContent = window.FmI18n?.t?.(reqKey) || "HÃ£y nháº­p danh má»¥c cá»§a báº¡n !";
-      const targetRow = Array.from(categoryTableBody.querySelectorAll("tr")).find((row) => {
-        const cells = row.querySelectorAll("td");
-        const code = cells[1]?.textContent?.trim() || "";
-        const name = cells[2]?.textContent?.trim() || "";
-        return code === typedCode || (!code && name === typedCode);
-      });
-      if (!targetRow) return;
-      const cells = targetRow.querySelectorAll("td");
-      const currentTotal = toMoneyNumber(cells[3]?.textContent || "");
-      const currentRemain = toMoneyNumber(cells[6]?.textContent || "");
-      cells[3].textContent = formatMoney(currentTotal + addedBudget);
-      cells[6].textContent = formatMoney(currentRemain + addedBudget);
-      resetCategoryForm();
-      switchCategoryTab("list");
-      refreshCategoryTable();
+    const dungApiDanhMuc =
+      !activeCategoryConfigKey ||
+      activeCategoryConfigKey === "default" ||
+      activeCategoryConfigKey === "nguon-kinh-phi";
+
+    if (dungApiDanhMuc) {
+      const jsonDanhMuc = {
+        code: categoryCode,
+        name: categoryName,
+        type: activeCategoryConfigKey === "nguon-kinh-phi" ? "FUND_SOURCE" : "ASSET",
+      };
+      void (async () => {
+        try {
+          if (window.CoSoApi?.taoDanhMuc) await window.CoSoApi.taoDanhMuc(jsonDanhMuc);
+          if (activeCategoryConfigKey === "nguon-kinh-phi") {
+            await taiDanhMucTuApi("FUND_SOURCE", "nguon-kinh-phi");
+          } else {
+            await taiDanhMucTuApi("ASSET", "default");
+          }
+          const cfg = categoryConfigs[activeCategoryConfigKey] || categoryConfigs.default;
+          renderCategoryRows(cfg.rows);
+          resetCategoryForm();
+          switchCategoryTab("list");
+          refreshCategoryTable();
+        } catch (e) {
+          console.warn("[Danh mục] Thêm API thất bại:", e);
+          window.alert(window.FmI18n?.t?.("categories.loadError") || "Không lưu được danh mục. Kiểm tra backend đang chạy.");
+        }
+      })();
       return;
     }
-
-    const nextId = getNextCategoryId();
-    const newCode = isBudgetView
-      ? categoryCode || "NKP-MOI"
-      : activeCategoryConfigKey === "nha-cung-cap"
-        ? categoryCode || "NCC-MOI"
-        : categoryCode || "DM-MOI";
-    const actionTd = categoryActionButtonsHtml(String(nextId), newCode);
-    newRow.innerHTML = isBudgetView
-      ? `
-      <td>${nextId}</td>
-      <td>${newCode}</td>
-      <td>${categoryName}</td>
-      <td>0 Ä‘</td>
-      <td>0 Ä‘</td>
-      <td>0 Ä‘</td>
-      <td>0 Ä‘</td>
-      ${actionTd}
-    `
-      : activeCategoryConfigKey === "nha-cung-cap"
-        ? `
-      <td>${nextId}</td>
-      <td>${newCode}</td>
-      <td>${categoryName}</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      ${actionTd}
-    `
-        : `
-      <td>${nextId}</td>
-      <td>${newCode}</td>
-      <td>${categoryName}</td>
-      ${actionTd}
-    `;
-    categoryTableBody.appendChild(newRow);
-
-    resetCategoryForm();
-    switchCategoryTab("list");
-    refreshCategoryTable();
   });
 
   refreshCategoryTable = setupTableControls({
@@ -1342,12 +1307,12 @@ if (duongDanLaTrang("category-update.html")) {
           ? String(values[1])
           : values[0] != null
             ? String(values[0])
-            : "â€”";
+            : "—";
       if (codeLabel) codeLabel.textContent = codeDisplay;
       if (typeLabel) {
         const tk = `categories.views.${vk}.title`;
         typeLabel.setAttribute("data-i18n", tk);
-        typeLabel.textContent = window.FmI18n?.t?.(tk) || payload.pageTitle || "â€”";
+        typeLabel.textContent = window.FmI18n?.t?.(tk) || payload.pageTitle || "—";
       }
 
       const goBackToCategories = () => {
@@ -1373,7 +1338,7 @@ if (duongDanLaTrang("category-update.html")) {
           const kFb = "categories.edit.fieldFallback";
           lab.setAttribute("data-i18n", kFb);
           lab.setAttribute("data-i18n-params", JSON.stringify({ n: i + 1 }));
-          lab.textContent = window.FmI18n?.t?.(kFb, { n: i + 1 }) || `TrÆ°á»ng ${i + 1}`;
+          lab.textContent = window.FmI18n?.t?.(kFb, { n: i + 1 }) || `Trường ${i + 1}`;
         }
         const inp = document.createElement("input");
         inp.type = "text";
@@ -1382,9 +1347,9 @@ if (duongDanLaTrang("category-update.html")) {
         inp.value = values[i] != null ? String(values[i]) : "";
         const labelForReadonly = hasLabel ? String(labels[i]) : "";
         if (
-          /^mÃ£\b/i.test(labelForReadonly) ||
+          /^mã\b/i.test(labelForReadonly) ||
           /^code\b/i.test(labelForReadonly) ||
-          /^(Sá»‘|STT)\b/i.test(labelForReadonly) ||
+          /^(Số|STT)\b/i.test(labelForReadonly) ||
           /^id$/i.test(labelForReadonly.trim())
         ) {
           inp.readOnly = true;
@@ -1409,29 +1374,22 @@ if (duongDanLaTrang("category-update.html")) {
           newData.push(el ? el.value.trim() : "");
         }
         const rowId = String(values[0] ?? "");
-        const than = { code: newData[1] || "", name: newData[2] || "", type: configKey || "default" };
+        const than = {
+          code: newData[1] || "",
+          name: newData[2] || "",
+          type: configKey === "nguon-kinh-phi" ? "FUND_SOURCE" : "ASSET",
+        };
         void (async () => {
           try {
-            if (rowId && window.FmApi?.capNhatDanhMuc) await window.FmApi.capNhatDanhMuc(rowId, than);
+            if (rowId && window.CoSoApi?.capNhatDanhMuc) await window.CoSoApi.capNhatDanhMuc(rowId, than);
           } catch (err) {
-            console.warn("[Danh má»¥c] Cáº­p nháº­t API tháº¥t báº¡i:", err);
+            console.warn("[Danh mục] Cập nhật API thất bại:", err);
           }
         })();
-        let patches = {};
         try {
-          patches = JSON.parse(sessionStorage.getItem("categoryRowPatches") || "{}");
-        } catch {
-          patches = {};
-        }
-        if (!patches[configKey] || typeof patches[configKey] !== "object") {
-          patches[configKey] = {};
-        }
-        patches[configKey][rowId] = newData;
-        try {
-          sessionStorage.setItem("categoryRowPatches", JSON.stringify(patches));
           sessionStorage.removeItem("categoryEditDraft");
         } catch (_) {}
-        window.alert(window.FmI18n?.t?.("categories.successUpdateAlert") || "Cáº­p nháº­t danh má»¥c thÃ nh cÃ´ng!");
+        window.alert(window.FmI18n?.t?.("categories.successUpdateAlert") || "Cập nhật danh mục thành công!");
         if (window.history.length > 1) {
           window.history.back();
           return;
@@ -1476,7 +1434,7 @@ if (duongDanLaTrang("assets.html")) {
   const assetTableBody = document.getElementById("assetTableBody");
   const assetDetailForm = document.getElementById("assetDetailForm");
   const assetMenuLinks = Array.from(document.querySelectorAll('.nav-submenu a[href*="assets.html"]'));
-  const ASSET_RATING_HISTORY_KEY = "assetRatingHistory";
+
 
   const thoatThuocTinh = (chuoi) =>
     String(chuoi ?? "")
@@ -1487,22 +1445,75 @@ if (duongDanLaTrang("assets.html")) {
     if (so == null || so === "") return "";
     const n = Number(so);
     if (Number.isNaN(n)) return String(so);
-    return n.toLocaleString("vi-VN") + " Ä‘";
+    return n.toLocaleString("vi-VN") + " đ";
   };
-  const taiBangTaiSanTuApi = async () => {
-    if (!assetTableBody || !window.FmApi || typeof window.FmApi.layDanhSachTaiSan !== "function") return;
+  const taoMaTaiSanNoiBo = () => {
+    const random4 = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0");
+    return `AUTO-${Date.now()}-${random4}`;
+  };
+  const ganTuyChonCode = (id, options, placeholder) => {
+    const select = document.getElementById(id);
+    if (!(select instanceof HTMLSelectElement)) return;
+    const htmlOptions = options
+      .map((o) => `<option value="${thoatThuocTinh(o.value)}">${thoatThuocTinh(o.label)}</option>`)
+      .join("");
+    const placeholderOption = placeholder ? `<option value="">${thoatThuocTinh(placeholder)}</option>` : "";
+    select.innerHTML = `${placeholderOption}${htmlOptions}`;
+  };
+  const taiTuyChonDanhMucChoFormTaiSan = async () => {
+    const api = window.FmApi || window.CoSoApi;
+    if (!api?.layDanhSachDanhMuc) return;
     try {
-      const list = await window.FmApi.layDanhSachTaiSan();
-      if (!Array.isArray(list) || list.length === 0) return;
-      const hang = list
-        .map((a) => {
+      const [assets, funds] = await Promise.all([
+        api.layDanhSachDanhMuc({ type: "ASSET" }),
+        api.layDanhSachDanhMuc({ type: "FUND_SOURCE" }),
+      ]);
+      const toOpts = (list) =>
+        (Array.isArray(list) ? list : []).map((c) => ({
+          value: String(c.code || c.categoryCode || ""),
+          label: String(c.name || c.categoryName || c.code || ""),
+        }));
+      ganTuyChonCode("assetCategoryInput", toOpts(assets), "-- Chọn danh mục --");
+      ganTuyChonCode("assetFundInput", toOpts(funds), "-- Chọn nguồn kinh phí --");
+    } catch (err) {
+      console.warn("[Tài sản] Không tải danh mục cho form:", err);
+    }
+  };
+
+  const ganTenNguoiBanGiaoTuPhien = () => {
+    const el = document.getElementById("transferGiverInput");
+    const user = window.AppAuth?.getUser?.();
+    if (el && user) {
+      el.value = String(user.fullName || user.username || "").trim();
+    }
+  };
+
+  const reRatingBaseRows = [];
+  const syncReRatingBaseFromAssets = () => {
+    reRatingBaseRows.length = 0;
+    Array.from(assetTableBody?.querySelectorAll("tr[data-card-number]") || []).forEach((row) => {
+      reRatingBaseRows.push({
+        card: row.dataset.cardNumber || "",
+        name: row.dataset.assetName || "",
+        unit: row.dataset.classroom || "",
+        quantity: row.dataset.quantity || "",
+        price: row.dataset.unitPrice || "",
+        building: row.dataset.department || "",
+        className: row.dataset.classroom || "",
+      });
+    });
+  };
+
+  const taoHangTaiSanTuDto = (a) => {
           const id = a.id != null ? String(a.id) : "";
           const card = a.cardNumber || a.card_number || "";
           const ten = a.assetName || a.asset_name || "";
           const nhaCungCap = a.provider || "";
           const nuoc = a.country || "";
           const khoa = a.department || "";
-          const phong = a.classroom || "";
+          const phong = a.roomCode || a.room_code || a.classroom || "";
           const loaiTs = a.assetType || a.asset_type || "";
           const dm = a.itemCategory || a.item_category || "";
           const namSx = a.manufactureYear != null ? String(a.manufactureYear) : "";
@@ -1516,15 +1527,20 @@ if (duongDanLaTrang("assets.html")) {
           const ghiChu = a.note || "";
           const nguoiMua = a.buyer || "";
           const toa = a.building || a.buildingName || "";
-          const tt = a.status || "";
+          const roomId = a.roomId != null ? String(a.roomId) : "";
+          const tt = String(a.status || "IN_USE").toUpperCase();
+          const dangHoatDong = tt === "IN_USE" || tt === "ACTIVE";
           return `<tr
             data-asset-id="${thoatThuocTinh(id)}"
+            data-status="${thoatThuocTinh(tt)}"
             data-asset-name="${thoatThuocTinh(ten)}"
             data-provider="${thoatThuocTinh(nhaCungCap)}"
             data-country="${thoatThuocTinh(nuoc)}"
             data-card-number="${thoatThuocTinh(card)}"
             data-department="${thoatThuocTinh(khoa)}"
             data-building="${thoatThuocTinh(toa)}"
+            data-room-id="${thoatThuocTinh(roomId)}"
+            data-room-code="${thoatThuocTinh(phong)}"
             data-classroom="${thoatThuocTinh(phong)}"
             data-asset-type="${thoatThuocTinh(loaiTs)}"
             data-item-category="${thoatThuocTinh(dm)}"
@@ -1538,73 +1554,70 @@ if (duongDanLaTrang("assets.html")) {
             data-usage-year="${thoatThuocTinh(namSd)}"
             data-note="${thoatThuocTinh(ghiChu)}"
             data-buyer="${thoatThuocTinh(nguoiMua)}"
+            data-quantity="${thoatThuocTinh(sl)}"
           >
-            <td><input name="assetRowSelector" value="${thoatThuocTinh(card)}" type="checkbox" /></td>
-            <td>${thoatThuocTinh(card)}</td>
-            <td>${thoatThuocTinh(ten)}</td>
-            <td>${dinhDangTienVn(dg)}</td>
-            <td>${thoatThuocTinh(sl)}</td>
             <td>${thoatThuocTinh(dm)}</td>
-            <td>${thoatThuocTinh(phong)}</td>
-            <td>${thoatThuocTinh(nguoiMua)}</td>
-            <td><button class="status-pill on" type="button" aria-pressed="true"></button></td>
-            <td>â€”</td>
+            <td>${thoatThuocTinh(ten)}</td>
+            <td>${thoatThuocTinh(sl)}</td>
+            <td>${thoatThuocTinh(phong || toa)}</td>
+            <td><button type="button" class="status-pill asset-status-pill${dangHoatDong ? " on" : ""}" aria-pressed="${dangHoatDong}" data-asset-active="${dangHoatDong ? "1" : "0"}" title="${dangHoatDong ? "Đang sử dụng — bấm để bảo trì" : "Đang bảo trì — bấm để đưa vào sử dụng"}"></button></td>
             <td>
               <div class="room-action-buttons user-action-buttons">
-                <button class="icon-btn asset-view-btn" type="button" title="Xem chi tiáº¿t">
-                  <img src="../../assets/icons/view-info.svg" alt="Xem chi tiáº¿t" />
+                <button class="icon-btn asset-view-btn" type="button" title="Xem chi tiết">
+                  <img src="/assets/icons/view_infor.svg" alt="Xem chi tiết" />
                 </button>
-                <button class="icon-btn asset-transfer-btn" type="button" title="Äiá»u chuyá»ƒn">
-                  <img src="../../assets/icons/transfer.svg" alt="Äiá»u chuyá»ƒn" />
+                <button class="icon-btn asset-transfer-btn" type="button" title="Điều chuyển">
+                  <img src="/assets/icons/dieu_chuyen_1.svg" alt="Điều chuyển" />
                 </button>
-                <button class="icon-btn asset-update-btn" type="button" title="Cáº­p nháº­t">
-                  <img src="../../assets/icons/update.svg" alt="Cáº­p nháº­t" />
-                </button>
-                <button class="icon-btn asset-delete-btn" type="button" title="XÃ³a">
-                  <img src="../../assets/icons/delete.svg" alt="XÃ³a" />
+                <button class="icon-btn asset-update-btn" type="button" title="Cập nhật">
+                  <img src="/assets/icons/update.svg" alt="Cập nhật" />
                 </button>
               </div>
             </td>
           </tr>`;
-        })
-        .join("");
-      assetTableBody.innerHTML = hang;
+  };
+
+  let refreshAssetTable = () => {};
+  const taiBangTaiSanTuApi = async () => {
+    const api = window.FmApi || window.CoSoApi;
+    if (!assetTableBody || !api?.layDanhSachTaiSan) return;
+    try {
+      const list = await api.layDanhSachTaiSan();
+      if (!Array.isArray(list)) {
+        assetTableBody.innerHTML =
+          '<tr><td colspan="6" style="text-align:center;padding:16px;color:#b3261e">Dữ liệu API không hợp lệ.</td></tr>';
+        refreshAssetTable();
+        return;
+      }
+      const filtered = list.filter((a) => {
+        const b = String(a?.building || a?.buildingName || "").toUpperCase();
+        return b === "E7" || b === "GDDN";
+      });
+      if (filtered.length === 0) {
+        assetTableBody.innerHTML =
+          '<tr><td colspan="6" style="text-align:center;padding:24px">Không có tài sản thuộc E7 hoặc Giảng đường đa năng.</td></tr>';
+        refreshAssetTable();
+        syncReRatingBaseFromAssets();
+        renderReRatingRows();
+        return;
+      }
+      assetTableBody.innerHTML = filtered.map(taoHangTaiSanTuDto).join("");
+      refreshAssetTable();
+      syncReRatingBaseFromAssets();
+      renderReRatingRows();
     } catch (err) {
-      console.warn("[TÃ i sáº£n] KhÃ´ng táº£i Ä‘Æ°á»£c tá»« API:", err);
+      console.warn("[Tài sản] Không tải được từ API:", err);
+      assetTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:16px;color:#b3261e">Không tải được từ API. (${thoatThuocTinh(err?.message || err)})</td></tr>`;
+      refreshAssetTable();
     }
   };
   let activeReRatingTab = "all";
   let selectedReRatingCard = "";
   let selectedHistoryCard = "";
 
-  const getAssetRatingHistory = () => {
-    try {
-      const raw = JSON.parse(localStorage.getItem(ASSET_RATING_HISTORY_KEY) || "{}");
-      return raw && typeof raw === "object" ? raw : {};
-    } catch (_) {
-      return {};
-    }
-  };
+  let assetRatingHistory = {};
 
-  const setAssetRatingHistory = (history) => {
-    try {
-      localStorage.setItem(ASSET_RATING_HISTORY_KEY, JSON.stringify(history));
-    } catch (_) {}
-  };
-
-  let assetRatingHistory = getAssetRatingHistory();
-  const reRatingBaseRows = Array.from(reRatingTableBody?.querySelectorAll("tr") || []).map((row) => ({
-    card: row.dataset.card || "",
-    name: row.dataset.name || "",
-    unit: row.dataset.unit || "",
-    quantity: row.dataset.quantity || "",
-    price: row.dataset.price || "",
-    duration: row.dataset.duration || "",
-    building: row.children[3]?.textContent?.trim() || "",
-    className: row.children[4]?.textContent?.trim() || "",
-  }));
-
-  const formatStars = (stars) => "â˜…".repeat(stars) + "â˜†".repeat(Math.max(0, 5 - stars));
+  const formatStars = (stars) => "★".repeat(stars) + "☆".repeat(Math.max(0, 5 - stars));
   const formatDateTime = (iso) => {
     if (!iso) return "";
     const d = new Date(iso);
@@ -1620,17 +1633,21 @@ if (duongDanLaTrang("assets.html")) {
   const renderAssetRatingRows = () => {
     if (!assetRatingTableBody) return;
     const unrated = reRatingBaseRows.filter((item) => (assetRatingHistory[item.card] || []).length === 0);
+    if (unrated.length === 0) {
+      assetRatingTableBody.innerHTML =
+        '<tr><td colspan="4" style="text-align:center;padding:24px">Không có tài sản cần đánh giá.</td></tr>';
+      return;
+    }
     assetRatingTableBody.innerHTML = unrated
       .map(
         (item) =>
           `<tr data-card="${item.card}" data-name="${item.name}" data-unit="${item.unit}" data-quantity="${item.quantity}" data-price="${item.price}" data-duration="${item.duration}">
-            <td>${item.card}</td>
             <td>${item.name}</td>
             <td>${item.building}</td>
             <td>${item.className}</td>
             <td>
-              <span>ChÆ°a Ä‘Ã¡nh giÃ¡</span>
-              <button class="btn btn-primary asset-rate-now-btn" type="button" style="margin-left:8px;padding:4px 8px">ÄÃ¡nh giÃ¡ ngay</button>
+              <span>Chưa đánh giá</span>
+              <button class="btn btn-primary asset-rate-now-btn" type="button" style="margin-left:8px;padding:4px 8px">Đánh giá ngay</button>
             </td>
           </tr>`
       )
@@ -1643,16 +1660,21 @@ if (duongDanLaTrang("assets.html")) {
       const count = (assetRatingHistory[item.card] || []).length;
       return activeReRatingTab === "all" ? true : count > 0;
     });
+    if (rows.length === 0) {
+      reRatingTableBody.innerHTML =
+        '<tr><td colspan="5" style="text-align:center;padding:24px">Không có tài sản.</td></tr>';
+      renderAssetRatingRows();
+      return;
+    }
     reRatingTableBody.innerHTML = rows
       .map((item, idx) => {
         const latest = latestRatingForCard(item.card);
-        const actionLabel = activeReRatingTab === "all" ? "ÄÃ¡nh giÃ¡ láº¡i" : "Xem lá»‹ch sá»­";
+        const actionLabel = activeReRatingTab === "all" ? "Đánh giá lại" : "Xem lịch sử";
         const latestInfo = latest
-          ? `<div style="font-size:12px;color:#5b6f84;margin-top:4px">${formatStars(Number(latest.stars || 0))} â€¢ ${formatDateTime(latest.ratedAt)}</div>`
+          ? `<div style="font-size:12px;color:#4a4a4a;margin-top:4px">${formatStars(Number(latest.stars || 0))} • ${formatDateTime(latest.ratedAt)}</div>`
           : "";
         return `<tr data-card="${item.card}" data-name="${item.name}" data-unit="${item.unit}" data-quantity="${item.quantity}" data-price="${item.price}" data-duration="${item.duration}">
           <td>${idx + 1}</td>
-          <td>${item.card}</td>
           <td>${item.name}</td>
           <td>${item.building}</td>
           <td>${item.className}</td>
@@ -1673,16 +1695,16 @@ if (duongDanLaTrang("assets.html")) {
       return;
     }
     reRatingHistorySection.hidden = false;
-    reRatingHistoryTitle.textContent = `Lá»‹ch sá»­ Ä‘Ã¡nh giÃ¡ - ${rows.name} (${rows.card})`;
+    reRatingHistoryTitle.textContent = `Lịch sử đánh giá - ${rows.name}`;
     reRatingHistoryList.innerHTML = history
       .map(
-        (item, idx) => `<div style="border:1px solid #dce6f1;border-radius:8px;padding:10px;margin-bottom:8px">
+        (item, idx) => `<div style="border:1px solid #ffd4b3;border-radius:8px;padding:10px;margin-bottom:8px">
         <div style="display:flex;justify-content:space-between;gap:8px">
-          <strong>Láº§n ${idx + 1} - ${formatDateTime(item.ratedAt)}</strong>
-          <button class="btn btn-success rating-delete-btn" type="button" data-card="${card}" data-rate-id="${item.id}" style="padding:4px 8px">XÃ³a</button>
+          <strong>Lần ${idx + 1} - ${formatDateTime(item.ratedAt)}</strong>
+          <button class="btn btn-success rating-delete-btn" type="button" data-card="${card}" data-rate-id="${item.id}" style="padding:4px 8px">Xóa</button>
         </div>
         <div>${formatStars(Number(item.stars || 0))}</div>
-        <div>NgÆ°á»i Ä‘Ã¡nh giÃ¡: ${item.reviewer || "-"}</div>
+        <div>Người đánh giá: ${item.reviewer || "-"}</div>
         <div>${item.content || ""}</div>
       </div>`
       )
@@ -1718,23 +1740,22 @@ if (duongDanLaTrang("assets.html")) {
 
   const fieldMap = {
     assetNameInput: "assetName",
+    assetRoomInput: "roomId",
+    assetStatusInput: "status",
+    assetPurchaseDateInput: "purchaseDate",
+    assetFundInput: "fundSource",
+    assetNoteInput: "note",
+    assetCategoryInput: "itemCategory",
+    assetQuantityInput: "quantity",
     assetProviderInput: "provider",
     assetCountryInput: "country",
     assetCardInput: "cardNumber",
-    assetDepartmentInput: "department",
-    assetClassInput: "classroom",
     assetTypeInput: "assetType",
-    assetCategoryInput: "itemCategory",
     assetManufactureYearInput: "manufactureYear",
     assetUnitPriceInput: "unitPrice",
-    assetQuantityInput: "quantity",
     assetOriginalPriceInput: "originalPrice",
-    assetFundInput: "fundSource",
     assetUsageTimeInput: "usageTime",
-    assetPurchaseDateInput: "purchaseDate",
     assetUsageYearInput: "usageYear",
-    assetNoteInput: "note",
-    assetBuyerInput: "buyer",
   };
 
   const switchAssetTab = (tabName) => {
@@ -1766,7 +1787,7 @@ if (duongDanLaTrang("assets.html")) {
         assetPageTitle.setAttribute("data-i18n", isReRatingMode ? "assets.pageReRating" : "assets.pageRating");
         assetPageTitle.textContent =
           (typeof window.FmI18n?.t === "function" && window.FmI18n.t(assetPageTitle.getAttribute("data-i18n") || "")) ||
-          (isReRatingMode ? "ÄÃ¡nh giÃ¡ láº¡i tÃ i sáº£n" : "ÄÃ¡nh giÃ¡ tÃ i sáº£n");
+          (isReRatingMode ? "Đánh giá lại tài sản" : "Đánh giá tài sản");
       }
       if (assetTabs) assetTabs.hidden = true;
       if (assetListSection) assetListSection.hidden = true;
@@ -1787,7 +1808,7 @@ if (duongDanLaTrang("assets.html")) {
     if (assetPageTitle) {
       assetPageTitle.setAttribute("data-i18n", "assets.pageTitle");
       assetPageTitle.textContent =
-        (typeof window.FmI18n?.t === "function" && window.FmI18n.t("assets.pageTitle")) || "Quáº£n lÃ½ tÃ i sáº£n";
+        (typeof window.FmI18n?.t === "function" && window.FmI18n.t("assets.pageTitle")) || "Quản lý tài sản";
     }
     if (assetTabs) assetTabs.hidden = false;
     setActiveAssetMenuItem("");
@@ -1802,6 +1823,9 @@ if (duongDanLaTrang("assets.html")) {
       const value = row.dataset[dataKey] || "";
       input.value = value;
     });
+    const selectedRoomId = row.dataset.roomId || "";
+    const selectedRoomCode = row.dataset.roomCode || row.dataset.classroom || "";
+    void taiDanhSachPhongChoTaiSan(selectedRoomId, selectedRoomCode);
   };
 
   const ASSET_SELECTED_KEY = "assetSelectedPayload";
@@ -1810,6 +1834,8 @@ if (duongDanLaTrang("assets.html")) {
     Object.values(fieldMap).forEach((dataKey) => {
       payload[dataKey] = row.dataset[dataKey] || "";
     });
+    payload.roomCode = row.dataset.roomCode || row.dataset.classroom || "";
+    payload.classroom = row.dataset.classroom || "";
     if (row.dataset.assetId) payload.id = row.dataset.assetId;
     return payload;
   };
@@ -1826,25 +1852,57 @@ if (duongDanLaTrang("assets.html")) {
     if (!row) return;
     const mappings = [
       ["transferCardInput", row.dataset.cardNumber || ""],
-      ["transferCategoryInput", row.dataset.itemCategory || ""],
       ["transferNameInput", row.dataset.assetName || ""],
-      ["transferTypeInput", row.dataset.assetType || ""],
-      ["transferBuildingInput", row.dataset.building || ""],
-      ["transferGiverInput", row.dataset.buyer || ""],
-      ["transferClassInput", row.dataset.classroom || ""],
+      ["transferCurrentRoomInput", row.dataset.classroom || row.dataset.building || ""],
+      ["transferGiverInput", "admin"],
     ];
     mappings.forEach(([id, value]) => {
       const input = document.getElementById(id);
       if (input) input.value = value;
     });
   };
+  const taiDanhSachPhongChoTaiSan = async (selectedRoomId = "", selectedRoomCode = "") => {
+    const roomSelect = document.getElementById("assetRoomInput");
+    if (!(roomSelect instanceof HTMLSelectElement)) return;
+    try {
+      const api = window.FmApi || window.CoSoApi;
+      if (!api?.layDanhSachPhong) return;
+      const rooms = await api.layDanhSachPhong();
+      if (!Array.isArray(rooms)) return;
+      const options = rooms
+        .map((room) => {
+          const id = room.id != null ? String(room.id) : "";
+          const roomCode = String(room.roomCode || "").trim();
+          const buildingCode = String(room.buildingCode || "").trim();
+          if (!id || !roomCode) return "";
+          const label = `${roomCode}${buildingCode ? ` - Nhà ${buildingCode}` : ""}`;
+          return `<option value="${thoatThuocTinh(id)}" data-room-code="${thoatThuocTinh(roomCode)}">${thoatThuocTinh(label)}</option>`;
+        })
+        .filter(Boolean)
+        .join("");
+      roomSelect.innerHTML = `<option value="">-- Chọn phòng --</option>${options}`;
+      if (selectedRoomId && [...roomSelect.options].some((o) => o.value === selectedRoomId)) {
+        roomSelect.value = selectedRoomId;
+      } else if (selectedRoomCode) {
+        const opt = [...roomSelect.options].find((o) => (o.getAttribute("data-room-code") || "") === selectedRoomCode);
+        if (opt) roomSelect.value = opt.value;
+      }
+    } catch (error) {
+      console.warn("[Tài sản] Không tải được danh sách phòng:", error);
+    }
+  };
 
   assetTabList?.addEventListener("click", () => switchAssetTab("list"));
   assetTabDetail?.addEventListener("click", () => {
     assetDetailForm?.reset();
+    void taiTuyChonDanhMucChoFormTaiSan();
+    void taiDanhSachPhongChoTaiSan();
     switchAssetTab("detail");
   });
-  assetTabTransfer?.addEventListener("click", () => switchAssetTab("transfer"));
+  assetTabTransfer?.addEventListener("click", () => {
+    switchAssetTab("transfer");
+    ganTenNguoiBanGiaoTuPhien();
+  });
 
   assetDetailForm?.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -1853,18 +1911,83 @@ if (duongDanLaTrang("assets.html")) {
       const el = document.getElementById(fieldId);
       if (el) than[jsonKey] = el.value.trim();
     });
+    than.roomId = than.roomId ? Number(than.roomId) : null;
+    const roomSelect = document.getElementById("assetRoomInput");
+    if (roomSelect instanceof HTMLSelectElement) {
+      const selectedOption = roomSelect.selectedOptions?.[0];
+      than.classroom = selectedOption?.getAttribute("data-room-code") || "";
+    }
+    if (!than.cardNumber) {
+      than.cardNumber = taoMaTaiSanNoiBo();
+      const hiddenCard = document.getElementById("assetCardInput");
+      if (hiddenCard instanceof HTMLInputElement) hiddenCard.value = than.cardNumber;
+    }
     void (async () => {
       try {
-        if (window.FmApi?.taoTaiSan) await window.FmApi.taoTaiSan(than);
+        if (window.CoSoApi?.taoTaiSan) await window.CoSoApi.taoTaiSan(than);
       } catch (e) {
-        window.alert("Gá»­i thÃªm tÃ i sáº£n lÃªn mÃ¡y chá»§ tháº¥t báº¡i.");
+        window.alert("Gửi thêm tài sản lên máy chủ thất bại.");
       }
-      window.alert("ThÃªm tÃ i sáº£n thÃ nh cÃ´ng!");
+      window.alert("Thêm tài sản thành công!");
       assetDetailForm.reset();
       switchAssetTab("list");
       await taiBangTaiSanTuApi();
     })();
   });
+
+  const setAssetPillVisual = (pill, active) => {
+    pill.classList.toggle("on", active);
+    pill.setAttribute("aria-pressed", active ? "true" : "false");
+    pill.dataset.assetActive = active ? "1" : "0";
+    pill.title = active ? "Đang sử dụng — bấm để bảo trì" : "Đang bảo trì — bấm để đưa vào sử dụng";
+  };
+
+  const capNhatTrangThaiTaiSan = async (assetId, active) => {
+    const api = window.FmApi || window.CoSoApi;
+    if (!api?.capNhatTaiSan) throw new Error("API cập nhật tài sản chưa sẵn sàng");
+    const status = active ? "IN_USE" : "MAINTENANCE";
+    return api.capNhatTaiSan(assetId, { status });
+  };
+
+  assetTableBody?.addEventListener(
+    "click",
+    (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const pill = target.closest("button.asset-status-pill");
+      if (pill && assetTableBody.contains(pill)) {
+        event.preventDefault();
+        event.stopPropagation();
+        const row = pill.closest("tr");
+        if (!row) return;
+        const assetId = row.dataset.assetId || "";
+        if (!assetId) return;
+
+        const wasActive = pill.classList.contains("on");
+        const willBeActive = !wasActive;
+        setAssetPillVisual(pill, willBeActive);
+        pill.disabled = true;
+
+        void (async () => {
+          try {
+            await capNhatTrangThaiTaiSan(assetId, willBeActive);
+            row.dataset.status = willBeActive ? "IN_USE" : "MAINTENANCE";
+          } catch (e) {
+            setAssetPillVisual(pill, wasActive);
+            window.alert(
+              willBeActive
+                ? "Không thể đưa tài sản vào sử dụng. Kiểm tra backend (cổng 8080)."
+                : "Không thể chuyển sang bảo trì. Kiểm tra backend (cổng 8080)."
+            );
+          } finally {
+            pill.disabled = false;
+          }
+        })();
+        return;
+      }
+    },
+    true
+  );
 
   assetTableBody?.addEventListener("click", (event) => {
     const target = event.target;
@@ -1895,28 +2018,64 @@ if (duongDanLaTrang("assets.html")) {
     switchAssetTab("transfer");
   });
 
-  assetTableBody?.addEventListener("click", (event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-    const deleteBtn = target.closest(".asset-delete-btn");
-    if (!deleteBtn) return;
-    const row = deleteBtn.closest("tr");
-    if (!row) return;
-    const maTaiSan = row.dataset.assetId || "";
-    const soThe = row.dataset.cardNumber || "";
-    if (!window.confirm(`XÃ³a tÃ i sáº£n ${soThe || maTaiSan}?`)) return;
-    if (maTaiSan && window.FmApi?.xoaTaiSan) {
-      void (async () => {
-        try {
-          await window.FmApi.xoaTaiSan(maTaiSan);
-          row.remove();
-        } catch (e) {
-          window.alert("XÃ³a trÃªn mÃ¡y chá»§ tháº¥t báº¡i.");
-        }
-      })();
+  document.getElementById("assetTransferForm")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!(form instanceof HTMLFormElement)) return;
+    const formData = new FormData(form);
+    const sourceRoom = String(formData.get("sourceRoom") || "").trim();
+    const targetRoom = String(formData.get("targetRoom") || "").trim();
+    const transferQuantity = Number(formData.get("transferQuantity") || 0);
+    const giverName = String(formData.get("giverName") || "").trim();
+    const receiverName = String(formData.get("receiverName") || "").trim();
+    const receivedDate = String(formData.get("receivedDate") || "").trim();
+    const note = String(formData.get("note") || "").trim();
+
+    if (!targetRoom || !transferQuantity || !receivedDate || !giverName || !receiverName) {
+      window.alert("Vui lòng nhập đủ thông tin điều chuyển.");
       return;
     }
-    row.remove();
+    if (sourceRoom && sourceRoom === targetRoom) {
+      window.alert("Phòng đích phải khác phòng hiện tại.");
+      return;
+    }
+
+    const activeRow = assetTableBody?.querySelector(
+      `tr[data-card-number="${CSS.escape(String(formData.get("cardNumber") || ""))}"]`
+    );
+    if (!(activeRow instanceof HTMLTableRowElement)) {
+      window.alert("Không tìm thấy tài sản để điều chuyển.");
+      return;
+    }
+    const currentQuantity = Number(activeRow.dataset.quantity || 0);
+    if (transferQuantity > currentQuantity) {
+      window.alert("Số lượng điều chuyển không được vượt quá số lượng hiện có.");
+      return;
+    }
+
+    void (async () => {
+      try {
+        const api = window.FmApi || window.CoSoApi;
+        const assetId = activeRow.dataset.assetId || "";
+        if (!assetId || !api?.taoPhieuDieuChuyenTaiSan) {
+          throw new Error("Thiếu API điều chuyển tài sản.");
+        }
+        await api.taoPhieuDieuChuyenTaiSan(assetId, {
+          targetRoomCode: targetRoom,
+          transferQuantity,
+          transferDate: receivedDate,
+          giverName,
+          receiverName,
+          note,
+        });
+        window.alert("Điều chuyển tài sản thành công.");
+        form.reset();
+        await taiBangTaiSanTuApi();
+        switchAssetTab("list");
+      } catch (error) {
+        window.alert(`Điều chuyển thất bại: ${error?.message || error}`);
+      }
+    })();
   });
 
   window.addEventListener("hashchange", applyAssetMode);
@@ -1976,7 +2135,7 @@ if (duongDanLaTrang("assets.html")) {
 
   reRateSaveBtn?.addEventListener("click", () => {
     if (!selectedReRatingCard) {
-      window.alert("Vui lÃ²ng chá»n tÃ i sáº£n cáº§n Ä‘Ã¡nh giÃ¡ láº¡i.");
+      window.alert("Vui lòng chọn tài sản cần đánh giá lại.");
       return;
     }
     const reviewer = reRateReviewer?.value.trim() || "";
@@ -1984,7 +2143,7 @@ if (duongDanLaTrang("assets.html")) {
     const ratedAt = reRateDate?.value || "";
     const content = reRateNote?.value.trim() || "";
     if (!reviewer || !stars || !ratedAt || !content) {
-      window.alert("Vui lÃ²ng nháº­p Ä‘áº§y Ä‘á»§ ngÆ°á»i Ä‘Ã¡nh giÃ¡, sá»‘ sao, thá»i gian vÃ  ná»™i dung Ä‘Ã¡nh giÃ¡.");
+      window.alert("Vui lòng nhập đầy đủ người đánh giá, số sao, thời gian và nội dung đánh giá.");
       return;
     }
     const key = String(selectedReRatingCard);
@@ -1996,11 +2155,10 @@ if (duongDanLaTrang("assets.html")) {
       ratedAt,
       content,
     });
-    setAssetRatingHistory(assetRatingHistory);
     renderReRatingRows();
     refreshReRatingTable();
     renderHistoryPanel(key);
-    window.alert("ÄÃ£ lÆ°u Ä‘Ã¡nh giÃ¡ láº¡i tÃ i sáº£n.");
+    window.alert("Đã lưu đánh giá lại tài sản.");
     selectedReRatingCard = "";
     switchReRatingTab("rated");
   });
@@ -2016,17 +2174,19 @@ if (duongDanLaTrang("assets.html")) {
     const list = Array.isArray(assetRatingHistory[card]) ? assetRatingHistory[card] : [];
     assetRatingHistory[card] = list.filter((item) => item.id !== rateId);
     if (assetRatingHistory[card].length === 0) delete assetRatingHistory[card];
-    setAssetRatingHistory(assetRatingHistory);
     renderReRatingRows();
     refreshReRatingTable();
     renderHistoryPanel(card);
   });
 
-  setupTableControls({
+  refreshAssetTable = setupTableControls({
     tableBody: assetTableBody,
     searchInput: document.getElementById("assetListSearchInput"),
     pageSizeSelect: document.getElementById("assetListPageSizeSelect"),
   });
+  void taiTuyChonDanhMucChoFormTaiSan();
+  ganTenNguoiBanGiaoTuPhien();
+  void taiDanhSachPhongChoTaiSan();
   void taiBangTaiSanTuApi();
   renderAssetRatingRows();
   setupTableControls({
@@ -2103,6 +2263,17 @@ if (duongDanLaTrang("assets.html")) {
 }
 
 if (duongDanLaTrang("asset-view.html") || duongDanLaTrang("asset-update.html")) {
+  const esc = (s) =>
+    String(s ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;");
+  const ganTuyChonCode = (id, options, placeholder) => {
+    const select = document.getElementById(id);
+    if (!(select instanceof HTMLSelectElement)) return;
+    const htmlOptions = options.map((o) => `<option value="${esc(o.value)}">${esc(o.label)}</option>`).join("");
+    select.innerHTML = `${placeholder ? `<option value="">${esc(placeholder)}</option>` : ""}${htmlOptions}`;
+  };
   const ASSET_SELECTED_KEY = "assetSelectedPayload";
   const payloadRaw = sessionStorage.getItem(ASSET_SELECTED_KEY);
   let payload = null;
@@ -2116,23 +2287,22 @@ if (duongDanLaTrang("asset-view.html") || duongDanLaTrang("asset-update.html")) 
   } else {
     const fieldMap = {
       assetNameInput: "assetName",
+      assetRoomInput: "roomId",
+      assetStatusInput: "status",
+      assetPurchaseDateInput: "purchaseDate",
+      assetFundInput: "fundSource",
+      assetNoteInput: "note",
+      assetCategoryInput: "itemCategory",
+      assetQuantityInput: "quantity",
       assetProviderInput: "provider",
       assetCountryInput: "country",
       assetCardInput: "cardNumber",
-      assetDepartmentInput: "department",
-      assetClassInput: "classroom",
       assetTypeInput: "assetType",
-      assetCategoryInput: "itemCategory",
       assetManufactureYearInput: "manufactureYear",
       assetUnitPriceInput: "unitPrice",
-      assetQuantityInput: "quantity",
       assetOriginalPriceInput: "originalPrice",
-      assetFundInput: "fundSource",
       assetUsageTimeInput: "usageTime",
-      assetPurchaseDateInput: "purchaseDate",
       assetUsageYearInput: "usageYear",
-      assetNoteInput: "note",
-      assetBuyerInput: "buyer",
     };
 
     const tuDoiTuongTaiSan = (a) =>
@@ -2143,7 +2313,8 @@ if (duongDanLaTrang("asset-view.html") || duongDanLaTrang("asset-update.html")) 
             provider: a.provider || "",
             country: a.country || "",
             cardNumber: a.cardNumber || a.card_number || "",
-            department: a.department || "",
+            roomId: a.roomId != null ? String(a.roomId) : "",
+            roomCode: a.roomCode || a.room_code || "",
             classroom: a.classroom || "",
             assetType: a.assetType || a.asset_type || "",
             itemCategory: a.itemCategory || a.item_category || "",
@@ -2156,9 +2327,60 @@ if (duongDanLaTrang("asset-view.html") || duongDanLaTrang("asset-update.html")) 
             purchaseDate: a.purchaseDate || a.purchase_date || "",
             usageYear: a.usageYear != null ? String(a.usageYear) : "",
             note: a.note || "",
-            buyer: a.buyer || "",
+            status: a.status || "IN_USE",
           }
         : null;
+
+    const taiDanhSachPhong = async (selectedRoomId = "", selectedRoomCode = "") => {
+      const roomSelect = document.getElementById("assetRoomInput");
+      if (!(roomSelect instanceof HTMLSelectElement)) return;
+      try {
+        const api = window.FmApi || window.CoSoApi;
+        if (!api?.layDanhSachPhong) return;
+        const rooms = await api.layDanhSachPhong();
+        if (!Array.isArray(rooms)) return;
+        const options = rooms
+          .map((room) => {
+            const id = room.id != null ? String(room.id) : "";
+            const roomCode = String(room.roomCode || "").trim();
+            const buildingCode = String(room.buildingCode || "").trim();
+            if (!id || !roomCode) return "";
+            const label = `${roomCode}${buildingCode ? ` - Nhà ${buildingCode}` : ""}`;
+            return `<option value="${esc(id)}" data-room-code="${esc(roomCode)}">${esc(label)}</option>`;
+          })
+          .filter(Boolean)
+          .join("");
+        roomSelect.innerHTML = `<option value="">-- Chọn phòng --</option>${options}`;
+        if (selectedRoomId && [...roomSelect.options].some((o) => o.value === selectedRoomId)) {
+          roomSelect.value = selectedRoomId;
+        } else if (selectedRoomCode) {
+          const opt = [...roomSelect.options].find((o) => (o.getAttribute("data-room-code") || "") === selectedRoomCode);
+          if (opt) roomSelect.value = opt.value;
+        }
+      } catch (e) {
+        console.warn("[Tài sản] Không tải được danh sách phòng:", e);
+      }
+    };
+
+    const taiTuyChonDanhMucChoForm = async () => {
+      const api = window.FmApi || window.CoSoApi;
+      if (!api?.layDanhSachDanhMuc) return;
+      try {
+        const [assets, funds] = await Promise.all([
+          api.layDanhSachDanhMuc({ type: "ASSET" }),
+          api.layDanhSachDanhMuc({ type: "FUND_SOURCE" }),
+        ]);
+        const toOpts = (list) =>
+          (Array.isArray(list) ? list : []).map((c) => ({
+            value: String(c.code || c.categoryCode || ""),
+            label: String(c.name || c.categoryName || c.code || ""),
+          }));
+        ganTuyChonCode("assetCategoryInput", toOpts(assets), "-- Chọn danh mục --");
+        ganTuyChonCode("assetFundInput", toOpts(funds), "-- Chọn nguồn kinh phí --");
+      } catch (err) {
+        console.warn("[Tài sản] Không tải danh mục cho form:", err);
+      }
+    };
 
     const applyAssetDetailFields = (p) => {
       Object.entries(fieldMap).forEach(([fieldId, dataKey]) => {
@@ -2167,14 +2389,15 @@ if (duongDanLaTrang("asset-view.html") || duongDanLaTrang("asset-update.html")) 
         const v = p[dataKey];
         input.value = v != null && v !== "" ? String(v) : "";
       });
+      void taiDanhSachPhong(String(p.roomId || ""), String(p.roomCode || p.classroom || ""));
     };
-    applyAssetDetailFields(payload);
+    void taiTuyChonDanhMucChoForm().then(() => applyAssetDetailFields(payload));
 
     const idTaiSan = payload.id != null ? String(payload.id) : "";
-    if (idTaiSan && window.FmApi?.layTaiSanTheoId) {
+    if (idTaiSan && window.CoSoApi?.layTaiSanTheoId) {
       void (async () => {
         try {
-          const raw = await window.FmApi.layTaiSanTheoId(idTaiSan);
+          const raw = await window.CoSoApi.layTaiSanTheoId(idTaiSan);
           const p2 = tuDoiTuongTaiSan(raw);
           if (p2) {
             applyAssetDetailFields({ ...payload, ...p2 });
@@ -2183,7 +2406,7 @@ if (duongDanLaTrang("asset-view.html") || duongDanLaTrang("asset-update.html")) 
             } catch (_) {}
           }
         } catch (e) {
-          console.warn("[TÃ i sáº£n] GET theo id:", e);
+          console.warn("[Tài sản] GET theo id:", e);
         }
       })();
     }
@@ -2222,334 +2445,488 @@ if (duongDanLaTrang("asset-view.html") || duongDanLaTrang("asset-update.html")) 
         const el = document.getElementById(fieldId);
         if (el) than[jsonKey] = el.value.trim();
       });
+      than.roomId = than.roomId ? Number(than.roomId) : null;
+      const roomSelect = document.getElementById("assetRoomInput");
+      if (roomSelect instanceof HTMLSelectElement) {
+        const selectedOption = roomSelect.selectedOptions?.[0];
+        than.classroom = selectedOption?.getAttribute("data-room-code") || "";
+      }
       void (async () => {
         try {
-          if (maTaiSan && window.FmApi?.capNhatTaiSan) await window.FmApi.capNhatTaiSan(maTaiSan, than);
+          if (maTaiSan && window.CoSoApi?.capNhatTaiSan) await window.CoSoApi.capNhatTaiSan(maTaiSan, than);
         } catch (e) {
-          window.alert("Cáº­p nháº­t trÃªn mÃ¡y chá»§ tháº¥t báº¡i.");
+          window.alert("Cập nhật trên máy chủ thất bại.");
         }
-        window.alert("Cáº­p nháº­t tÃ i sáº£n thÃ nh cÃ´ng!");
+        window.alert("Cập nhật tài sản thành công!");
         window.location.href = "assets.html";
       })();
     });
   }
 }
 
-if (duongDanLaTrang("liquidation.html")) {
-  const liquidationPageTitle = document.getElementById("liquidationPageTitle");
-  const liquidationMenuLinks = Array.from(document.querySelectorAll('.nav-submenu a[href*="liquidation.html"]'));
-  const transferTabAllAssets = document.getElementById("transferTabAllAssets");
-  const transferTabHistory = document.getElementById("transferTabHistory");
-  const transferAllAssetsSection = document.getElementById("transferAllAssetsSection");
-  const transferHistorySection = document.getElementById("transferHistorySection");
-  const transferAllAssetsHeadRow = document.getElementById("transferAllAssetsHeadRow");
-  const transferAllAssetsBody = document.getElementById("transferAllAssetsBody");
-  const transferHistoryHeadRow = document.getElementById("transferHistoryHeadRow");
-  const transferHistoryBody = document.getElementById("transferHistoryBody");
-  const transferHistorySearchInput = document.getElementById("transferHistorySearchInput");
-  const transferHistoryPageSizeSelect = document.getElementById("transferHistoryPageSizeSelect");
-  const transferHistoryToolbar = document.getElementById("transferHistoryToolbar");
-  const transferHistoryFooter = document.getElementById("transferHistoryFooter");
-  const liquidationDetailSection = document.getElementById("liquidationDetailSection");
-  const liquidationDetailTitle = document.getElementById("liquidationDetailTitle");
-  const liqCardInput = document.getElementById("liqCardInput");
-  const liqDateLabel = document.getElementById("liqDateLabel");
-  const liqNameInput = document.getElementById("liqNameInput");
-  const liqUnitInput = document.getElementById("liqUnitInput");
-  const liqUnitLabel = document.getElementById("liqUnitLabel");
-  const liqUserInput = document.getElementById("liqUserInput");
-  const liqUserLabel = document.getElementById("liqUserLabel");
-  const liqQuantityInput = document.getElementById("liqQuantityInput");
-  const liqReasonInput = document.getElementById("liqReasonInput");
-  const liqImageInput = document.getElementById("liqImageInput");
-  const liqImageHint = document.getElementById("liqImageHint");
-  const liqReasonLabel = document.getElementById("liqReasonLabel");
-  const liqSubmitBtn = document.getElementById("liqSubmitBtn");
-  let currentLiquidationMode = "dieu-chuyen";
-  let refreshTransferHistoryTable = () => {};
-
-  const transferModeConfig = {
-    title: "Äiá»u chuyá»ƒn tÃ i sáº£n",
-    tab1: "Táº¥t cáº£ tÃ i sáº£n",
-    tab2: "Danh sÃ¡ch tÃ i sáº£n Ä‘iá»u chuyá»ƒn",
-    allAssetsColumns: ["ID", "Sá»‘ tháº»", "TÃªn", "Khoa", "Lá»›p", "Chá»©c nÄƒng"],
-    allAssetsRows: [
-      ["1", "023", "Tivi LCD Sony 46 in", "KT", "CT13KT01", '<button class="icon-btn transfer-truck-btn" type="button" title="Äiá»u chuyá»ƒn"><img src="../../assets/icons/transfer.svg" alt="Äiá»u chuyá»ƒn" /></button>'],
-      ["2", "022", "ÄÃ n Organ Yamaha E443", "TL-GD", "CT13TLGD01", '<button class="icon-btn transfer-truck-btn" type="button" title="Äiá»u chuyá»ƒn"><img src="../../assets/icons/transfer.svg" alt="Äiá»u chuyá»ƒn" /></button>'],
-      ["3", "021", "Ghitar classice", "TL-GD", "CT13TLGD01", '<button class="icon-btn transfer-truck-btn" type="button" title="Äiá»u chuyá»ƒn"><img src="../../assets/icons/transfer.svg" alt="Äiá»u chuyá»ƒn" /></button>'],
-      ["4", "020", "Cá»“ng chiÃªng ( bá»™ )", "NV-CTXH", "CT13CTXH01", '<button class="icon-btn transfer-truck-btn" type="button" title="Äiá»u chuyá»ƒn"><img src="../../assets/icons/transfer.svg" alt="Äiá»u chuyá»ƒn" /></button>'],
-      ["5", "019", "MÃ¡y vi tÃ­nh CMS", "NV-CTXH", "CT13CTXH01", '<button class="icon-btn transfer-truck-btn" type="button" title="Äiá»u chuyá»ƒn"><img src="../../assets/icons/transfer.svg" alt="Äiá»u chuyá»ƒn" /></button>'],
-      ["6", "018", "MÃ¡y vi tÃ­nh Acer", "NV-CTXH", "CT13CTXH01", '<button class="icon-btn transfer-truck-btn" type="button" title="Äiá»u chuyá»ƒn"><img src="../../assets/icons/transfer.svg" alt="Äiá»u chuyá»ƒn" /></button>'],
-      ["7", "017", "Báº£ng chá»‘ng lÃ³a", "NN", "CT13TA02", '<button class="icon-btn transfer-truck-btn" type="button" title="Äiá»u chuyá»ƒn"><img src="../../assets/icons/transfer.svg" alt="Äiá»u chuyá»ƒn" /></button>'],
-      ["8", "016", "Báº£ng mecal", "NN", "CT13TA01", '<button class="icon-btn transfer-truck-btn" type="button" title="Äiá»u chuyá»ƒn"><img src="../../assets/icons/transfer.svg" alt="Äiá»u chuyá»ƒn" /></button>'],
-    ],
-    historyColumns: ["ID", "Sá»‘ tháº»", "TÃªn", "ÄÆ¡n vá»‹ giao", "ÄÆ¡n vá»‹ nháº­n", "NgÆ°á»i giao", "NgÆ°á»i nháº­n", "NgÃ y giao"],
-    historyRows: [
-      ["1", "023", "Tivi LCD Sony 46 in", "", "Khoa Kinh táº¿", "Tráº§n Tiáº¿n Há»£p", "Äá»— Nháº­t Thanh", "21/11/2016"],
-      ["2", "023", "Tivi LCD Sony 46 in", "Khoa Kinh táº¿", "Khoa CÃ´ng Nghá»‡ ThÃ´ng Tin", "Äá»— Nháº­t Thanh", "VÃµ HoÃ ng PhÃºc", "25/11/2016"],
-      ["3", "002", "BÃ n giÃ¡o viÃªn", "Khoa CÃ´ng Nghá»‡ ThÃ´ng Tin", "Khoa LÃ½-HÃ³a-Sinh", "VÃµ HoÃ ng PhÃºc", "Tráº§n Huá»³nh HÃ²a PhÃºc", "15/11/2016"],
-      ["4", "001", "BÃ n há»p", "", "Khoa CÃ´ng Nghá»‡ ThÃ´ng Tin", "Tráº§n Huá»³nh HÃ²a PhÃºc", "Tráº§n Tiáº¿n Há»£p", "15/11/2016"],
-    ],
-    showToolbar: true,
-    footerText: "Hiá»ƒn thá»‹ 1 cá»§a 1 trang",
-  };
-
-  const liquidationModeConfig = {
-    title: "Thanh lÃ½ tÃ i sáº£n",
-    tab1: "Táº¥t cáº£ tÃ i sáº£n",
-    tab2: "Danh sÃ¡ch tÃ i sáº£n thanh lÃ½",
-    allAssetsColumns: ["ID", "Sá»‘ tháº»", "TÃªn", "Khoa", "Lá»›p", "Chá»©c nÄƒng"],
-    allAssetsRows: [
-      ["1", "023", "Tivi LCD Sony 46 in", "KT", "CT13KT01", '<button class="icon-btn liquidation-view-btn" type="button" title="Thanh lÃ½"><img src="../../assets/icons/sales.svg" alt="Thanh lÃ½" /></button>'],
-      ["2", "022", "ÄÃ n Organ Yamaha E443", "TL-GD", "CT13TLGD01", '<button class="icon-btn liquidation-view-btn" type="button" title="Thanh lÃ½"><img src="../../assets/icons/sales.svg" alt="Thanh lÃ½" /></button>'],
-      ["3", "021", "Ghitar classice", "TL-GD", "CT13TLGD01", '<button class="icon-btn liquidation-view-btn" type="button" title="Thanh lÃ½"><img src="../../assets/icons/sales.svg" alt="Thanh lÃ½" /></button>'],
-      ["4", "020", "Cá»“ng chiÃªng ( bá»™ )", "NV-CTXH", "CT13CTXH01", '<button class="icon-btn liquidation-view-btn" type="button" title="Thanh lÃ½"><img src="../../assets/icons/sales.svg" alt="Thanh lÃ½" /></button>'],
-      ["5", "019", "MÃ¡y vi tÃ­nh CMS", "NV-CTXH", "CT13CTXH01", '<button class="icon-btn liquidation-view-btn" type="button" title="Thanh lÃ½"><img src="../../assets/icons/sales.svg" alt="Thanh lÃ½" /></button>'],
-      ["6", "018", "MÃ¡y vi tÃ­nh Acer", "NV-CTXH", "CT13CTXH01", '<button class="icon-btn liquidation-view-btn" type="button" title="Thanh lÃ½"><img src="../../assets/icons/sales.svg" alt="Thanh lÃ½" /></button>'],
-      ["7", "017", "Báº£ng chá»‘ng lÃ³a", "NN", "CT13TA02", '<button class="icon-btn liquidation-view-btn" type="button" title="Thanh lÃ½"><img src="../../assets/icons/sales.svg" alt="Thanh lÃ½" /></button>'],
-      ["8", "016", "Báº£ng mecal", "NN", "CT13TA01", '<button class="icon-btn liquidation-view-btn" type="button" title="Thanh lÃ½"><img src="../../assets/icons/sales.svg" alt="Thanh lÃ½" /></button>'],
-    ],
-    historyColumns: ["ID", "Sá»‘ tháº»", "TÃªn", "ÄÆ¡n vá»‹", "Sá»‘ lÆ°á»£ng", "NgÆ°á»i thanh lÃ½", "LÃ½ do", "áº¢nh minh há»a", "NgÃ y thanh lÃ½"],
-    historyRows: [
-      ["1", "023", "Tivi LCD Sony 46 in", "Khoa Kinh táº¿", "8", "Tráº§n Tiáº¿n Há»£p", "lÃ½ do nÃ¨", "KhÃ´ng cÃ³ hÃ¬nh", "21/11/2016"],
-      ["2", "013", "Tá»§ sáº¯t 2 cÃ¡nh", "Khoa Nghá»‡ thuáº­t", "1", "Äá»— Nháº­t Thanh", "Tá»§ bá»‹ hÆ° há»ng", "KhÃ´ng cÃ³ hÃ¬nh", "21/11/2016"],
-      ["3", "020", "Cá»“ng chiÃªng ( bá»™ )", "Khoa Ngá»¯ vÄƒn vÃ  CÃ´ng tÃ¡c xÃ£ há»™i", "3", "VÃµ HoÃ ng PhÃºc", "Sáº£n pháº©m bá»‹ lá»—i", "KhÃ´ng cÃ³ hÃ¬nh", "21/11/2016"],
-      ["4", "019", "MÃ¡y vi tÃ­nh CMS", "Khoa Ngá»¯ vÄƒn vÃ  CÃ´ng tÃ¡c xÃ£ há»™i", "6", "Tráº§n Huá»³nh HÃ²a PhÃºc", "Sáº£n pháº©m bá»‹ lá»—i", "KhÃ´ng cÃ³ hÃ¬nh", "21/11/2016"],
-    ],
-    showToolbar: false,
-    footerText: "",
-  };
-
-  const renderColumns = (headRow, columns) => {
-    if (!headRow) return;
-    headRow.innerHTML = columns.map((column) => `<th>${column}</th>`).join("");
-  };
-
-  const renderRows = (body, rows) => {
-    if (!body) return;
-    body.innerHTML = rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("");
-  };
-
-  const applyLiquidationMode = () => {
-    const mode = window.location.hash.replace("#", "").trim() === "thanh-ly" ? "thanh-ly" : "dieu-chuyen";
-    currentLiquidationMode = mode;
-    const config = mode === "thanh-ly" ? liquidationModeConfig : transferModeConfig;
-    liquidationMenuLinks.forEach((link) => link.classList.remove("active"));
-    const targetLabel = mode === "thanh-ly" ? "Thanh lÃ½ tÃ i sáº£n" : "Äiá»u chuyá»ƒn tÃ i sáº£n";
-    const matchedLink = liquidationMenuLinks.find((link) => (link.textContent?.trim() || "") === targetLabel);
-    if (matchedLink) matchedLink.classList.add("active");
-    if (liquidationPageTitle) liquidationPageTitle.textContent = config.title;
-    if (transferTabAllAssets) transferTabAllAssets.textContent = config.tab1;
-    if (transferTabHistory) transferTabHistory.textContent = config.tab2;
-    renderColumns(transferAllAssetsHeadRow, config.allAssetsColumns);
-    renderRows(transferAllAssetsBody, config.allAssetsRows);
-    renderColumns(transferHistoryHeadRow, config.historyColumns);
-    renderRows(transferHistoryBody, config.historyRows);
-    refreshTransferHistoryTable();
-    if (transferHistoryToolbar) transferHistoryToolbar.hidden = !config.showToolbar;
-    if (transferHistoryFooter) {
-      transferHistoryFooter.hidden = !config.footerText;
-      if (config.footerText) {
-        const txt =
-          typeof window.FmI18n?.t === "function"
-            ? window.FmI18n.t("pager.showPageOf", { current: 1, total: 1 })
-            : config.footerText;
-        transferHistoryFooter.textContent = txt;
-      } else {
-        transferHistoryFooter.textContent = "";
-      }
-    }
-    if (liquidationDetailSection) liquidationDetailSection.hidden = true;
-  };
-
-  const switchTransferTab = (tabName) => {
-    const isAllAssets = tabName === "all-assets";
-    const isHistory = tabName === "history";
-    if (transferAllAssetsSection) transferAllAssetsSection.hidden = !isAllAssets;
-    if (transferHistorySection) transferHistorySection.hidden = !isHistory;
-    if (liquidationDetailSection) liquidationDetailSection.hidden = true;
-    transferTabAllAssets?.classList.toggle("tab-active", isAllAssets);
-    transferTabHistory?.classList.toggle("tab-active", isHistory);
-  };
-
-  const departmentMap = {
-    KT: "Khoa Kinh táº¿",
-    "TL-GD": "Khoa Nghá»‡ thuáº­t",
-    "NV-CTXH": "Khoa Ngá»¯ vÄƒn vÃ  CÃ´ng tÃ¡c xÃ£ há»™i",
-    NN: "Khoa Ngoáº¡i ngá»¯",
-    NT: "Khoa Ná»™i trÃº",
-  };
-
-  transferTabAllAssets?.addEventListener("click", () => switchTransferTab("all-assets"));
-  transferTabHistory?.addEventListener("click", () => switchTransferTab("history"));
-  liqImageInput?.addEventListener("change", () => {
-    const files = Array.from(liqImageInput.files || []);
-    if (!liqImageHint) return;
-    if (files.length === 0) {
-      liqImageHint.textContent = "Báº¥m Ä‘á»ƒ chá»n áº£nh minh há»a";
-      return;
-    }
-    liqImageHint.textContent = files.map((f) => f.name).join(", ");
-  });
-
-  transferAllAssetsBody?.addEventListener("click", (event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-    const triggerBtn = target.closest(".liquidation-view-btn, .transfer-truck-btn");
-    if (!triggerBtn) return;
-    const row = triggerBtn.closest("tr");
-    if (!row) return;
-    const cells = row.querySelectorAll("td");
-    const card = cells[1]?.textContent?.trim() || "";
-    const assetName = cells[2]?.textContent?.trim() || "";
-    const deptCode = cells[3]?.textContent?.trim() || "";
-    const defaultPeople = ["Tráº§n Tiáº¿n Há»£p", "Äá»— Nháº­t Thanh", "VÃµ HoÃ ng PhÃºc", "Tráº§n Huá»³nh HÃ²a PhÃºc"];
-    const picker = Number(card) % defaultPeople.length;
-
-    if (liqCardInput) liqCardInput.value = card;
-    if (liqNameInput) liqNameInput.value = assetName;
-    if (liqUnitInput) liqUnitInput.value = departmentMap[deptCode] || deptCode;
-    if (liqUserInput) liqUserInput.value = defaultPeople[picker];
-    if (liqQuantityInput) liqQuantityInput.value = "";
-    if (liqReasonInput) liqReasonInput.value = "";
-
-    const isTransferMode = currentLiquidationMode === "dieu-chuyen";
-    if (liquidationDetailTitle) liquidationDetailTitle.textContent = isTransferMode ? "ThÃ´ng tin Ä‘iá»u chuyá»ƒn" : "ThÃ´ng tin thanh lÃ½";
-    if (liqDateLabel) liqDateLabel.textContent = isTransferMode ? "NgÃ y Ä‘iá»u chuyá»ƒn" : "NgÃ y thanh lÃ½";
-    if (liqReasonLabel) liqReasonLabel.textContent = isTransferMode ? "Ghi chÃº Ä‘iá»u chuyá»ƒn" : "LÃ½ do thanh lÃ½";
-    if (liqReasonInput) liqReasonInput.placeholder = isTransferMode ? "Nháº­p ghi chÃº Ä‘iá»u chuyá»ƒn" : "Nháº­p lÃ½ do thanh lÃ½";
-    if (liqUnitLabel) liqUnitLabel.textContent = isTransferMode ? "ÄÆ¡n vá»‹ nháº­n" : "ÄÆ¡n vá»‹";
-    if (liqUserLabel) liqUserLabel.textContent = isTransferMode ? "NgÆ°á»i nháº­n" : "NgÆ°á»i thanh lÃ½";
-    if (liqSubmitBtn) liqSubmitBtn.textContent = isTransferMode ? "Äiá»u chuyá»ƒn" : "Thanh lÃ½";
-
-    if (transferAllAssetsSection) transferAllAssetsSection.hidden = true;
-    if (transferHistorySection) transferHistorySection.hidden = true;
-    if (liquidationDetailSection) liquidationDetailSection.hidden = false;
-    transferTabAllAssets?.classList.remove("tab-active");
-    transferTabHistory?.classList.remove("tab-active");
-  });
-
-  window.addEventListener("hashchange", applyLiquidationMode);
-  applyLiquidationMode();
-  window.addEventListener("fm-i18n-applied", () => {
-    const mode = window.location.hash.replace("#", "").trim() === "thanh-ly" ? "thanh-ly" : "dieu-chuyen";
-    const config = mode === "thanh-ly" ? liquidationModeConfig : transferModeConfig;
-    if (transferHistoryFooter && config.footerText) {
-      transferHistoryFooter.textContent =
-        typeof window.FmI18n?.t === "function"
-          ? window.FmI18n.t("pager.showPageOf", { current: 1, total: 1 })
-          : config.footerText;
-    }
-  });
-  switchTransferTab("all-assets");
-
-  refreshTransferHistoryTable = setupTableControls({
-    tableBody: transferHistoryBody,
-    searchInput: transferHistorySearchInput,
-    pageSizeSelect: transferHistoryPageSizeSelect,
-  });
-
-  document.getElementById("liquidationExportJsonBtn")?.addEventListener("click", () => {
-    const Fm = window.FmExportJson;
-    if (!Fm) return;
-    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const iso = new Date().toISOString();
-    if (liquidationDetailSection && !liquidationDetailSection.hidden) {
-      const f = document.getElementById("liquidationDetailForm");
-      if (f) {
-        Fm.download(`liquidation-detail-${stamp}.json`, {
-          exportedAt: iso,
-          form: Fm.formToPlainObject(f),
-        });
-        return;
-      }
-    }
-    if (transferAllAssetsSection && !transferAllAssetsSection.hidden && transferAllAssetsBody) {
-      Fm.download(`liquidation-all-assets-${stamp}.json`, {
-        exportedAt: iso,
-        rows: Fm.tbodyToObjectsAuto(transferAllAssetsBody),
-      });
-      return;
-    }
-    if (transferHistorySection && !transferHistorySection.hidden && transferHistoryBody) {
-      Fm.download(`liquidation-history-${stamp}.json`, {
-        exportedAt: iso,
-        rows: Fm.tbodyToObjectsAuto(transferHistoryBody),
-      });
-    }
-  });
-}
 
 if (duongDanLaTrang("statistics.html")) {
-  const statisticsTableBody = document.getElementById("statisticsTableBody");
-  const statisticsSearchInput = document.getElementById("statisticsSearchInput");
-  const statisticsPageSizeSelect = document.getElementById("statisticsPageSizeSelect");
-  const statisticsBuildingFilter = document.getElementById("statisticsBuildingFilter");
-  const statisticsClassFilter = document.getElementById("statisticsClassFilter");
-  const statisticsFundingFilter = document.getElementById("statisticsFundingFilter");
-  const statisticsStatusFilter = document.getElementById("statisticsStatusFilter");
+  const statisticsKpiTotalQty = document.getElementById("statisticsKpiTotalQty");
+  const statisticsKpiInUse = document.getElementById("statisticsKpiInUse");
+  const statisticsKpiLiquidated = document.getElementById("statisticsKpiLiquidated");
+  const statisticsSummaryBody = document.getElementById("statisticsSummaryBody");
+  const statisticsStatusMessage = document.getElementById("statisticsStatusMessage");
 
-  const filterConfigs = [
-    { element: statisticsBuildingFilter, columnIndex: 4 },
-    { element: statisticsClassFilter, columnIndex: 5 },
-    { element: statisticsFundingFilter, columnIndex: 7 },
-    { element: statisticsStatusFilter, columnIndex: 8 },
-  ];
+  const statT = (key, fallback) => {
+    const v = window.FmI18n?.t?.(key);
+    if (!v || v === key) return fallback;
+    return String(v).replace(/<[^>]+>/g, "");
+  };
 
-  const getRows = () => Array.from(statisticsTableBody?.querySelectorAll("tr") || []);
+  const mapStatusCode = (raw) => String(raw || "IN_USE").trim().toUpperCase();
 
-  const populateFilterOptions = () => {
-    const rows = getRows();
-    filterConfigs.forEach(({ element, columnIndex }) => {
-      if (!element) return;
-      const values = Array.from(
-        new Set(
-          rows
-            .map((row) => row.children[columnIndex]?.textContent?.trim() || "")
-            .filter(Boolean)
-        )
-      ).sort((a, b) => a.localeCompare(b, "vi"));
+  const buildingLabel = (a) => {
+    const b = a.building || a.buildingName || a.building_code || "";
+    const s = String(b).trim();
+    return s || statT("statistics.buildingUnknown", "Khác");
+  };
 
-      element.innerHTML = `<option value="All">All</option>${values.map((value) => `<option value="${value}">${value}</option>`).join("")}`;
+  const chuanHoaMaToa = (raw) =>
+    String(raw || "")
+      .trim()
+      .normalize("NFD")
+      .replace(/\p{M}/gu, "")
+      .toUpperCase();
+
+  /** Loại KHAC và tài sản không xác định tòa khỏi thống kê. */
+  const isExcludedBuildingKey = (buildingKey) => {
+    const s = String(buildingKey || "").trim();
+    if (!s) return true;
+    if (chuanHoaMaToa(s) === "KHAC") return true;
+    const unknown = statT("statistics.buildingUnknown", "Khác");
+    if (s === unknown || /^kh[aá]c$/i.test(s)) return true;
+    return false;
+  };
+
+  const layHangThongKe = () => allRows.filter((r) => !isExcludedBuildingKey(r.buildingKey));
+
+  const isInUseStatus = (code) => code === "IN_USE" || code === "ACTIVE";
+  const isLiquidatedStatus = (code) => code === "LIQUIDATED";
+
+  const soLuongTaiSan = (a) => {
+    const n = Number(a.quantity);
+    return Number.isFinite(n) && n > 0 ? n : 1;
+  };
+
+  const chuanHoaTaiSan = (list) =>
+    (Array.isArray(list) ? list : []).map((a) => {
+      const statusCode = mapStatusCode(a.status);
+      return {
+        buildingKey: buildingLabel(a),
+        statusCode,
+        quantity: soLuongTaiSan(a),
+      };
+    });
+
+  let allRows = [];
+  let buildingChart = null;
+  let statusChart = null;
+
+  const statisticsChartBuilding = document.getElementById("statisticsChartBuilding");
+  const statisticsChartStatus = document.getElementById("statisticsChartStatus");
+  const statisticsChartBuildingEmpty = document.getElementById("statisticsChartBuildingEmpty");
+  const statisticsChartStatusEmpty = document.getElementById("statisticsChartStatusEmpty");
+  const statisticsSummaryFoot = document.getElementById("statisticsSummaryFoot");
+  const statisticsTotalQty = document.getElementById("statisticsTotalQty");
+  const statisticsTotalInUse = document.getElementById("statisticsTotalInUse");
+
+  const STAT_CHART_PRIMARY = "#ff6600";
+  const STAT_CHART_IN_USE = "#22a06b";
+  const STAT_CHART_PENDING = "#2684ff";
+  const STAT_CHART_LIQUIDATED = "#e34935";
+
+  const destroyCharts = () => {
+    buildingChart?.destroy();
+    statusChart?.destroy();
+    buildingChart = null;
+    statusChart = null;
+  };
+
+  const barValuePlugin = {
+    id: "statisticsBarValues",
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      const meta = chart.getDatasetMeta(0);
+      if (!meta?.data?.length) return;
+      ctx.save();
+      ctx.fillStyle = "#5c3d1e";
+      ctx.font = "600 13px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      meta.data.forEach((bar, index) => {
+        const value = chart.data.datasets[0].data[index];
+        if (value == null) return;
+        ctx.fillText(String(value), bar.x, bar.y - 6);
+      });
+      ctx.restore();
+    },
+  };
+
+  const donutLegendLabels = (chart, labels, values) => {
+    const total = values.reduce((sum, v) => sum + v, 0);
+    const { data } = chart;
+    return labels.map((label, i) => {
+      const value = values[i];
+      const pct = total > 0 ? ((value / total) * 100).toFixed(1) : "0";
+      const box = data.datasets[0].backgroundColor[i];
+      return {
+        text: `${label} (${value}) — ${pct}%`,
+        fillStyle: box,
+        strokeStyle: box,
+        lineWidth: 0,
+        hidden: false,
+        index: i,
+      };
     });
   };
 
-  const applyStatisticsFilter = setupTableControls({
-    tableBody: statisticsTableBody,
-    searchInput: statisticsSearchInput,
-    pageSizeSelect: statisticsPageSizeSelect,
-    customFilter: (row) =>
-      filterConfigs.every(({ element, columnIndex }) => {
-        if (!element) return true;
-        const selectedValue = element.value;
-        if (!selectedValue || selectedValue === "All") return true;
-        const cellValue = row.children[columnIndex]?.textContent?.trim() || "";
-        return cellValue === selectedValue;
-      }),
-  });
+  const setChartEmpty = (canvas, emptyEl, isEmpty) => {
+    if (emptyEl) {
+      emptyEl.classList.toggle("is-visible", isEmpty);
+      emptyEl.hidden = isEmpty;
+      if (isEmpty) {
+        emptyEl.textContent = statT("statistics.emptySummary", "Không có dữ liệu.");
+      }
+    }
+    if (canvas) {
+      canvas.hidden = false;
+      canvas.style.visibility = isEmpty ? "hidden" : "visible";
+    }
+  };
 
-  filterConfigs.forEach(({ element }) => {
-    element?.addEventListener("change", applyStatisticsFilter);
+  const renderBuildingChart = (groups) => {
+    if (typeof Chart === "undefined" || !statisticsChartBuilding) return;
+    buildingChart?.destroy();
+    buildingChart = null;
+    if (!groups.length) {
+      setChartEmpty(statisticsChartBuilding, statisticsChartBuildingEmpty, true);
+      return;
+    }
+    setChartEmpty(statisticsChartBuilding, statisticsChartBuildingEmpty, false);
+    const labels = groups.map((g) => g.building);
+    const values = groups.map((g) => g.quantity);
+    buildingChart = new Chart(statisticsChartBuilding, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          {
+            data: values,
+            backgroundColor: STAT_CHART_PRIMARY,
+            borderRadius: 4,
+            maxBarThickness: 48,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.parsed.y} ${statT("statistics.unitPieces", "(cái)")}`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: "#5c3d1e", font: { weight: "600" } },
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0 },
+            grid: { color: "rgba(0,0,0,0.06)" },
+          },
+        },
+      },
+      plugins: [barValuePlugin],
+    });
+  };
+
+  const gopTheoTrangThai = (rows) => {
+    let inUseQty = 0;
+    let pendingQty = 0;
+    let liquidatedQty = 0;
+    for (const r of rows) {
+      if (isLiquidatedStatus(r.statusCode)) liquidatedQty += r.quantity;
+      else if (isInUseStatus(r.statusCode)) inUseQty += r.quantity;
+      else pendingQty += r.quantity;
+    }
+    return { inUseQty, pendingQty, liquidatedQty };
+  };
+
+  const renderStatusChart = (rows) => {
+    if (typeof Chart === "undefined" || !statisticsChartStatus) return;
+    statusChart?.destroy();
+    statusChart = null;
+    const { inUseQty, pendingQty, liquidatedQty } = gopTheoTrangThai(rows);
+    const values = [inUseQty, pendingQty, liquidatedQty];
+    const total = values.reduce((a, b) => a + b, 0);
+    if (!total) {
+      setChartEmpty(statisticsChartStatus, statisticsChartStatusEmpty, true);
+      return;
+    }
+    setChartEmpty(statisticsChartStatus, statisticsChartStatusEmpty, false);
+    const labels = [
+      statT("statistics.statusInUse", "Đang sử dụng"),
+      statT("statistics.statusPending", "Chờ xử lý"),
+      statT("statistics.statusLiquidated", "Thanh lý"),
+    ];
+    const colors = [STAT_CHART_IN_USE, STAT_CHART_PENDING, STAT_CHART_LIQUIDATED];
+    statusChart = new Chart(statisticsChartStatus, {
+      type: "doughnut",
+      data: {
+        labels,
+        datasets: [
+          {
+            data: values,
+            backgroundColor: colors,
+            borderWidth: 0,
+            hoverOffset: 4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "58%",
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              boxWidth: 14,
+              padding: 14,
+              color: "#333",
+              font: { size: 12 },
+              generateLabels: (chart) => donutLegendLabels(chart, labels, values),
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const v = ctx.parsed;
+                const pct = total > 0 ? ((v / total) * 100).toFixed(1) : "0";
+                return `${ctx.label}: ${v} (${pct}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  };
+
+  const setStatusMessage = (text, isError = false) => {
+    if (!statisticsStatusMessage) return;
+    if (!text) {
+      statisticsStatusMessage.hidden = true;
+      statisticsStatusMessage.textContent = "";
+      statisticsStatusMessage.classList.remove("is-error");
+      return;
+    }
+    statisticsStatusMessage.hidden = false;
+    statisticsStatusMessage.textContent = text;
+    statisticsStatusMessage.classList.toggle("is-error", isError);
+  };
+
+  const tinhKpi = (rows) => {
+    let totalQty = 0;
+    let inUseQty = 0;
+    let liquidatedQty = 0;
+    for (const r of rows) {
+      totalQty += r.quantity;
+      if (isInUseStatus(r.statusCode)) inUseQty += r.quantity;
+      if (isLiquidatedStatus(r.statusCode)) liquidatedQty += r.quantity;
+    }
+    return { totalQty, inUseQty, liquidatedQty };
+  };
+
+  const gopTheoToa = (rows) => {
+    const map = new Map();
+    for (const r of rows) {
+      const cur = map.get(r.buildingKey) || { quantity: 0, inUseQty: 0 };
+      cur.quantity += r.quantity;
+      if (isInUseStatus(r.statusCode)) cur.inUseQty += r.quantity;
+      map.set(r.buildingKey, cur);
+    }
+    return Array.from(map.entries())
+      .map(([building, agg]) => ({ building, ...agg }))
+      .sort((a, b) => a.building.localeCompare(b.building, "vi"));
+  };
+
+  const render = () => {
+    const rows = layHangThongKe();
+    const kpi = tinhKpi(rows);
+    const groups = gopTheoToa(rows);
+
+    if (statisticsKpiTotalQty) statisticsKpiTotalQty.textContent = String(kpi.totalQty);
+    if (statisticsKpiInUse) statisticsKpiInUse.textContent = String(kpi.inUseQty);
+    if (statisticsKpiLiquidated) statisticsKpiLiquidated.textContent = String(kpi.liquidatedQty);
+
+    renderBuildingChart(groups);
+    renderStatusChart(rows);
+
+    if (!statisticsSummaryBody) return;
+    if (!groups.length) {
+      statisticsSummaryBody.innerHTML = `<tr><td colspan="3" class="statistics-placeholder">${statT("statistics.emptySummary", "Không có dữ liệu.")}</td></tr>`;
+      if (statisticsSummaryFoot) statisticsSummaryFoot.hidden = true;
+      return;
+    }
+    const escHtml = (s) =>
+      String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/"/g, "&quot;");
+    statisticsSummaryBody.innerHTML = groups
+      .map(
+        (g) =>
+          `<tr><td>${escHtml(g.building)}</td><td>${g.quantity}</td><td>${g.inUseQty}</td></tr>`
+      )
+      .join("");
+    if (statisticsSummaryFoot) statisticsSummaryFoot.hidden = false;
+    if (statisticsTotalQty) statisticsTotalQty.textContent = String(kpi.totalQty);
+    if (statisticsTotalInUse) statisticsTotalInUse.textContent = String(kpi.inUseQty);
+    window.FmI18n?.apply?.(statisticsSummaryFoot || document);
+  };
+
+  const taiThongKe = async () => {
+    setStatusMessage("");
+    destroyCharts();
+    setChartEmpty(statisticsChartBuilding, statisticsChartBuildingEmpty, true);
+    setChartEmpty(statisticsChartStatus, statisticsChartStatusEmpty, true);
+    if (statisticsSummaryBody) {
+      statisticsSummaryBody.innerHTML = `<tr><td colspan="3" class="statistics-placeholder">${statT("statistics.loading", "Đang tải…")}</td></tr>`;
+    }
+    if (statisticsSummaryFoot) statisticsSummaryFoot.hidden = true;
+    const api = window.FmApi || window.CoSoApi;
+    if (!api?.layDanhSachTaiSan) {
+      setStatusMessage(statT("statistics.loadError", "Không tải được dữ liệu tài sản."), true);
+      return;
+    }
+    try {
+      const list = await api.layDanhSachTaiSan();
+      allRows = chuanHoaTaiSan(list);
+      render();
+    } catch (err) {
+      console.warn("[Thống kê] Lỗi API:", err);
+      setStatusMessage(statT("statistics.loadError", "Không tải được dữ liệu tài sản."), true);
+      if (statisticsSummaryBody) {
+        statisticsSummaryBody.innerHTML = `<tr><td colspan="3" class="statistics-placeholder">—</td></tr>`;
+      }
+    }
+  };
+
+  void taiThongKe();
+
+  window.addEventListener("fm-i18n-applied", () => {
+    window.FmI18n?.apply?.(document.querySelector("main.content") || document);
+    render();
   });
-  populateFilterOptions();
-  applyStatisticsFilter();
 }
 
 if (duongDanLaTrang("room-detail.html")) {
   const params = new URLSearchParams(window.location.search);
   const roomCode = params.get("room") || "NA-001";
   const idPhongTuUrl = params.get("id") || "";
-  const applyRoomDetail = (profile) => {
+  const filterDate = params.get("date")?.trim() || "";
+  const filterShift = params.get("shift")?.trim() || "";
+  const filterBuilding = params.get("building")?.trim() || "";
+
+  const nhanCaChiTiet = (shift) => {
+    const s = String(shift || "").toUpperCase();
+    if (s === "MORNING") return "Sáng";
+    if (s === "AFTERNOON") return "Chiều";
+    if (s === "EVENING") return "Tối";
+    return shift || "";
+  };
+
+  const hienThiBoLocLich = () => {
+    const el = document.getElementById("roomScheduleContext");
+    if (!el) return;
+    if (!filterDate && !filterShift) {
+      el.hidden = true;
+      el.textContent = "";
+      return;
+    }
+    const parts = [];
+    if (filterShift) parts.push(`Ca ${nhanCaChiTiet(filterShift)}`);
+    if (filterDate) {
+      const [y, m, d] = filterDate.split("-");
+      parts.push(d && m && y ? `${d}/${m}/${y}` : filterDate);
+    }
+    el.hidden = false;
+    el.textContent = `Lịch theo bộ lọc: ${parts.join(" · ")}`;
+  };
+
+  const chuoiCoNghia = (v) => {
+    const s = v != null ? String(v).trim() : "";
+    if (!s) return "";
+    const lower = s.toLowerCase();
+    if (lower === "trống" || lower === "trong" || s === "--" || s === "-") return "";
+    return s;
+  };
+
+  const apDungLopGvTuLich = (profile, rawRow) => {
+    const next = { ...profile };
+    if (!filterDate && !filterShift) {
+      return { profile: next, showTeacherClass: true };
+    }
+    const lopRaw = chuoiCoNghia(
+      rawRow?.classStudying ||
+        rawRow?.class_studying ||
+        rawRow?.classUsing ||
+        rawRow?.class_using ||
+        "",
+    );
+    const gvRaw = chuoiCoNghia(
+      rawRow?.teacherName || rawRow?.teacher_name || rawRow?.teacher || "",
+    );
+    if (!lopRaw && !gvRaw) {
+      next.classStudying = "";
+      next.classUsing = "";
+      next.className = "";
+      next.teacher = "";
+      return { profile: next, showTeacherClass: false };
+    }
+    if (lopRaw) next.classStudying = lopRaw;
+    if (gvRaw) next.teacher = gvRaw;
+    return { profile: next, showTeacherClass: true };
+  };
+
+  const chonSoLuongThietBi = (tuTongHop, tuPhong) => {
+    const n = Number(tuTongHop);
+    if (tuTongHop != null && tuTongHop !== "" && !Number.isNaN(n) && n > 0) return String(n);
+    return tuPhong != null && tuPhong !== "" ? String(tuPhong) : "";
+  };
+
+  const datAnHienOLich = (show) => {
+    ["roomTeacher", "roomClass"].forEach((id) => {
+      const el = document.getElementById(id);
+      const box = el?.closest(".info-box");
+      if (box) box.hidden = !show;
+    });
+  };
+
+  const applyRoomDetail = (profile, summary = null, { showTeacherClass = true } = {}) => {
     const roomCodeLabel = document.getElementById("roomCodeLabel");
     if (roomCodeLabel) roomCodeLabel.textContent = roomCode;
+    hienThiBoLocLich();
+    datAnHienOLich(showTeacherClass);
+    const mapped = summary || {};
     const mappings = [
       ["roomTeacher", profile.teacher],
       ["roomClass", profile.classStudying || profile.classUsing || profile.className],
-      ["roomDesks", profile.desks],
-      ["roomChairs", profile.chairs],
-      ["roomSpeakers", profile.speakers],
-      ["roomAirConditioner", profile.airConditioner],
-      ["roomMicrophone", profile.microphone],
+      ["roomDesks", chonSoLuongThietBi(mapped.desks, profile.desks)],
+      ["roomChairs", chonSoLuongThietBi(mapped.chairs, profile.chairs)],
+      ["roomSpeakers", chonSoLuongThietBi(mapped.speakers, profile.speakers)],
+      ["roomAirConditioner", chonSoLuongThietBi(mapped.airConditioners, profile.airConditioner)],
+      ["roomMicrophone", chonSoLuongThietBi(mapped.microphones, profile.microphone)],
       ["roomGlassDoor", profile.glassDoor],
       ["roomCeilingFan", profile.ceilingFan],
       ["roomCurtain", profile.curtain],
@@ -2559,24 +2936,51 @@ if (duongDanLaTrang("room-detail.html")) {
       if (el) el.textContent = value != null ? String(value) : "";
     });
   };
+  const thamSoLichPhong = () => {
+    if (!filterDate && !filterShift) return null;
+    const p = {};
+    if (filterDate) p.date = filterDate;
+    if (filterShift) p.shift = filterShift;
+    p.semester = xacDinhHocKyTuNgay(filterDate);
+    return p;
+  };
+
   void (async () => {
     try {
-      const api = window.FmApi;
+      const api = window.CoSoApi;
       if (!api) {
         applyRoomDetail(getRoomProfile(roomCode));
         return;
       }
+      const lichParams = thamSoLichPhong();
       let raw = null;
       if (idPhongTuUrl && typeof api.layPhongTheoId === "function") {
-        raw = await api.layPhongTheoId(idPhongTuUrl);
+        raw = await api.layPhongTheoId(idPhongTuUrl, lichParams || undefined);
       } else if (typeof api.layDanhSachPhong === "function") {
-        const ds = await api.layDanhSachPhong();
+        const thamSoDs = lichParams ? { ...lichParams } : {};
+        if (filterBuilding) thamSoDs.building = filterBuilding;
+        const ds = await api.layDanhSachPhong(Object.keys(thamSoDs).length ? thamSoDs : undefined);
         raw = ds.find((r) => String(r.roomCode || r.room_code || "").trim() === roomCode);
       }
-      const fromApi = mapRoomApiToProfile(raw);
-      applyRoomDetail(fromApi || getRoomProfile(roomCode));
+
+      let fromApi = mapRoomApiToProfile(raw);
+      const lichRow = filterDate || filterShift ? raw : raw;
+      const { profile: profileLich, showTeacherClass } = apDungLopGvTuLich(
+        fromApi || getRoomProfile(roomCode),
+        lichRow,
+      );
+      let summary = null;
+      try {
+        const idPhong = idPhongTuUrl || raw?.id || "";
+        if (idPhong && typeof api.layTongHopTaiSanTheoPhong === "function") {
+          summary = await api.layTongHopTaiSanTheoPhong(idPhong);
+        }
+      } catch (e) {
+        console.warn("[Phòng] Tổng hợp tài sản theo phòng API:", e);
+      }
+      applyRoomDetail(profileLich, summary, { showTeacherClass });
     } catch (e) {
-      console.warn("[PhÃ²ng] Chi tiáº¿t API:", e);
+      console.warn("[Phòng] Chi tiết API:", e);
       applyRoomDetail(getRoomProfile(roomCode));
     }
   })();
@@ -2597,13 +3001,28 @@ if (duongDanLaTrang("room-edit.html")) {
     const buildingHint = document.getElementById("roomEditBuildingHint");
     const roomEditBuildingLabel = document.getElementById("roomEditBuildingLabel");
     if (buildingHint) buildingHint.hidden = false;
-    if (roomEditBuildingLabel) roomEditBuildingLabel.textContent = `TÃ²a nhÃ  ${buildingParam}`;
+    if (roomEditBuildingLabel) roomEditBuildingLabel.textContent = `Tòa nhà ${buildingParam}`;
   }
   if (form) {
     fillK65ClassSelects(form);
     form.addEventListener("input", () => form.classList.remove("submitted"));
     form.addEventListener("change", () => form.classList.remove("submitted"));
   }
+  // Khóa chỉnh tay số lượng thiết bị: dữ liệu được tổng hợp từ bảng assets.
+  [
+    "roomDesksInput",
+    "roomChairsInput",
+    "roomSpeakersInput",
+    "roomAirConditionerInput",
+    "roomMicrophoneInput",
+    "roomCeilingFanInput",
+  ].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el instanceof HTMLInputElement) {
+      el.readOnly = true;
+      el.title = "Được tổng hợp tự động từ Quản lý tài sản";
+    }
+  });
   const ensureK65OrLegacy = (id, v) => {
     const s = document.getElementById(id);
     if (!s || v == null || v === "") return;
@@ -2641,7 +3060,7 @@ if (duongDanLaTrang("room-edit.html")) {
   applyRoomEditForm(profile);
   void (async () => {
     try {
-      const api = window.FmApi;
+      const api = window.CoSoApi;
       if (!api) return;
       let raw = null;
       if (idPhongTuUrl && typeof api.layPhongTheoId === "function") {
@@ -2653,7 +3072,7 @@ if (duongDanLaTrang("room-edit.html")) {
       const fromApi = mapRoomApiToProfile(raw);
       if (fromApi) applyRoomEditForm({ ...getRoomProfile(roomCode), ...fromApi });
     } catch (e) {
-      console.warn("[PhÃ²ng] Táº£i form sá»­a API:", e);
+      console.warn("[Phòng] Tải form sửa API:", e);
     }
   })();
 
@@ -2704,22 +3123,16 @@ if (duongDanLaTrang("room-edit.html")) {
       capacity: Number(capacity) || 0,
       status,
       teacherName: document.getElementById("roomTeacherInput")?.value.trim() || "",
-      deskCount: Number(document.getElementById("roomDesksInput")?.value) || 0,
-      chairCount: Number(document.getElementById("roomChairsInput")?.value) || 0,
-      speakerCount: Number(document.getElementById("roomSpeakersInput")?.value) || 0,
-      airConditionerCount: Number(document.getElementById("roomAirConditionerInput")?.value) || 0,
-      microphoneCount: Number(document.getElementById("roomMicrophoneInput")?.value) || 0,
       glassDoorStatus: getRadioValueByName("roomGlassDoor"),
-      ceilingFanCount: Number(document.getElementById("roomCeilingFanInput")?.value) || 0,
       curtainStatus: getRadioValueByName("roomCurtain"),
     };
     void (async () => {
       try {
-        if (idPhongCapNhat && window.FmApi?.capNhatPhong) {
-          await window.FmApi.capNhatPhong(idPhongCapNhat, jsonCapNhatPhong);
+        if (idPhongCapNhat && window.CoSoApi?.capNhatPhong) {
+          await window.CoSoApi.capNhatPhong(idPhongCapNhat, jsonCapNhatPhong);
         }
       } catch (e) {
-        console.warn("[PhÃ²ng] Cáº­p nháº­t API:", e);
+        console.warn("[Phòng] Cập nhật API:", e);
       }
     })();
     if (b) {
@@ -2728,7 +3141,7 @@ if (duongDanLaTrang("room-edit.html")) {
         addRoomRowToBuilding(b, [roomCode, floor, className, "-", status, capacity]);
       }
     }
-    window.alert("Cáº­p nháº­t phÃ²ng thÃ nh cÃ´ng!");
+    window.alert("Cập nhật phòng thành công!");
     if (window.history.length > 1) {
       window.history.back();
       return;
@@ -2755,12 +3168,28 @@ if (duongDanLaTrang("room-add.html")) {
   const hidden = document.getElementById("roomTargetBuilding");
   if (hidden) hidden.value = building;
   const addLbl = document.getElementById("roomAddBuildingLabel");
-  if (addLbl) addLbl.textContent = `TÃ²a nhÃ  ${building}`;
+  if (addLbl) addLbl.textContent = `Tòa nhà ${building}`;
   if (form) {
     fillK65ClassSelects(form);
     form.addEventListener("input", () => form.classList.remove("submitted"));
     form.addEventListener("change", () => form.classList.remove("submitted"));
   }
+  // Khóa nhập tay số lượng thiết bị ở màn thêm phòng.
+  [
+    "roomDesksInput",
+    "roomChairsInput",
+    "roomSpeakersInput",
+    "roomAirConditionerInput",
+    "roomMicrophoneInput",
+    "roomCeilingFanInput",
+  ].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el instanceof HTMLInputElement) {
+      el.readOnly = true;
+      el.value = "0";
+      el.title = "Được tổng hợp tự động từ Quản lý tài sản";
+    }
+  });
   form?.addEventListener("submit", (e) => {
     e.preventDefault();
     if (!form.checkValidity()) {
@@ -2775,7 +3204,7 @@ if (duongDanLaTrang("room-add.html")) {
     const capacity = document.getElementById("roomCapacityInput")?.value.trim() || "";
     const status = getRadioValueByName("roomStatus");
     if (isRoomCodeTakenInBuilding(building, roomCode)) {
-      window.alert("MÃ£ phÃ²ng nÃ y Ä‘Ã£ cÃ³ trong tÃ²a Ä‘Ã£ chá»n. Vui lÃ²ng nháº­p mÃ£ khÃ¡c.");
+      window.alert("Mã phòng này đã có trong tòa đã chọn. Vui lòng nhập mã khác.");
       return;
     }
     setRoomUpdate(roomCode, {
@@ -2805,23 +3234,17 @@ if (duongDanLaTrang("room-add.html")) {
       status,
       teacherName: document.getElementById("roomTeacherInput")?.value.trim() || "",
       classStudying,
-      deskCount: Number(document.getElementById("roomDesksInput")?.value) || 0,
-      chairCount: Number(document.getElementById("roomChairsInput")?.value) || 0,
-      speakerCount: Number(document.getElementById("roomSpeakersInput")?.value) || 0,
-      airConditionerCount: Number(document.getElementById("roomAirConditionerInput")?.value) || 0,
-      microphoneCount: Number(document.getElementById("roomMicrophoneInput")?.value) || 0,
       glassDoorStatus: getRadioValueByName("roomGlassDoor"),
-      ceilingFanCount: Number(document.getElementById("roomCeilingFanInput")?.value) || 0,
       curtainStatus: getRadioValueByName("roomCurtain"),
     };
     void (async () => {
       try {
-        if (window.FmApi?.taoPhong) await window.FmApi.taoPhong(jsonPhong);
+        if (window.CoSoApi?.taoPhong) await window.CoSoApi.taoPhong(jsonPhong);
       } catch (e) {
-        console.warn("[PhÃ²ng] ThÃªm API:", e);
+        console.warn("[Phòng] Thêm API:", e);
       }
     })();
-    window.alert("ThÃªm phÃ²ng thÃ nh cÃ´ng!");
+    window.alert("Thêm phòng thành công!");
     window.location.href = "../dashboard/departments.html";
   });
 }
@@ -2837,69 +3260,69 @@ if (duongDanLaTrang("contact-profile.html")) {
 
   const roleLabel = (role) => {
     const r = String(role || "").trim();
-    if (!r) return "â€”";
+    if (!r) return "—";
     const map = {
       ADMIN: "Administrator",
-      MANAGER: "Quáº£n lÃ½",
-      STAFF: "CÃ¡n bá»™ quáº£n lÃ½ tÃ i sáº£n",
-      STUDENT: "Sinh viÃªn",
+      MANAGER: "Quản lý",
+      STAFF: "Cán bộ quản lý tài sản",
+      STUDENT: "Sinh viên",
     };
     return map[r.toUpperCase()] || r;
   };
 
   const emailFromUsername = (username) => {
     const name = String(username || "").trim();
-    if (!name) return "â€”";
+    if (!name) return "—";
     return name.includes("@") ? name : `${name}@hotmail.com`;
   };
 
   const contactProfiles = {
     "tien-hop": {
-      name: "Tráº§n Tiáº¿n Há»£p",
-      role: "CÃ¡n bá»™ quáº£n lÃ½ tÃ i sáº£n",
+      name: "Trần Tiến Hợp",
+      role: "Cán bộ quản lý tài sản",
       phone: "1263751380",
       email: "trantienhop@hotmail.com",
-      address: "BÃ¬nh Äá»‹nh",
+      address: "Bình Định",
       avatar: "/assets/images/avatar/avatar_1.jpg",
     },
     "nhat-thanh": {
-      name: "Äá»— Nháº­t Thanh",
-      role: "CÃ¡n bá»™ quáº£n lÃ½ tÃ i sáº£n",
+      name: "Đỗ Nhật Thanh",
+      role: "Cán bộ quản lý tài sản",
       phone: "1263751380",
       email: "donhatthanh@hotmail.com",
       address: "An Giang",
       avatar: "/assets/images/avatar/avatar_2.jpg",
     },
     "hoang-phuc": {
-      name: "VÃµ HoÃ ng PhÃºc",
-      role: "CÃ¡n bá»™ quáº£n lÃ½ tÃ i sáº£n",
+      name: "Võ Hoàng Phúc",
+      role: "Cán bộ quản lý tài sản",
       phone: "1234459015",
       email: "vohoangphuc@hotmail.com",
-      address: "SÃ³c TrÄƒng",
+      address: "Sóc Trăng",
       avatar: "/assets/images/avatar/avatar_3.jpg",
     },
     "huynh-hoa-phuc": {
-      name: "Tráº§n Huá»³nh HÃ²a PhÃºc",
-      role: "CÃ¡n bá»™ quáº£n lÃ½ tÃ i sáº£n",
+      name: "Trần Huỳnh Hòa Phúc",
+      role: "Cán bộ quản lý tài sản",
       phone: "1263751380",
       email: "tranhuynhhoaphuc@hotmail.com",
-      address: "Tiá»n Giang",
+      address: "Tiền Giang",
       avatar: "/assets/images/avatar/avatar_4.jpg",
     },
   };
 
   const dienTuApi = (u) => {
     if (!u) return;
-    const fullName = u.fullName || u.fullname || u.username || "â€”";
+    const fullName = u.fullName || u.fullname || u.username || "—";
     const av =
       window.UserAvatar && typeof window.UserAvatar.resolve === "function"
         ? window.UserAvatar.resolve(u)
         : "/assets/images/avatar/avatar_1.jpg";
     if (profileName) profileName.textContent = String(fullName).toUpperCase();
     if (profileRole) profileRole.textContent = roleLabel(u.role);
-    if (profilePhone) profilePhone.textContent = u.phoneNumber || u.phone_number || "â€”";
+    if (profilePhone) profilePhone.textContent = u.phoneNumber || u.phone_number || "—";
     if (profileEmail) profileEmail.textContent = emailFromUsername(u.username);
-    if (profileAddress) profileAddress.textContent = u.address || "â€”";
+    if (profileAddress) profileAddress.textContent = u.address || "—";
     if (profileAvatarImage) {
       profileAvatarImage.src = av;
       profileAvatarImage.alt = `avatar ${fullName}`;
@@ -2921,12 +3344,12 @@ if (duongDanLaTrang("contact-profile.html")) {
 
   void (async () => {
     try {
-      if (userIdTuUrl && window.FmApi?.layNguoiDungTheoId) {
-        dienTuApi(await window.FmApi.layNguoiDungTheoId(userIdTuUrl));
+      if (userIdTuUrl && window.CoSoApi?.layNguoiDungTheoId) {
+        dienTuApi(await window.CoSoApi.layNguoiDungTheoId(userIdTuUrl));
         return;
       }
-      if (window.FmApi?.layDanhSachNguoiDung) {
-        const list = await window.FmApi.layDanhSachNguoiDung();
+      if (window.CoSoApi?.layDanhSachNguoiDung) {
+        const list = await window.CoSoApi.layDanhSachNguoiDung();
         const found = list.find(
           (x) =>
             String(x.username || "") === userKey || String(x.id) === String(userKey).replace(/^id-/, ""),

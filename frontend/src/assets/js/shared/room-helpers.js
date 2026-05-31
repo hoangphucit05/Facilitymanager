@@ -1,6 +1,7 @@
 (function exposeRoomHelpers(window) {
-  const ROOM_UPDATES_KEY = "roomUpdates";
-  const ROOM_ADDITIONS_KEY = "roomAdditionsByBuilding";
+  const getRoomUpdates = () => ({});
+
+  const setRoomUpdate = () => {};
 
   /** Các mã lớp (cột *Lớp đang sử dụng* / select thêm-sửa phòng) — tương ứng CQ.65.* bỏ tiền tố CQ.65. */
   const K65_CLASS_OPTIONS = [
@@ -44,20 +45,6 @@
     "TC-NH",
     "QLXD",
   ];
-
-  const getRoomUpdates = () => {
-    try {
-      return JSON.parse(localStorage.getItem(ROOM_UPDATES_KEY) || "{}");
-    } catch (_) {
-      return {};
-    }
-  };
-
-  const setRoomUpdate = (roomCode, payload) => {
-    const updates = getRoomUpdates();
-    updates[roomCode] = payload;
-    localStorage.setItem(ROOM_UPDATES_KEY, JSON.stringify(updates));
-  };
 
   const ROOM_STATUS_VI = {
     IN_USE: "Đang sử dụng",
@@ -119,24 +106,23 @@
   };
 
   const getRoomProfile = (roomCode) => {
-    const updates = getRoomUpdates();
-    const saved = updates[roomCode] || {};
+    const saved = getRoomUpdates()[roomCode] || {};
     const defaults = {
       buildingCode: "",
-      teacher: "Nguyễn Văn A",
-      className: "CNTT",
-      classStudying: "CNTT",
+      teacher: "",
+      className: "",
+      classStudying: "",
       floor: "",
-      desks: "30",
-      chairs: "60",
-      speakers: "2",
-      airConditioner: "2",
-      microphone: "1",
-      glassDoor: "Không vỡ",
-      ceilingFan: "4",
-      curtain: "Có",
-      status: "Đang sử dụng",
-      capacity: "50",
+      desks: "",
+      chairs: "",
+      speakers: "",
+      airConditioner: "",
+      microphone: "",
+      glassDoor: "",
+      ceilingFan: "",
+      curtain: "",
+      status: "",
+      capacity: "",
     };
     return { ...defaults, ...saved };
   };
@@ -163,28 +149,12 @@
     });
   };
 
-  const getRoomAdditions = () => {
-    try {
-      return JSON.parse(localStorage.getItem(ROOM_ADDITIONS_KEY) || "{}");
-    } catch (_) {
-      return {};
-    }
-  };
+  const getRoomAdditions = () => ({});
 
-  const setRoomAdditions = (data) => {
-    localStorage.setItem(ROOM_ADDITIONS_KEY, JSON.stringify(data));
-  };
+  const setRoomAdditions = () => {};
 
   /** [mã, tầng, lớp, slot, trạng thái, sức chứa] */
-  const addRoomRowToBuilding = (buildingCode, row) => {
-    const all = getRoomAdditions();
-    if (!all[buildingCode]) all[buildingCode] = [];
-    const list = all[buildingCode];
-    const idx = list.findIndex((r) => r[0] === row[0]);
-    if (idx >= 0) list[idx] = row;
-    else list.push(row);
-    setRoomAdditions(all);
-  };
+  const addRoomRowToBuilding = () => {};
 
   const mapRoomStatusLabel = (raw) => {
     const s = hienThiTuMap(raw, ROOM_STATUS_VI);

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="./assets/css/pages.css" />
   </head>
   <body data-required-roles="ADMIN,MANAGER,STAFF,STUDENT">
+    <div class="sidebar-backdrop" aria-hidden="true"></div>
     <div class="app app--with-sidebar">
       <div id="appSidebar"></div>
 
@@ -23,17 +24,24 @@
         </header>
 
         <section class="panel home-hero">
-          <img class="home-logo" src="./assets/images/logo-home.png" alt="Logo" width="180" height="72" />
           <div class="home-hero-row">
+            <div class="home-hero-logo" aria-hidden="true">FM</div>
             <div class="home-hero-left">
-              <p class="home-greeting"><span data-i18n="dashboard.homeGreeting">Xin chào</span> <span id="homeUserName">—</span></p>
+              <p class="home-greeting">
+                <span data-i18n="dashboard.homeGreeting">Xin chào</span>,
+                <span id="homeUserName">—</span> 👋
+              </p>
+              <p class="home-subtitle" data-i18n="dashboard.homeSubtitle">Chúc bạn một ngày làm việc hiệu quả!</p>
               <p class="fm-furigana-sample" lang="ja" aria-hidden="true">
                 <ruby>施設<rt>しせつ</rt></ruby>の<ruby>管理<rt>かんり</rt></ruby>
               </p>
             </div>
             <div class="home-hero-time">
               <span id="homeDate" class="home-date">—</span>
-              <span id="homeClock" class="home-clock">—</span>
+              <div class="home-clock-row">
+                <span class="home-clock-icon" aria-hidden="true">🕐</span>
+                <span id="homeClock" class="home-clock">—</span>
+              </div>
             </div>
           </div>
         </section>
@@ -41,22 +49,8 @@
         <section class="panel home-shortcuts-panel">
           <h2 class="home-section-title" data-i18n="dashboard.modulesTitle">Module thường dùng</h2>
           <div class="home-modules-layout">
-            <div id="homeShortcutGrid" class="home-shortcut-grid" aria-label="Lối tắt module"></div>
-            <div class="home-modules-divider" aria-hidden="true"></div>
-            <div class="home-task-buttons">
-              <button type="button" class="home-task-btn" data-task="pending">
-                <span class="home-task-icon" aria-hidden="true">&#128203;</span>
-                <span data-i18n="dashboard.taskPending">Việc chờ xử lý</span>
-              </button>
-              <button type="button" class="home-task-btn" data-task="open">
-                <span class="home-task-icon" aria-hidden="true">&#9203;</span>
-                <span data-i18n="dashboard.taskOpen">Việc chưa xong</span>
-              </button>
-              <button type="button" class="home-task-btn" data-task="mine">
-                <span class="home-task-icon" aria-hidden="true">&#128100;</span>
-                <span data-i18n="dashboard.taskMine">Việc tôi phụ trách</span>
-              </button>
-            </div>
+            <div id="homeModuleGrid" class="home-module-grid home-module-grid--main" aria-label="Module chính"></div>
+            <div id="homeTaskList" class="home-task-list" aria-label="Công việc"></div>
           </div>
         </section>
       </main>

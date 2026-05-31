@@ -13,6 +13,8 @@
 (function i18nManagerScope(window) {
   const STORAGE_KEY = "fm_ui_lang";
   const SUPPORTED = ["vi", "en", "ja"];
+  /** Tăng khi thêm key dịch mới — ép trình duyệt tải lại JSON (tránh cache cũ thiếu key). */
+  const BUNDLE_REV = "20260529f";
   const CACHE = new Map();
 
   let currentLocale = "vi";
@@ -60,15 +62,34 @@
 
   async function loadBundle(locale) {
     const lang = normalizeLocale(locale);
-    if (CACHE.has(lang)) return CACHE.get(lang);
+    const cacheKey = `${lang}@${BUNDLE_REV}`;
+    if (CACHE.has(cacheKey)) return CACHE.get(cacheKey);
 
     const base = detectBaseUrl().replace(/\/?$/, "/");
-    const url = `${base}locales/${lang}.json`;
-    const res = await fetch(url, { credentials: "same-origin", cache: "no-cache" });
-    if (!res.ok) throw new Error(`FmI18n: failed to load ${url} (${res.status})`);
-    const data = await res.json();
-    CACHE.set(lang, data);
-    return data;
+    const file = `${lang}.json?v=${encodeURIComponent(BUNDLE_REV)}`;
+    const candidates = [
+      `${base}locales/${file}`,
+      `${base}i18n/${file}`,
+      `${base}public/i18n/${file}`,
+      `/locales/${file}`,
+      `/i18n/${file}`,
+    ];
+    let lastErr = null;
+    for (const url of candidates) {
+      try {
+        const res = await fetch(url, { credentials: "same-origin", cache: "no-store" });
+        if (!res.ok) {
+          lastErr = new Error(`FmI18n: failed to load ${url} (${res.status})`);
+          continue;
+        }
+        const data = await res.json();
+        CACHE.set(cacheKey, data);
+        return data;
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw lastErr || new Error(`FmI18n: no bundle for ${lang}`);
   }
 
   function t(key, params) {
@@ -149,6 +170,9 @@
       currentLocale = lang;
       document.documentElement.setAttribute("data-i18n-locale", lang);
       apply(document);
+      requestAnimationFrame(() => {
+        apply(document.querySelector("main.content") || document);
+      });
       window.dispatchEvent(
         new CustomEvent("fm-i18n-applied", { detail: { locale: currentLocale, bundle: currentBundle } }),
       );

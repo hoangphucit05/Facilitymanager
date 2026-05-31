@@ -6,8 +6,5 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "dev": "npm run build && npx --yes serve dist -p 5173"
-  },
-  "devDependencies": {
-    "vite": "^6.3.5"
   }
 }

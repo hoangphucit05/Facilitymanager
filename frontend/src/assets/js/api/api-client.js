@@ -4,7 +4,7 @@
  * Kiến trúc luồng dữ liệu:
  *   Frontend  →  SQL Sync Server (:8081)  →  Spring Boot (:8080)  →  MySQL
  *                       ↓ (sau mỗi POST/PUT/PATCH/DELETE thành công)
- *                 Tự export lại schema_main.sql
+ *                 Tự export lại database/mysql/schema.sql
  *
  * Để đổi địa chỉ: gán window.API_BASE_URL (hoặc API_CO_SO) = 'http://host:port' trước khi load script.
  * Mặc định: Spring Boot trực tiếp — cùng hostname với trang (localhost hoặc IP LAN) + cổng 8080.
@@ -83,8 +83,19 @@
       const q = thamSo ? "?" + new URLSearchParams(thamSo).toString() : "";
       return goiDuongDan("GET", "/api/rooms" + q).then(chuanHoaDanhSach);
     },
-    layPhongTheoId(maPhong) {
-      return goiDuongDan("GET", "/api/rooms/" + encodeURIComponent(maPhong));
+    layPhongTheoId(maPhong, thamSo) {
+      const q = thamSo ? "?" + new URLSearchParams(thamSo).toString() : "";
+      return goiDuongDan("GET", "/api/rooms/" + encodeURIComponent(maPhong) + q);
+    },
+    layTongHopTaiSanTheoPhong(maPhong) {
+      return goiDuongDan("GET", "/api/rooms/" + encodeURIComponent(maPhong) + "/asset-summary");
+    },
+    layLichTheoMaPhong(maPhong) {
+      return goiDuongDan("GET", "/api/rooms/code/" + encodeURIComponent(maPhong) + "/schedule").then(chuanHoaDanhSach);
+    },
+    layLopDangHocTheoMaPhong(maPhong, atIso) {
+      const q = atIso ? ("?at=" + encodeURIComponent(atIso)) : "";
+      return goiDuongDan("GET", "/api/rooms/code/" + encodeURIComponent(maPhong) + "/current-class" + q);
     },
     taoPhong(doiTuongJson) {
       return goiDuongDan("POST", "/api/rooms", { body: doiTuongJson });
@@ -115,6 +126,9 @@
     xoaTaiSan(maTaiSan) {
       return goiDuongDan("DELETE", "/api/assets/" + encodeURIComponent(maTaiSan));
     },
+    taoPhieuDieuChuyenTaiSan(maTaiSan, doiTuongJson) {
+      return goiDuongDan("POST", "/api/assets/" + encodeURIComponent(maTaiSan) + "/transfer", { body: doiTuongJson });
+    },
 
     layDanhSachDanhMuc(thamSo) {
       const q = thamSo ? "?" + new URLSearchParams(thamSo).toString() : "";
@@ -131,6 +145,54 @@
     },
     xoaDanhMuc(maDanhMuc) {
       return goiDuongDan("DELETE", "/api/categories/" + encodeURIComponent(maDanhMuc));
+    },
+
+    layDanhSachYeuCau(thamSo) {
+      const q = thamSo ? "?" + new URLSearchParams(thamSo).toString() : "";
+      return goiDuongDan("GET", "/api/requests" + q).then(chuanHoaDanhSach);
+    },
+    layDanhSachNguoiPhanViec() {
+      return goiDuongDan("GET", "/api/requests/assignees").then(chuanHoaDanhSach);
+    },
+    demYeuCauMoi() {
+      return goiDuongDan("GET", "/api/requests/count-new");
+    },
+    layYeuCauTheoId(id) {
+      return goiDuongDan("GET", "/api/requests/" + encodeURIComponent(id));
+    },
+    taoYeuCau(doiTuongJson) {
+      return goiDuongDan("POST", "/api/requests", { body: doiTuongJson });
+    },
+    luuNhapYeuCau(doiTuongJson) {
+      return goiDuongDan("POST", "/api/requests/drafts", { body: doiTuongJson });
+    },
+    capNhatYeuCau(id, doiTuongJson) {
+      return goiDuongDan("PUT", "/api/requests/" + encodeURIComponent(id), { body: doiTuongJson });
+    },
+    patchYeuCau(id, doiTuongJson) {
+      return goiDuongDan("PATCH", "/api/requests/" + encodeURIComponent(id), { body: doiTuongJson });
+    },
+    xoaYeuCau(id) {
+      return goiDuongDan("DELETE", "/api/requests/" + encodeURIComponent(id));
+    },
+
+    layDanhSachKiemKe() {
+      return goiDuongDan("GET", "/api/audits").then(chuanHoaDanhSach);
+    },
+    layKiemKeTheoId(id) {
+      return goiDuongDan("GET", "/api/audits/" + encodeURIComponent(id));
+    },
+    taoKiemKe(doiTuongJson) {
+      return goiDuongDan("POST", "/api/audits", { body: doiTuongJson });
+    },
+    capNhatChiTietKiemKe(id, rows) {
+      return goiDuongDan("PUT", "/api/audits/" + encodeURIComponent(id) + "/details", { body: rows });
+    },
+    hoanTatKiemKe(id) {
+      return goiDuongDan("POST", "/api/audits/" + encodeURIComponent(id) + "/complete");
+    },
+    xuatKiemKeJson(id) {
+      return goiDuongDan("GET", "/api/audits/" + encodeURIComponent(id) + "/export");
     },
 
     layDanhSachNguoiDung(thamSo) {
@@ -160,7 +222,7 @@
     },
 
     /**
-     * Kích hoạt export SQL thủ công và tải về file schema_main.sql.
+     * Kích hoạt export SQL thủ công (cập nhật database/mysql/schema.sql).
      * Chỉ hoạt động khi dùng qua SQL Sync Server (port 8081).
      */
     exportSql() {

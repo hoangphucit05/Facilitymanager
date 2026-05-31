@@ -305,7 +305,7 @@
   color: #fff;
 }
 .iv-btn-solid-primary:hover {
-  background: var(--blue-800);
+  background: var(--color-primary-dark);
 }
 .iv-btn-text {
   border: 0;
@@ -346,8 +346,8 @@
   text-align: left;
 }
 .iv-table thead th {
-  background: var(--slate-50);
-  color: var(--text);
+  background: var(--color-primary-pale);
+  color: var(--color-primary-dark);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -399,8 +399,9 @@
   color: var(--primary);
 }
 .iv-page-item.is-active {
-  border-color: var(--primary);
-  color: var(--primary);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-on-primary);
   font-weight: 700;
 }
 .iv-page-total {
@@ -424,7 +425,7 @@
   justify-content: center;
   z-index: 1000;
   padding-top: 80px;
-  background: rgba(55, 55, 55, 0.32);
+  background: var(--overlay-backdrop);
 }
 .iv-modal-mask.is-open {
   display: flex;
@@ -443,12 +444,15 @@
 }
 .iv-modal-header {
   padding: 14px 16px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-weight: 600;
   font-size: 14px;
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  border-radius: 6px 6px 0 0;
 }
 .iv-modal-close {
   border: 0;
@@ -456,6 +460,10 @@
   font-size: 18px;
   color: var(--muted);
   cursor: pointer;
+}
+
+.iv-modal-header .iv-modal-close {
+  color: var(--color-text-on-primary);
 }
 .iv-modal-body {
   padding: 16px 18px;
@@ -576,16 +584,16 @@ button.iv-text-btn:hover {
   background: var(--slate-200);
 }
 .iv-tree-icon.lvl-0 {
-  background: var(--blue-200);
+  background: var(--color-primary-lighter);
 }
 .iv-tree-icon.lvl-1 {
-  background: var(--teal-200);
+  background: var(--color-primary-light);
 }
 .iv-tree-icon.lvl-2 {
-  background: var(--amber-200);
+  background: var(--color-accent);
 }
 .iv-tree-icon.lvl-3 {
-  background: var(--violet-200);
+  background: var(--color-primary-dark);
 }
 .iv-tree-children {
   margin-left: 18px;
