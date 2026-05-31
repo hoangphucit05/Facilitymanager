@@ -17,6 +17,6 @@ public class CauHinhWebMvcBoSung implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(boLocPhienToken)
-                .addPathPatterns("/api/admin/**", "/api/permission/getMenuList");
+                .addPathPatterns("/api/admin/**", "/api/permission/getMenuList", "/api/requests/**", "/api/audits/**");
     }
 }

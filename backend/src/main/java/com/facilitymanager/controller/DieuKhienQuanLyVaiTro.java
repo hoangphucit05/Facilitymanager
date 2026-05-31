@@ -6,7 +6,7 @@ import com.facilitymanager.dto.YeuCauCapNhatVaiTro;
 import com.facilitymanager.dto.YeuCauTaoVaiTro;
 import com.facilitymanager.service.DichVuBangMenuVaiTro;
 import com.facilitymanager.service.DichVuQuanLyVaiTro;
-import com.facilitymanager.vo.MenuVo;
+import com.facilitymanager.vo.VoMenu;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class DieuKhienQuanLyVaiTro {
     }
 
     @GetMapping("/menu-tree")
-    public KetQuaApi<List<MenuVo>> cayMenuDayDu() {
+    public KetQuaApi<List<VoMenu>> cayMenuDayDu() {
         return KetQuaApi.ok(dichVuBangMenuVaiTro.layCayMenuDayDu());
     }
 

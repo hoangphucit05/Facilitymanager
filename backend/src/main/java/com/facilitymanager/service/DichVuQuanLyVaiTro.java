@@ -6,7 +6,7 @@ import com.facilitymanager.dto.YeuCauTaoVaiTro;
 import com.facilitymanager.entity.QuyenMenuUngDung;
 import com.facilitymanager.entity.VaiTroUngDung;
 import com.facilitymanager.repository.QuyenMenuUngDungRepository;
-import com.facilitymanager.repository.UserRepository;
+import com.facilitymanager.repository.NguoiDungRepository;
 import com.facilitymanager.repository.VaiTroUngDungRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,12 +27,12 @@ public class DichVuQuanLyVaiTro {
 
     private final VaiTroUngDungRepository vaiTroUngDungRepository;
     private final QuyenMenuUngDungRepository quyenMenuUngDungRepository;
-    private final UserRepository userRepository;
+    private final NguoiDungRepository userRepository;
 
     public DichVuQuanLyVaiTro(
             VaiTroUngDungRepository vaiTroUngDungRepository,
             QuyenMenuUngDungRepository quyenMenuUngDungRepository,
-            UserRepository userRepository
+            NguoiDungRepository userRepository
     ) {
         this.vaiTroUngDungRepository = vaiTroUngDungRepository;
         this.quyenMenuUngDungRepository = quyenMenuUngDungRepository;

@@ -1,8 +1,8 @@
 package com.facilitymanager.service;
 
 import com.facilitymanager.dto.NguoiDungPhanHoiDto;
-import com.facilitymanager.entity.User;
-import com.facilitymanager.repository.UserRepository;
+import com.facilitymanager.entity.NguoiDung;
+import com.facilitymanager.repository.NguoiDungRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +14,10 @@ import java.util.Map;
 @Service
 public class DichVuQuanLyNguoiDung {
 
-    private final UserRepository userRepository;
+    private final NguoiDungRepository userRepository;
     private final DichVuKiemTraMatKhau dichVuKiemTraMatKhau;
 
-    public DichVuQuanLyNguoiDung(UserRepository userRepository, DichVuKiemTraMatKhau dichVuKiemTraMatKhau) {
+    public DichVuQuanLyNguoiDung(NguoiDungRepository userRepository, DichVuKiemTraMatKhau dichVuKiemTraMatKhau) {
         this.userRepository = userRepository;
         this.dichVuKiemTraMatKhau = dichVuKiemTraMatKhau;
     }
@@ -56,7 +56,7 @@ public class DichVuQuanLyNguoiDung {
         if (fullName == null || fullName.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Họ tên không được để trống.");
         }
-        User user = new User();
+        NguoiDung user = new NguoiDung();
         user.setUsername(u);
         user.setPasswordHash(dichVuKiemTraMatKhau.maHoa(password));
         user.setFullName(fullName.trim());
@@ -80,7 +80,7 @@ public class DichVuQuanLyNguoiDung {
             String status,
             String avatarUrl
     ) {
-        User user = timTheoId(id);
+        NguoiDung user = timTheoId(id);
         if (username != null && !username.isBlank()) {
             String u = username.trim();
             if (!u.equals(user.getUsername()) && userRepository.existsByUsername(u)) {
@@ -117,7 +117,7 @@ public class DichVuQuanLyNguoiDung {
 
     @Transactional
     public NguoiDungPhanHoiDto capNhatMotPhan(long id, Map<String, Object> patch) {
-        User user = timTheoId(id);
+        NguoiDung user = timTheoId(id);
         if (patch.containsKey("status")) {
             Object v = patch.get("status");
             if (v != null && !String.valueOf(v).isBlank()) {
@@ -143,12 +143,12 @@ public class DichVuQuanLyNguoiDung {
         userRepository.deleteById(id);
     }
 
-    private User timTheoId(long id) {
+    private NguoiDung timTheoId(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy user."));
     }
 
-    private NguoiDungPhanHoiDto chuyenSangDto(User user) {
+    private NguoiDungPhanHoiDto chuyenSangDto(NguoiDung user) {
         return new NguoiDungPhanHoiDto(
                 user.getId(),
                 user.getUsername(),

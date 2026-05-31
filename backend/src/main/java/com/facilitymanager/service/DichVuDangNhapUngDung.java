@@ -3,8 +3,8 @@ package com.facilitymanager.service;
 import com.facilitymanager.captcha.DichVuCaptchaRedis;
 import com.facilitymanager.dto.PhanHoiDangNhap;
 import com.facilitymanager.entity.QuyenMenuUngDung;
-import com.facilitymanager.entity.User;
-import com.facilitymanager.repository.UserRepository;
+import com.facilitymanager.entity.NguoiDung;
+import com.facilitymanager.repository.NguoiDungRepository;
 import com.facilitymanager.security.DichVuPhienToken;
 import com.facilitymanager.security.NoiDungPhien;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class DichVuDangNhapUngDung {
 
-    private final UserRepository userRepository;
+    private final NguoiDungRepository userRepository;
     private final DichVuCaptchaRedis dichVuCaptchaRedis;
     private final DichVuKiemTraMatKhau dichVuKiemTraMatKhau;
     private final DichVuChuanHoaMaVaiTro dichVuChuanHoaMaVaiTro;
@@ -26,7 +26,7 @@ public class DichVuDangNhapUngDung {
     private final DichVuHieuLucVaiTro dichVuHieuLucVaiTro;
 
     public DichVuDangNhapUngDung(
-            UserRepository userRepository,
+            NguoiDungRepository userRepository,
             DichVuCaptchaRedis dichVuCaptchaRedis,
             DichVuKiemTraMatKhau dichVuKiemTraMatKhau,
             DichVuChuanHoaMaVaiTro dichVuChuanHoaMaVaiTro,
@@ -51,7 +51,7 @@ public class DichVuDangNhapUngDung {
         if (!dichVuCaptchaRedis.xacThucVaXoa(captchaId, captchaCode)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mã xác thực (CAPTCHA) không đúng hoặc đã hết hạn.");
         }
-        User user = userRepository.findByUsername(username.trim())
+        NguoiDung user = userRepository.findByUsername(username.trim())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sai tên đăng nhập hoặc mật khẩu."));
         if (!dichVuKiemTraMatKhau.khop(password, user.getPasswordHash())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sai tên đăng nhập hoặc mật khẩu.");

@@ -33,9 +33,6 @@ public class BoLocPhienToken implements HandlerInterceptor {
             return true;
         }
         String uri = request.getRequestURI();
-        if (!canBatBuoc(uri)) {
-            return true;
-        }
         String auth = request.getHeader("Authorization");
         NoiDungPhien payload = dichVuPhienToken.giaiMa(auth);
         if (payload == null) {
@@ -55,10 +52,6 @@ public class BoLocPhienToken implements HandlerInterceptor {
             }
         }
         return true;
-    }
-
-    private static boolean canBatBuoc(String uri) {
-        return uri.startsWith("/api/admin") || uri.contains("/api/permission/getMenuList");
     }
 
     private static void viet401(HttpServletResponse response, String message) throws Exception {

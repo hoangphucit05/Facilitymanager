@@ -1,8 +1,8 @@
 package com.facilitymanager.service;
 
 import com.facilitymanager.captcha.DichVuCaptchaRedis;
-import com.facilitymanager.entity.User;
-import com.facilitymanager.repository.UserRepository;
+import com.facilitymanager.entity.NguoiDung;
+import com.facilitymanager.repository.NguoiDungRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +14,12 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class DichVuDangKyUngDung {
 
-    private final UserRepository userRepository;
+    private final NguoiDungRepository userRepository;
     private final DichVuCaptchaRedis dichVuCaptchaRedis;
     private final DichVuKiemTraMatKhau dichVuKiemTraMatKhau;
 
     public DichVuDangKyUngDung(
-            UserRepository userRepository,
+            NguoiDungRepository userRepository,
             DichVuCaptchaRedis dichVuCaptchaRedis,
             DichVuKiemTraMatKhau dichVuKiemTraMatKhau
     ) {
@@ -46,7 +46,7 @@ public class DichVuDangKyUngDung {
         if (userRepository.existsByUsername(u)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Tên đăng nhập đã được sử dụng.");
         }
-        User user = new User();
+        NguoiDung user = new NguoiDung();
         user.setUsername(u);
         user.setPasswordHash(dichVuKiemTraMatKhau.maHoa(password));
         user.setFullName(fullName.trim());

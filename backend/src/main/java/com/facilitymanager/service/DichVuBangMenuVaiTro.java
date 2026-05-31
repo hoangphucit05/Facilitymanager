@@ -2,7 +2,7 @@ package com.facilitymanager.service;
 
 import com.facilitymanager.entity.QuyenMenuUngDung;
 import com.facilitymanager.repository.QuyenMenuUngDungRepository;
-import com.facilitymanager.vo.MenuVo;
+import com.facilitymanager.vo.VoMenu;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,7 @@ public class DichVuBangMenuVaiTro {
     }
 
     @Transactional(readOnly = true)
-    public List<MenuVo> layCayMenuChoMaVaiTro(String maVaiTroChuanHoa) {
+    public List<VoMenu> layCayMenuChoMaVaiTro(String maVaiTroChuanHoa) {
         Set<Long> duocPhep = dichVuHieuLucVaiTro.layTapIdMenuHieuLucTheoMa(maVaiTroChuanHoa);
         if (duocPhep.isEmpty()) {
             return List.of();
@@ -52,17 +52,17 @@ public class DichVuBangMenuVaiTro {
     }
 
     @Transactional(readOnly = true)
-    public List<MenuVo> layCayMenuDayDu() {
+    public List<VoMenu> layCayMenuDayDu() {
         return xayCay(quyenMenuUngDungRepository.findAllCoCha());
     }
 
-    private List<MenuVo> xayCay(List<QuyenMenuUngDung> nodes) {
+    private List<VoMenu> xayCay(List<QuyenMenuUngDung> nodes) {
         if (nodes.isEmpty()) {
             return List.of();
         }
-        Map<Long, MenuVo> voMap = new HashMap<>();
+        Map<Long, VoMenu> voMap = new HashMap<>();
         for (QuyenMenuUngDung m : nodes) {
-            MenuVo v = new MenuVo();
+            VoMenu v = new VoMenu();
             v.setId(m.getId());
             v.setParentId(m.getParentIdOrNull());
             v.setTitle(m.getTitle());
@@ -74,12 +74,12 @@ public class DichVuBangMenuVaiTro {
             v.setStatus(0);
             voMap.put(m.getId(), v);
         }
-        List<MenuVo> roots = new ArrayList<>();
-        for (MenuVo v : voMap.values()) {
+        List<VoMenu> roots = new ArrayList<>();
+        for (VoMenu v : voMap.values()) {
             if (v.getParentId() == null) {
                 roots.add(v);
             } else {
-                MenuVo p = voMap.get(v.getParentId());
+                VoMenu p = voMap.get(v.getParentId());
                 if (p != null) {
                     p.getChildren().add(v);
                 } else {
@@ -91,7 +91,7 @@ public class DichVuBangMenuVaiTro {
         if (roots.size() == 1 && Objects.equals(roots.get(0).getPermissionType(), LOAI_NAV)) {
             return roots;
         }
-        MenuVo wrap = new MenuVo();
+        VoMenu wrap = new VoMenu();
         wrap.setId(0L);
         wrap.setTitle("Menu");
         wrap.setName("root_nav");
@@ -101,9 +101,9 @@ public class DichVuBangMenuVaiTro {
         return List.of(wrap);
     }
 
-    private void sapXepDeQuy(List<MenuVo> list) {
+    private void sapXepDeQuy(List<VoMenu> list) {
         list.sort(Comparator.comparingInt(a -> a.getSortOrder() != null ? a.getSortOrder() : 0));
-        for (MenuVo v : list) {
+        for (VoMenu v : list) {
             if (!v.getChildren().isEmpty()) {
                 sapXepDeQuy(v.getChildren());
             }

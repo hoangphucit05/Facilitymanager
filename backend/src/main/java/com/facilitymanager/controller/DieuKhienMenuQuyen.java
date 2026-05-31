@@ -3,7 +3,7 @@ package com.facilitymanager.controller;
 import com.facilitymanager.dto.KetQuaApi;
 import com.facilitymanager.security.BoLocPhienToken;
 import com.facilitymanager.service.DichVuBangMenuVaiTro;
-import com.facilitymanager.vo.MenuVo;
+import com.facilitymanager.vo.VoMenu;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +24,7 @@ public class DieuKhienMenuQuyen {
     }
 
     @GetMapping("/getMenuList")
-    public KetQuaApi<List<MenuVo>> getMenuList(HttpServletRequest request) {
+    public KetQuaApi<List<VoMenu>> getMenuList(HttpServletRequest request) {
         String roleCode = (String) request.getAttribute(BoLocPhienToken.ATTR_ROLE);
         if (roleCode == null || roleCode.isBlank()) {
             return KetQuaApi.ok(List.of());
