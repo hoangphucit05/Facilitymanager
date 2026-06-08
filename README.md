@@ -1,135 +1,255 @@
-# Facility Manager
+# Hệ thống Quản lý Cơ sở Vật chất UTC2
 
-## Overview
+## 1. Tổng quan project
 
-This repository contains a **facility / asset management** web application: a **Spring Boot** REST API and a **static HTML/CSS/JavaScript** frontend (`frontend/src/` → `npm run build` → `frontend/dist/`).
+**Facility Manager** là ứng dụng web quản lý cơ sở vật chất, phục vụ công tác quản lý phòng học, tài sản, người dùng và phân quyền tại UTC2.
 
-It is **not** a React + Tailwind stack; the UI is classic multi-page HTML with shared assets under `frontend/src/assets/`.
+Hệ thống được xây dựng theo mô hình **Client–Server**:
 
----
+| Thành phần | Mô tả |
+|------------|--------|
+| **Frontend** | Giao diện web đa trang, gọi REST API |
+| **Backend** | Xử lý nghiệp vụ, xác thực, phân quyền RBAC |
+| **MySQL** | Lưu trữ dữ liệu nghiệp vụ |
+| **Redis** | Captcha và phiên đăng nhập (token) |
 
-## Getting Started
-
-Follow these instructions to get a copy of the project up and running on your local machine for **development** and **testing**.
-
-### Prerequisites
-
-| Tool | Version / notes |
-|------|-----------------|
-| **Node.js** | 18+ (cho `frontend/` — `npm run build`) |
-| **npm** | Comes with Node |
-| **JDK** | **21** (`JAVA_HOME` must point to JDK 21) |
-| **Maven** | 3.9+ |
-| **MySQL** | 8.x |
-| **Redis** | 6+ (required by the backend for captcha and token storage) |
-| **MySQL client** | `mysql` CLI để import `database/mysql/schema.sql`
-
-An IDE (IntelliJ IDEA, Eclipse, or VS Code with Java extensions) is optional.
-
-**Backend libraries** (declared in `backend/pom.xml`): Spring Boot 4 (Web MVC, Data JPA, Security, Data Redis), Hibernate/JPA, MySQL driver, MapStruct, Springdoc OpenAPI (Swagger UI).
+**Chức năng chính:**
+- Đăng nhập / đăng xuất (captcha, token Redis)
+- Quản lý người dùng, vai trò và phân quyền menu (Admin, Manager, Staff, Student)
+- Quản lý phòng học, danh mục, tài sản
+- Kiểm kê định kỳ, yêu cầu xử lý / sửa chữa
+- Thống kê tài sản
 
 ---
 
-## Installation
+## 2. Công cụ sử dụng
 
-1. **Clone** the repository to your local machine:
-
-   ```bash
-   git clone <your-repository-url>
-   ```
-
-2. **Navigate** into the project directory (repository root):
-
-   ```bash
-   cd Facility_manager_project
-   ```
-
-3. **Import database:**
-
-   ```bash
-   mysql -u root -p --default-character-set=utf8mb4 < database/mysql/schema.sql
-   mysql -u root -p --default-character-set=utf8mb4 < database/mysql/seed_tkb.sql
-   ```
-
-   File `schema.sql` tự tạo database `asset_management`. Với Docker Compose, script chạy tự động khi khởi tạo MySQL lần đầu.
-
-   Hibernate `ddl-auto` is `none`; schema được quản lý bởi file SQL này.
-
-4. **Start Redis** on `127.0.0.1:6379` (or set `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD` to match your environment).
-
-5. **Backend — install dependencies** (Maven downloads dependencies automatically on first run):
-
-   ```bash
-   cd backend
-   mvn -q -DskipTests dependency:go-offline
-   ```
-
-   Adjust `spring.datasource.*` in `application.yml` (or use `MYSQL_PASSWORD` and related env vars) so the app can reach MySQL.
-
-6. **Frontend:**
-
-   ```bash
-   cd frontend
-   npm install
-   npm run build
-   npm run dev
-   ```
-
-   Docker Compose builds frontend from `src/` automatically.
+| Lớp | Công nghệ | Mục đích |
+|-----|-----------|----------|
+| **Frontend** | HTML5, CSS3, JavaScript | Giao diện web, gọi API |
+| **Backend** | Java 21, Spring Boot | REST API, xử lý nghiệp vụ |
+| **ORM** | Spring Data JPA, Hibernate | Ánh xạ entity ↔ MySQL |
+| **Database** | MySQL 8 | Lưu dữ liệu hệ thống |
+| **Cache** | Redis | Captcha, phiên đăng nhập |
+| **Build** | Maven, npm | Build backend & frontend |
+| **DevOps** | Docker, Docker Compose, Nginx | Đóng gói và triển khai |
+| **API docs** | Swagger (Springdoc) | Kiểm thử và tài liệu API |
+| **Khác** | MapStruct, i18n, UUID, Git | Map DTO, đa ngôn ngữ, định danh, quản lý mã nguồn |
 
 ---
 
-## Available Scripts
+## 3. Cấu trúc thư mục
 
-### Backend (`backend/`)
+### 3.1 Backend
 
-Run these from the `backend` directory.
-
-| Command | Description |
-|---------|-------------|
-| `mvn spring-boot:run` | Runs the Spring Boot app in development mode. Default API base: **http://localhost:8080**. Health: `/api/health`. Swagger UI: `/swagger-ui/index.html`. |
-| `mvn -DskipTests package` | Builds the executable JAR under `target/` (e.g. `facility-manager-backend-0.0.1-SNAPSHOT.jar`). |
-| `java -jar target/facility-manager-backend-0.0.1-SNAPSHOT.jar` | Runs the packaged JAR (after `package`). |
-| `mvn -q -DskipTests compile` | Compiles Java sources without running tests (similar in spirit to a typecheck gate). |
-
-Main class: `com.facilitymanager.UngDungHeThong`.
-
-If `mvn compile` fails with missing types (e.g. `MenuVo`, `User`, `UserRepository`), your checkout is incomplete compared to the upstream branch—restore the missing Java files or sync again before `spring-boot:run`.
-
----
-
-### Frontend (`frontend/`)
-
-| Command | Description |
-|---------|-------------|
-| `npm run build` | Copy `src/` → `dist/` |
-| `npm run dev` | Build then serve `dist/` on port 5173 |
-
-**API base URL:** set in HTML before loading `api-client.js`:
-
-```html
-<script>window.API_BASE_URL = 'http://localhost:8080';</script>
+```
+backend/
+├── .dockerignore
+├── .mvn/
+├── Dockerfile
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── README.md
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── com/facilitymanager/
+│       │       ├── captcha/          # Sinh & kiểm tra captcha (Redis)
+│       │       ├── config/           # Cấu hình Spring, Redis, CORS, Swagger
+│       │       ├── controller/       # REST API (auth, user, room, asset, RBAC…)
+│       │       ├── dto/              # Request / Response DTO
+│       │       ├── entity/           # Entity ánh xạ bảng MySQL (JPA)
+│       │       ├── exception/        # Xử lý ngoại lệ toàn cục
+│       │       ├── repository/       # Spring Data JPA Repository
+│       │       ├── security/         # Token, interceptor phân quyền
+│       │       ├── service/          # Tầng nghiệp vụ
+│       │       ├── vo/               # View Object (menu, phân trang…)
+│       │       └── UngDungHeThong.java
+│       └── resources/
+│           └── application.yml       # Cấu hình datasource, Redis, JPA
+└── target/                           # Output build Maven (không commit)
 ```
 
+### 3.2 Frontend
+
+```
+frontend/
+├── Dockerfile
+├── nginx.conf
+├── package.json
+├── scripts/
+│   └── build.mjs                     # Copy src/ → dist/
+├── src/                              # Mã nguồn — chỉnh sửa tại đây
+│   ├── index.html
+│   ├── pages/
+│   │   ├── auth/                     # login, register, unauthorized
+│   │   ├── dashboard/                # phòng, tài sản, kiểm kê, yêu cầu…
+│   │   ├── profile/                  # user, RBAC, liên hệ
+│   │   └── student/                  # tạo / gửi / lưu yêu cầu
+│   ├── assets/
+│   │   ├── css/                      # base, layout, components, pages
+│   │   ├── js/
+│   │   │   ├── api/                  # api-client.js
+│   │   │   ├── auth/                 # login, guard, session
+│   │   │   ├── components/
+│   │   │   ├── pages/                # logic từng trang
+│   │   │   ├── shared/               # sidebar, menu, i18n, permission
+│   │   │   └── student/
+│   │   ├── images/
+│   │   ├── icons/
+│   │   └── fonts/
+│   └── locales/                      # vi.json, en.json, ja.json
+├── dist/                             # Build output (npm run build)
+└── docs/
+    ├── api-contract.md
+    └── rbac.md
+```
+
+### 3.3 Database
+
+```
+database/
+└── mysql/
+    ├── schema.sql                    # Tạo DB, 12 bảng, seed users & RBAC
+    ├── seed_tkb.sql                  # Thời khóa biểu (room_usage_slots)
+    ├── README.md
+    ├── backup/
+    └── data/
+```
+
+**12 bảng MySQL:**
+
+| Nhóm | Bảng | Mục đích |
+|------|------|----------|
+| Nghiệp vụ | `users` | Tài khoản & vai trò người dùng |
+| | `categories` | Danh mục loại tài sản |
+| | `rooms` | Thông tin phòng học |
+| | `assets` | Tài sản, thiết bị |
+| | `requests` | Yêu cầu xử lý / sửa chữa |
+| | `audits` | Đợt kiểm kê định kỳ |
+| Hỗ trợ | `audit_details` | Chi tiết kiểm kê từng tài sản |
+| | `room_usage_slots` | Lịch sử dụng phòng (TKB) |
+| | `asset_transfers` | Lịch sử điều chuyển tài sản |
+| | `fm_menu_permissions` | Menu & quyền chức năng |
+| | `fm_roles` | Vai trò (ADMIN, MANAGER, STAFF, STUDENT) |
+| | `fm_role_menu` | Phân quyền role ↔ menu |
+
 ---
 
-## Suggested dev startup order
+## 4. Chạy bằng Docker
 
-1. MySQL (`schema.sql` + `seed_tkb.sql` đã import)  
-2. Redis  
-3. `mvn spring-boot:run` in `backend/`  
-4. `npm run dev` in `frontend/`  
+### 4.1 Yêu cầu
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (hoặc Docker Engine + Docker Compose v2)
+- Port trống: **3000**, **3307**, **6379**, **8080**
+
+### 4.2 Khởi động
+
+Tại **thư mục gốc** repository:
+
+```bash
+docker compose up -d --build
+```
+
+| Service | Container | Port (host) | Mô tả |
+|---------|-----------|-------------|--------|
+| `mysql` | facility-mysql | **3307** → 3306 | MySQL 8.4, tự import `schema.sql` + `seed_tkb.sql` lần đầu |
+| `redis` | facility-redis | **6379** | Redis — captcha & phiên đăng nhập |
+| `backend` | facility-backend | **8080** | Spring Boot API |
+| `frontend` | facility-frontend | **3000** → 80 | Nginx phục vụ giao diện web |
+
+### 4.3 Truy cập
+
+| Mục | URL |
+|-----|-----|
+| Giao diện web | http://localhost:3000 |
+| API Backend | http://localhost:8080 |
+| Health check | http://localhost:8080/api/health |
+| Swagger UI | http://localhost:8080/swagger-ui/index.html |
+
+**Tài khoản demo:**
+
+| Username | Password | Vai trò |
+|----------|----------|---------|
+| `adminutc2` | `123456` | ADMIN |
+| `truongkhoa001` | `123456` | MANAGER |
+| `nv001` | `123456` | STAFF |
+| `sv001` | `123456` | STUDENT |
+
+### 4.4 Lệnh hữu ích
+
+```bash
+docker compose ps
+docker compose logs -f backend
+docker compose down
+docker compose down -v    # reset DB (xóa volume MySQL)
+```
+
+> **Lưu ý:** MySQL chỉ import script khi volume mới. Muốn reset DB: `docker compose down -v` rồi `docker compose up -d --build`.
 
 ---
 
-## Further documentation
+## 5. Giao diện hệ thống
 
-- `backend/README.md` — Java package layout  
-- `frontend/docs/api-contract.md` — form fields ↔ API mapping  
-- `database/mysql/README.md` — MySQL script notes  
+### Đăng nhập
+
+![Giao diện đăng nhập](docs/screenshots/01-dang-nhap.png)
+
+### Captcha xác thực & Đăng ký
+
+| Captcha xác thực | Đăng ký |
+|:---:|:---:|
+| ![Captcha](docs/screenshots/02-captcha.png) | ![Đăng ký](docs/screenshots/03-dang-ky.png) |
+
+### Trang chủ (Admin)
+
+![Trang chủ Admin](docs/screenshots/04-trang-chu.png)
+
+### Quản lý người dùng
+
+![Quản lý người dùng](docs/screenshots/05-quan-ly-user.png)
+
+### Bản đồ phòng học
+
+![Bản đồ phòng học](docs/screenshots/06-ban-do-phong.png)
+
+### Quản lý danh mục
+
+![Quản lý danh mục](docs/screenshots/07-quan-ly-danh-muc.png)
+
+### Quản lý tài sản
+
+![Quản lý tài sản](docs/screenshots/08-quan-ly-tai-san.png)
+
+### Thống kê tài sản
+
+![Thống kê tài sản](docs/screenshots/09-thong-ke.png)
+
+### Quản lý công việc — Chờ xử lý
+
+![Chờ xử lý](docs/screenshots/10-cho-xu-ly.png)
+
+### Kiểm kê định kỳ
+
+![Kiểm kê định kỳ](docs/screenshots/11-kiem-ke.png)
+
+### Liên hệ
+
+![Liên hệ người dùng](docs/screenshots/12-lien-he.png)
+
+### Phân quyền vai trò
+
+![Quản lý vai trò](docs/screenshots/13-phan-quyen.png)
 
 ---
 
-## License
+## 6. Nhóm thực hiện
 
-Set according to your organization (no default license file is implied here).
+- Trần Tiến Hợp
+- Võ Hoàng Phúc
+- Đỗ Nhật Thanh
+- Trần Huỳnh Hòa Phúc
+
+**Môn:** Công nghệ Java — **GVHD:** ThS. Trần Thị Dung  
+**Trường:** ĐH Giao thông Vận tải — Phân hiệu TP. Hồ Chí Minh
